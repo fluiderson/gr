@@ -10,14 +10,14 @@
 //!
 //! External consumers — plugin authors, dashboards, integration tests,
 //! sibling modules calling AM via `ClientHub` — depend on **this**
-//! crate, never on the impl crate (`cf-account-management`), so impl-side
+//! crate, never on the impl crate (`cyberware-account-management`), so impl-side
 //! churn (sea-orm migrations, axum wiring, tokio runtime) does not
 //! propagate as a contract break.
 //!
 //! # Mapping summary (AIP-193)
 //!
 //! Every AM domain failure converts to a canonical category at the
-//! impl-crate boundary (`cf-account-management::domain::error`). The
+//! impl-crate boundary (`cyberware-account-management::domain::error`). The
 //! resulting HTTP status codes follow Google AIP-193 verbatim:
 //!
 //! | AM domain shape | Canonical category | HTTP |
@@ -26,9 +26,10 @@
 //! | `NotFound` / `MetadataSchemaNotRegistered` / `MetadataEntryNotFound` | `NotFound` | 404 |
 //! | `TenantHasChildren` / `TenantHasResources` / `TypeNotAllowed` / `TenantDepthExceeded` / `PendingExists` / `InvalidActorForTransition` / `AlreadyResolved` / `Conflict` | `FailedPrecondition` | 400 |
 //! | `CrossTenantDenied` | `PermissionDenied` | 403 |
-//! | `ServiceUnavailable` (covers former `IdpUnavailable`) | `ServiceUnavailable` | 503 |
+//! | `ServiceUnavailable` (generic infra outage / `IdP` plugin failure) | `ServiceUnavailable` | 503 |
+//! | `IdpUnavailable` (bootstrap retry-loop sentinel; same wire envelope as `ServiceUnavailable`) | `ServiceUnavailable` | 503 |
 //! | `UnsupportedOperation` (former `IdpUnsupportedOperation`) | `Unimplemented` | 501 |
-//! | `AuditAlreadyRunning` | `ResourceExhausted` | 429 |
+//! | `IntegrityCheckInProgress` | `ResourceExhausted` | 429 |
 //! | `Internal` + retry-exhausted serialization conflict (`Aborted`) + unique violation (`AlreadyExists`) + DB unavailability (`ServiceUnavailable`) | as listed | 500 / 409 / 409 / 503 |
 //!
 //! `ServiceUnavailable` carries `retry_after_seconds`; `Aborted` carries
