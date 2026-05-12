@@ -16,6 +16,52 @@ use crate::models::{
 /// network error) without aborting the stream. The outer `Result<PluginStream, _>`
 /// returned by the trait methods represents errors that occur *before* the stream
 /// starts (e.g., invalid config, plugin unavailable).
+///
+/// # `'static` lifetime requirement
+///
+/// `PluginStream` is `BoxStream<'static, _>`, meaning the stream must own
+/// everything it touches. Chat Engine drives the stream to completion *after*
+/// the trait method returns, so any reference into `&self` would dangle once
+/// the call frame unwinds.
+///
+/// The compiler error you will see if you violate this is a lifetime mismatch
+/// pointing at the inside of your `async_stream::stream! { … }`,
+/// `futures::stream::unfold(…)`, or async closure — *not* at the trait
+/// signature. The fix is to detach from `&self` before entering the stream body:
+///
+/// ```ignore
+/// // ❌ Captures `&self.config` — won't satisfy `'static`.
+/// async fn on_message(&self, ctx: MessagePluginCtx)
+///     -> Result<PluginStream, PluginError>
+/// {
+///     Ok(async_stream::stream! {
+///         let response = self.config.client.send(&ctx.messages).await?;
+///         // ...
+///     }.boxed())
+/// }
+///
+/// // ✅ Clone the bits you need out of `self` first.
+/// async fn on_message(&self, ctx: MessagePluginCtx)
+///     -> Result<PluginStream, PluginError>
+/// {
+///     let client = self.config.client.clone();
+///     Ok(async_stream::stream! {
+///         let response = client.send(&ctx.messages).await?;
+///         // ...
+///     }.boxed())
+/// }
+///
+/// // ✅ Or hold the plugin in an `Arc` and clone the handle.
+/// // (works well if you need many fields and `Clone` on each is awkward)
+/// // self: Arc<MyPlugin> at the call site, then:
+/// let me = Arc::clone(&self);
+/// Ok(async_stream::stream! {
+///     me.do_things(...).await;
+/// }.boxed())
+/// ```
+///
+/// For non-streaming responses, prefer [`stream_from_events`] — it side-steps
+/// the issue entirely by collecting all events synchronously before returning.
 pub type PluginStream = BoxStream<'static, Result<StreamingEvent, PluginError>>;
 
 /// Helper to build an empty plugin stream (default no-op responses).
@@ -37,6 +83,9 @@ pub fn stream_from_events(events: Vec<StreamingEvent>) -> PluginStream {
 #[derive(Debug, Clone)]
 pub struct SessionPluginCtx {
     pub session_type_id: Uuid,
+    /// `None` during [`ChatEngineBackendPlugin::on_session_type_configured`]
+    /// (no session exists yet); `Some` for all other lifecycle hooks
+    /// (`on_session_created`, `on_session_updated`, `on_session_summary`).
     pub session_id: Option<Uuid>,
     pub call_ctx: PluginCallContext,
 }
@@ -130,6 +179,14 @@ pub struct PluginCallContext {
     /// and return `PluginError::Transient("cancelled")` (or similar) when
     /// the signal fires. `cancel.is_cancelled()` is also available for
     /// pre-flight checks before expensive operations.
+    ///
+    /// Clones of this token share the same cancellation state. When Chat Engine
+    /// cancels, all clones observe the signal simultaneously — and conversely,
+    /// calling `.cancel()` on any clone (including one obtained by cloning the
+    /// enclosing `PluginCallContext`) cancels every other holder, including
+    /// Chat Engine's parent token. If you fan out concurrent sub-tasks that
+    /// need *independent* cancellation, derive child tokens with
+    /// [`CancellationToken::child_token`] rather than cloning.
     pub cancel: CancellationToken,
 }
 
@@ -391,6 +448,10 @@ pub trait ChatEngineBackendPlugin: Send + Sync {
     /// The outer `Result` reports failures *before* streaming starts (e.g., auth
     /// failure). Once a stream is returned, individual items may be `Err` to
     /// signal mid-stream failures (e.g., upstream disconnect).
+    ///
+    /// The returned [`PluginStream`] must be `'static` — it cannot borrow from
+    /// `&self`. See [`PluginStream`]'s docs for the idiomatic way to detach
+    /// captured state (clone fields out, or hold `self` in an `Arc`).
     async fn on_message(
         &self,
         _ctx: MessagePluginCtx,

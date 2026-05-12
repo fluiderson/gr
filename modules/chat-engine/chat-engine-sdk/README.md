@@ -27,9 +27,11 @@ Plugins implement this trait to hook into the Chat Engine lifecycle:
 ```rust
 use async_trait::async_trait;
 use chat_engine_sdk::{
-    ChatEngineBackendPlugin, Capability, HealthStatus, MessagePluginCtx,
-    PluginError, SessionPluginCtx,
+    stream_from_events, Capability, ChatEngineBackendPlugin, HealthStatus,
+    MessagePluginCtx, PluginError, PluginStream, SessionPluginCtx, StreamingChunkEvent,
+    StreamingCompleteEvent, StreamingEvent, StreamingStartEvent,
 };
+use uuid::Uuid;
 
 pub struct MyPlugin {
     instance_id: String,
@@ -56,25 +58,49 @@ impl ChatEngineBackendPlugin for MyPlugin {
     async fn on_message(
         &self,
         ctx: MessagePluginCtx,
-    ) -> Result<Vec<String>, PluginError> {
-        // Process an incoming message; return response chunks.
-        Ok(vec!["hello from my plugin".into()])
+    ) -> Result<PluginStream, PluginError> {
+        // Emit a well-formed stream: Start -> Chunk(s) -> Complete.
+        let events = vec![
+            StreamingEvent::Start(StreamingStartEvent {
+                message_id: ctx.message_id,
+            }),
+            StreamingEvent::Chunk(StreamingChunkEvent {
+                message_id: ctx.message_id,
+                chunk: "hello from my plugin".into(),
+            }),
+            StreamingEvent::Complete(StreamingCompleteEvent {
+                message_id: ctx.message_id,
+                metadata: None,
+            }),
+        ];
+        Ok(stream_from_events(events))
     }
 
     async fn on_message_recreate(
         &self,
         ctx: MessagePluginCtx,
-    ) -> Result<Vec<String>, PluginError> {
-        // Regenerate response for an existing user message.
-        Ok(vec![])
+    ) -> Result<PluginStream, PluginError> {
+        // Regenerate: same shape as on_message — delegate.
+        self.on_message(ctx).await
     }
 
     async fn on_session_summary(
         &self,
         ctx: SessionPluginCtx,
-    ) -> Result<String, PluginError> {
-        // Generate a session summary.
-        Ok(String::new())
+    ) -> Result<PluginStream, PluginError> {
+        let summary_id = ctx.session_id.unwrap_or_else(Uuid::new_v4);
+        let events = vec![
+            StreamingEvent::Start(StreamingStartEvent { message_id: summary_id }),
+            StreamingEvent::Chunk(StreamingChunkEvent {
+                message_id: summary_id,
+                chunk: "session summary".into(),
+            }),
+            StreamingEvent::Complete(StreamingCompleteEvent {
+                message_id: summary_id,
+                metadata: None,
+            }),
+        ];
+        Ok(stream_from_events(events))
     }
 
     async fn health_check(&self) -> Result<HealthStatus, PluginError> {

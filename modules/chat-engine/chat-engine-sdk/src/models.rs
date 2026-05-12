@@ -13,9 +13,18 @@ use uuid::Uuid;
 pub struct TenantId(String);
 
 impl TenantId {
+    /// Constructs a `TenantId`, rejecting empty strings.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `s` is empty. An empty tenant id would silently scope queries
+    /// to no rows (or all rows, depending on the ORM) and so represents a
+    /// latent authorization bug; it must never reach the data layer.
     #[must_use]
     pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
+        let s = s.into();
+        assert!(!s.is_empty(), "TenantId must not be empty");
+        Self(s)
     }
 
     #[must_use]
@@ -31,13 +40,13 @@ impl TenantId {
 
 impl From<String> for TenantId {
     fn from(s: String) -> Self {
-        Self(s)
+        Self::new(s)
     }
 }
 
 impl From<&str> for TenantId {
     fn from(s: &str) -> Self {
-        Self(s.to_owned())
+        Self::new(s)
     }
 }
 
@@ -62,9 +71,17 @@ impl std::fmt::Display for TenantId {
 pub struct UserId(String);
 
 impl UserId {
+    /// Constructs a `UserId`, rejecting empty strings.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `s` is empty. An empty user id would defeat ownership checks
+    /// downstream and must never reach the data layer.
     #[must_use]
     pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
+        let s = s.into();
+        assert!(!s.is_empty(), "UserId must not be empty");
+        Self(s)
     }
 
     #[must_use]
@@ -80,13 +97,13 @@ impl UserId {
 
 impl From<String> for UserId {
     fn from(s: String) -> Self {
-        Self(s)
+        Self::new(s)
     }
 }
 
 impl From<&str> for UserId {
     fn from(s: &str) -> Self {
-        Self(s.to_owned())
+        Self::new(s)
     }
 }
 
@@ -104,7 +121,11 @@ impl std::fmt::Display for UserId {
 
 /// A chat session: the top-level container that groups a conversation's
 /// messages, tenant/user ownership, backend plugin binding, and lifecycle.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+///
+/// `Debug` is implemented manually to redact `share_token` — it is a
+/// cryptographic bearer secret that grants read-only access to the session
+/// and must never appear in logs, tracing spans, or test output.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Session {
     /// Unique session identifier (primary key).
     pub session_id: Uuid,
@@ -138,6 +159,30 @@ pub struct Session {
     /// Last-modified timestamp (UTC, RFC3339 on the wire).
     #[serde(with = "time::serde::rfc3339")]
     pub updated_at: OffsetDateTime,
+}
+
+impl std::fmt::Debug for Session {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // `share_token` is a bearer secret that grants read-only access to
+        // this session — anyone with the value can hijack the share link.
+        // We surface presence/absence so observability is preserved without
+        // leaking the token.
+        let share_token_redacted: Option<&'static str> =
+            self.share_token.as_ref().map(|_| "<redacted>");
+        f.debug_struct("Session")
+            .field("session_id", &self.session_id)
+            .field("tenant_id", &self.tenant_id)
+            .field("user_id", &self.user_id)
+            .field("client_id", &self.client_id)
+            .field("session_type_id", &self.session_type_id)
+            .field("enabled_capabilities", &self.enabled_capabilities)
+            .field("metadata", &self.metadata)
+            .field("lifecycle_state", &self.lifecycle_state)
+            .field("share_token", &share_token_redacted)
+            .field("created_at", &self.created_at)
+            .field("updated_at", &self.updated_at)
+            .finish()
+    }
 }
 
 /// Lifecycle state of a session.
@@ -206,6 +251,42 @@ impl LifecycleState {
 impl std::fmt::Display for LifecycleState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::LifecycleState;
+
+    #[test]
+    fn every_documented_valid_transition_is_allowed() {
+        // Mirrors the doc comment on `LifecycleState` exactly — change one,
+        // change the other.
+        let valid_edges = [
+            (LifecycleState::Active, LifecycleState::Archived),
+            (LifecycleState::Active, LifecycleState::SoftDeleted),
+            (LifecycleState::Active, LifecycleState::HardDeleted),
+            (LifecycleState::Archived, LifecycleState::Active),
+            (LifecycleState::Archived, LifecycleState::SoftDeleted),
+            (LifecycleState::Archived, LifecycleState::HardDeleted),
+            (LifecycleState::SoftDeleted, LifecycleState::Active),
+            (LifecycleState::SoftDeleted, LifecycleState::HardDeleted),
+        ];
+        for (from, to) in valid_edges {
+            assert!(
+                from.can_transition_to(&to),
+                "{from:?} -> {to:?} should be a valid transition"
+            );
+        }
+    }
+
+    #[test]
+    fn representative_invalid_transitions_are_rejected() {
+        // HardDeleted is terminal — nothing leaves it.
+        assert!(!LifecycleState::HardDeleted.can_transition_to(&LifecycleState::Active));
+        assert!(!LifecycleState::HardDeleted.can_transition_to(&LifecycleState::Archived));
+        // Self-loops are not real transitions.
+        assert!(!LifecycleState::Active.can_transition_to(&LifecycleState::Active));
     }
 }
 
@@ -411,7 +492,7 @@ pub enum StreamingEvent {
 
 /// Opens a stream for a given assistant message.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct StreamingStartEvent {
     /// ID of the assistant message being streamed.
     pub message_id: Uuid,
@@ -419,7 +500,7 @@ pub struct StreamingStartEvent {
 
 /// A single text fragment appended to the assistant message in flight.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct StreamingChunkEvent {
     /// ID of the assistant message this chunk belongs to.
     pub message_id: Uuid,
@@ -429,7 +510,7 @@ pub struct StreamingChunkEvent {
 
 /// Signals the assistant message is fully persisted and the stream is closing.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct StreamingCompleteEvent {
     /// ID of the completed assistant message.
     pub message_id: Uuid,
@@ -441,10 +522,166 @@ pub struct StreamingCompleteEvent {
 
 /// Signals a mid-stream failure; the assistant message may be incomplete.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct StreamingErrorEvent {
     /// ID of the assistant message that failed to stream.
     pub message_id: Uuid,
     /// Human-readable error description (may include plugin error code).
     pub error: String,
+}
+
+#[cfg(test)]
+mod streaming_event_wire_format_tests {
+    //! Pins the on-wire JSON shape of `StreamingEvent` and its payload structs
+    //! to the snake_case contract documented in `api/README.md`, `api/http-protocol.json`,
+    //! and ADR-0006 §Streaming Event Types. If you find yourself updating these
+    //! tests to change `message_id` → `messageId` (or similar), update the
+    //! OpenAPI spec and announce a breaking wire-protocol change first.
+
+    use super::{
+        StreamingChunkEvent, StreamingCompleteEvent, StreamingErrorEvent, StreamingEvent,
+        StreamingStartEvent,
+    };
+    use uuid::Uuid;
+
+    fn fixed_id() -> Uuid {
+        Uuid::parse_str("00000000-0000-0000-0000-000000000001").unwrap()
+    }
+
+    #[test]
+    fn start_event_serializes_with_snake_case() {
+        let json = serde_json::to_value(StreamingEvent::Start(StreamingStartEvent {
+            message_id: fixed_id(),
+        }))
+        .unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "type": "start",
+                "message_id": "00000000-0000-0000-0000-000000000001",
+            })
+        );
+    }
+
+    #[test]
+    fn chunk_event_serializes_with_snake_case() {
+        let json = serde_json::to_value(StreamingEvent::Chunk(StreamingChunkEvent {
+            message_id: fixed_id(),
+            chunk: "hello".into(),
+        }))
+        .unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "type": "chunk",
+                "message_id": "00000000-0000-0000-0000-000000000001",
+                "chunk": "hello",
+            })
+        );
+    }
+
+    #[test]
+    fn complete_event_serializes_with_snake_case() {
+        let json = serde_json::to_value(StreamingEvent::Complete(StreamingCompleteEvent {
+            message_id: fixed_id(),
+            metadata: Some(serde_json::json!({ "usage": { "input_units": 1 } })),
+        }))
+        .unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "type": "complete",
+                "message_id": "00000000-0000-0000-0000-000000000001",
+                "metadata": { "usage": { "input_units": 1 } },
+            })
+        );
+    }
+
+    #[test]
+    fn complete_event_omits_metadata_when_none() {
+        let json = serde_json::to_value(StreamingEvent::Complete(StreamingCompleteEvent {
+            message_id: fixed_id(),
+            metadata: None,
+        }))
+        .unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "type": "complete",
+                "message_id": "00000000-0000-0000-0000-000000000001",
+            })
+        );
+    }
+
+    #[test]
+    fn error_event_serializes_with_snake_case() {
+        let json = serde_json::to_value(StreamingEvent::Error(StreamingErrorEvent {
+            message_id: fixed_id(),
+            error: "upstream timeout".into(),
+        }))
+        .unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "type": "error",
+                "message_id": "00000000-0000-0000-0000-000000000001",
+                "error": "upstream timeout",
+            })
+        );
+    }
+}
+
+#[cfg(test)]
+mod id_validation_tests {
+    use super::{TenantId, UserId};
+
+    #[test]
+    fn tenant_id_accepts_non_empty() {
+        assert_eq!(TenantId::new("t").as_str(), "t");
+        assert_eq!(TenantId::from(String::from("t")).as_str(), "t");
+        assert_eq!(TenantId::from("t").as_str(), "t");
+    }
+
+    #[test]
+    #[should_panic(expected = "TenantId must not be empty")]
+    fn tenant_id_new_rejects_empty() {
+        let _ = TenantId::new("");
+    }
+
+    #[test]
+    #[should_panic(expected = "TenantId must not be empty")]
+    fn tenant_id_from_string_rejects_empty() {
+        let _ = TenantId::from(String::new());
+    }
+
+    #[test]
+    #[should_panic(expected = "TenantId must not be empty")]
+    fn tenant_id_from_str_rejects_empty() {
+        let _ = TenantId::from("");
+    }
+
+    #[test]
+    fn user_id_accepts_non_empty() {
+        assert_eq!(UserId::new("u").as_str(), "u");
+        assert_eq!(UserId::from(String::from("u")).as_str(), "u");
+        assert_eq!(UserId::from("u").as_str(), "u");
+    }
+
+    #[test]
+    #[should_panic(expected = "UserId must not be empty")]
+    fn user_id_new_rejects_empty() {
+        let _ = UserId::new("");
+    }
+
+    #[test]
+    #[should_panic(expected = "UserId must not be empty")]
+    fn user_id_from_string_rejects_empty() {
+        let _ = UserId::from(String::new());
+    }
+
+    #[test]
+    #[should_panic(expected = "UserId must not be empty")]
+    fn user_id_from_str_rejects_empty() {
+        let _ = UserId::from("");
+    }
 }
