@@ -45,7 +45,6 @@ pub(in crate::domain::services) struct BindOverrides<'a> {
 pub(in crate::domain::services) async fn validate_bind_constraints(
     ctx: &SecurityContext,
     enforcer: &PolicyEnforcer,
-    credstore: &dyn CredStoreClientV1,
     ancestor: &Upstream,
     overrides: &BindOverrides<'_>,
 ) -> Result<(), DomainError> {
@@ -68,7 +67,7 @@ pub(in crate::domain::services) async fn validate_bind_constraints(
     // 2. Check per-field override permissions and sharing mode constraints.
 
     // Auth override.
-    if let Some(auth_override) = overrides.auth {
+    if overrides.auth.is_some() {
         match ancestor.auth.as_ref().map(|a| a.sharing) {
             Some(SharingMode::Enforce) => {
                 return Err(DomainError::validation(
@@ -91,14 +90,6 @@ pub(in crate::domain::services) async fn validate_bind_constraints(
                     )
                     .await?;
             }
-        }
-
-        // Validate secret_ref accessibility regardless of sharing mode —
-        // the descendant's own secret must still be reachable.
-        if let Some(ref config) = auth_override.config
-            && let Some(raw_ref) = config.get("secret_ref")
-        {
-            validate_secret_ref_accessible(ctx, credstore, raw_ref).await?
         }
     }
 
@@ -161,7 +152,7 @@ pub(in crate::domain::services) async fn validate_bind_constraints(
 /// Validate that a `secret_ref` is accessible to the requesting tenant via
 /// `cred_store`. Per `cpt-cf-oagw-principle-cred-isolation`, if the secret
 /// is not accessible, the request is rejected (fail-closed).
-async fn validate_secret_ref_accessible(
+pub(in crate::domain::services) async fn validate_secret_ref_accessible(
     ctx: &SecurityContext,
     credstore: &dyn CredStoreClientV1,
     raw_ref: &str,
@@ -196,7 +187,6 @@ pub(in crate::domain::services) async fn validate_ancestor_bind(
     ctx: &SecurityContext,
     upstreams: &dyn crate::domain::repo::UpstreamRepository,
     enforcer: &PolicyEnforcer,
-    credstore: &dyn CredStoreClientV1,
     tenant_chain: &[uuid::Uuid],
     alias: &str,
     overrides: &BindOverrides<'_>,
@@ -204,8 +194,7 @@ pub(in crate::domain::services) async fn validate_ancestor_bind(
     for &ancestor_tid in &tenant_chain[1..] {
         match upstreams.get_by_alias(ancestor_tid, alias).await {
             Ok(ancestor_upstream) => {
-                validate_bind_constraints(ctx, enforcer, credstore, &ancestor_upstream, overrides)
-                    .await?;
+                validate_bind_constraints(ctx, enforcer, &ancestor_upstream, overrides).await?;
                 break; // Only check closest ancestor with matching alias.
             }
             Err(crate::domain::repo::RepositoryError::NotFound { .. }) => continue,

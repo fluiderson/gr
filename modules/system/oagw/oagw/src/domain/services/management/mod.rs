@@ -19,8 +19,11 @@ use crate::domain::repo::{RouteRepository, UpstreamRepository};
 
 #[cfg(test)]
 use alias::compute_derived_alias;
-use alias::{enforce_alias_create, enforce_alias_update, normalize_alias};
-use bind::{BindOverrides, validate_ancestor_bind};
+use alias::{
+    enforce_alias_create_derived, enforce_alias_create_with, enforce_alias_update_derived,
+    enforce_alias_update_with, normalize_alias,
+};
+use bind::{BindOverrides, validate_ancestor_bind, validate_secret_ref_accessible};
 use budget::validate_budget_config;
 #[cfg(test)]
 use merge::compute_effective_config;
@@ -95,7 +98,10 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
         }
 
         // Enforce alias derivation / explicit rules.
-        let alias = enforce_alias_create(req.alias.as_deref(), &req.server.endpoints)?;
+        let alias = match req.alias.as_deref() {
+            Some(user_alias) => enforce_alias_create_with(user_alias, &req.server.endpoints)?,
+            None => enforce_alias_create_derived(&req.server.endpoints)?,
+        };
 
         let tenant_id = ctx.subject_tenant_id();
         let id = req.id.unwrap_or_else(Uuid::new_v4);
@@ -107,7 +113,6 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
             ctx,
             &*self.upstreams,
             &self.policy_enforcer,
-            self.credstore.as_ref(),
             &tenant_chain,
             &alias,
             &BindOverrides {
@@ -118,6 +123,14 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
             },
         )
         .await?;
+
+        // Verify the descendant's secret_ref is reachable (fail-closed).
+        if let Some(ref auth) = req.auth
+            && let Some(ref config) = auth.config
+            && let Some(raw_ref) = config.get("secret_ref")
+        {
+            validate_secret_ref_accessible(ctx, self.credstore.as_ref(), raw_ref).await?;
+        }
 
         self.validate_budget_allocation(ctx, &tenant_chain, &alias, req.rate_limit.as_ref())
             .await?;
@@ -188,12 +201,19 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
         // Enforce alias re-evaluation when endpoints change.
         let endpoints_changed = existing.server.endpoints != old_endpoints;
         if endpoints_changed {
-            let alias = enforce_alias_update(
-                req.alias.as_deref(),
-                &existing.server.endpoints,
-                &existing.alias,
-                &old_endpoints,
-            )?;
+            let alias = match req.alias.as_deref() {
+                Some(user_alias) => enforce_alias_update_with(
+                    user_alias,
+                    &existing.server.endpoints,
+                    &existing.alias,
+                    &old_endpoints,
+                )?,
+                None => enforce_alias_update_derived(
+                    &existing.server.endpoints,
+                    &existing.alias,
+                    &old_endpoints,
+                )?,
+            };
             existing.alias = alias;
         } else if let Some(ref user_alias) = req.alias {
             let normalized = normalize_alias(user_alias);
@@ -228,7 +248,6 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
             ctx,
             &*self.upstreams,
             &self.policy_enforcer,
-            self.credstore.as_ref(),
             &tenant_chain,
             &existing.alias,
             &BindOverrides {
@@ -239,6 +258,14 @@ impl ControlPlaneService for ControlPlaneServiceImpl {
             },
         )
         .await?;
+
+        // Verify the descendant's secret_ref is reachable (fail-closed).
+        if let Some(ref auth) = req.auth
+            && let Some(ref config) = auth.config
+            && let Some(raw_ref) = config.get("secret_ref")
+        {
+            validate_secret_ref_accessible(ctx, self.credstore.as_ref(), raw_ref).await?;
+        }
 
         self.validate_budget_allocation(
             ctx,

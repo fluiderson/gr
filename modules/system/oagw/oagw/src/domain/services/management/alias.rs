@@ -146,52 +146,63 @@ pub(super) fn common_domain_suffix(hosts: &[String]) -> Option<String> {
     Some(candidate)
 }
 
-/// Enforce alias rules on upstream **creation**.
+/// Enforce alias rules on upstream **creation** when the user provided an alias.
 ///
-/// - Hostname-derivable endpoints: alias is auto-derived; user-provided alias
-///   is rejected with `400 Validation`.
-/// - IP or non-derivable endpoints: explicit alias is required.
-pub(in crate::domain::services) fn enforce_alias_create(
-    user_alias: Option<&str>,
+/// - Hostname-derivable endpoints: user-provided alias is rejected unless it
+///   exactly matches the derived value.
+/// - IP or non-derivable endpoints: the explicit alias is accepted.
+pub(in crate::domain::services) fn enforce_alias_create_with(
+    user_alias: &str,
     endpoints: &[Endpoint],
 ) -> Result<String, DomainError> {
     match compute_derived_alias(endpoints) {
         Some(derived) => {
-            if let Some(user) = user_alias {
-                // Reject user-provided alias when derivation is possible.
-                let normalized_user = normalize_alias(user);
-                if normalized_user != derived {
-                    return Err(DomainError::validation(format!(
-                        "alias is auto-derived for hostname-based endpoints; \
-                         remove the 'alias' field (derived: '{derived}')"
-                    )));
-                }
-                // User provided the exact derived value — tolerate silently.
+            // Reject user-provided alias when derivation is possible.
+            let normalized_user = normalize_alias(user_alias);
+            if normalized_user != derived {
+                return Err(DomainError::validation(format!(
+                    "alias is auto-derived for hostname-based endpoints; \
+                     remove the 'alias' field (derived: '{derived}')"
+                )));
             }
+            // User provided the exact derived value — tolerate silently.
             validate_alias(&derived)?;
             Ok(derived)
         }
         None => {
-            // Explicit alias required.
-            let alias = user_alias.ok_or_else(|| {
-                DomainError::validation(
-                    "explicit alias is required for IP-based or heterogeneous-host endpoints",
-                )
-            })?;
-            let normalized = normalize_alias(alias);
+            let normalized = normalize_alias(user_alias);
             validate_alias(&normalized)?;
             Ok(normalized)
         }
     }
 }
 
-/// Enforce alias immutability on upstream **update** when endpoints change.
+/// Enforce alias rules on upstream **creation** when no alias is provided.
+///
+/// - Hostname-derivable endpoints: alias is auto-derived.
+/// - IP or non-derivable endpoints: returns an error (explicit alias required).
+pub(in crate::domain::services) fn enforce_alias_create_derived(
+    endpoints: &[Endpoint],
+) -> Result<String, DomainError> {
+    match compute_derived_alias(endpoints) {
+        Some(derived) => {
+            validate_alias(&derived)?;
+            Ok(derived)
+        }
+        None => Err(DomainError::validation(
+            "explicit alias is required for IP-based or heterogeneous-host endpoints",
+        )),
+    }
+}
+
+/// Enforce alias immutability on upstream **update** when endpoints change
+/// and the user provided an alias.
 ///
 /// The alias is immutable once set. Any endpoint change that would alter it
 /// is rejected — the user must delete and re-create the upstream instead.
 /// hostname→IP transitions are always rejected.
-pub(in crate::domain::services) fn enforce_alias_update(
-    user_alias: Option<&str>,
+pub(in crate::domain::services) fn enforce_alias_update_with(
+    user_alias: &str,
     new_endpoints: &[Endpoint],
     existing_alias: &str,
     old_endpoints: &[Endpoint],
@@ -209,14 +220,12 @@ pub(in crate::domain::services) fn enforce_alias_update(
                      to '{derived}'; delete and re-create the upstream instead"
                 )));
             }
-            if let Some(user) = user_alias {
-                let normalized_user = normalize_alias(user);
-                if normalized_user != *derived {
-                    return Err(DomainError::validation(format!(
-                        "alias is auto-derived for hostname-based endpoints; \
-                         remove the 'alias' field (derived: '{derived}')"
-                    )));
-                }
+            let normalized_user = normalize_alias(user_alias);
+            if normalized_user != *derived {
+                return Err(DomainError::validation(format!(
+                    "alias is auto-derived for hostname-based endpoints; \
+                     remove the 'alias' field (derived: '{derived}')"
+                )));
             }
             Ok(derived.clone())
         }
@@ -230,16 +239,51 @@ pub(in crate::domain::services) fn enforce_alias_update(
         // would change it — the alias is the routing key and renaming it
         // would break API clients.
         (false, None) => {
-            if let Some(user) = user_alias {
-                let normalized = normalize_alias(user);
-                if normalized != existing_alias {
-                    return Err(DomainError::validation(format!(
-                        "alias cannot be changed from '{existing_alias}' to \
-                         '{normalized}'; delete and re-create the upstream instead"
-                    )));
-                }
+            let normalized = normalize_alias(user_alias);
+            if normalized != existing_alias {
+                return Err(DomainError::validation(format!(
+                    "alias cannot be changed from '{existing_alias}' to \
+                     '{normalized}'; delete and re-create the upstream instead"
+                )));
             }
             Ok(existing_alias.to_string())
         }
+    }
+}
+
+/// Enforce alias immutability on upstream **update** when endpoints change
+/// and no alias is provided by the user.
+///
+/// The alias is immutable once set. Any endpoint change that would alter it
+/// is rejected — the user must delete and re-create the upstream instead.
+/// hostname→IP transitions are always rejected.
+pub(in crate::domain::services) fn enforce_alias_update_derived(
+    new_endpoints: &[Endpoint],
+    existing_alias: &str,
+    old_endpoints: &[Endpoint],
+) -> Result<String, DomainError> {
+    let old_derivable = compute_derived_alias(old_endpoints).is_some();
+    let new_derived = compute_derived_alias(new_endpoints);
+
+    match (old_derivable, &new_derived) {
+        // New endpoints are hostname-derivable: only allowed when the
+        // derived alias matches the existing one exactly.
+        (_, Some(derived)) => {
+            if *derived != existing_alias {
+                return Err(DomainError::validation(format!(
+                    "endpoint change would alter the alias from '{existing_alias}' \
+                     to '{derived}'; delete and re-create the upstream instead"
+                )));
+            }
+            Ok(derived.clone())
+        }
+        // hostname → IP: always rejected. The hostname-derived alias would
+        // become a lie pointing at arbitrary IP addresses.
+        (true, None) => Err(DomainError::validation(
+            "cannot change hostname-based endpoints to IP-based; \
+                 delete and re-create the upstream instead",
+        )),
+        // IP → IP: keep existing alias.
+        (false, None) => Ok(existing_alias.to_string()),
     }
 }

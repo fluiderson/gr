@@ -2704,7 +2704,7 @@ fn enforce_alias_create_hostname_rejects_user_alias() {
         host: "api.openai.com".into(),
         port: 443,
     }];
-    let err = enforce_alias_create(Some("custom-alias"), &eps).unwrap_err();
+    let err = enforce_alias_create_with("custom-alias", &eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2715,7 +2715,7 @@ fn enforce_alias_create_hostname_tolerates_exact_match() {
         host: "api.openai.com".into(),
         port: 443,
     }];
-    let alias = enforce_alias_create(Some("api.openai.com"), &eps).unwrap();
+    let alias = enforce_alias_create_with("api.openai.com", &eps).unwrap();
     assert_eq!(alias, "api.openai.com");
 }
 
@@ -2726,7 +2726,7 @@ fn enforce_alias_create_hostname_auto_derives() {
         host: "api.openai.com".into(),
         port: 443,
     }];
-    let alias = enforce_alias_create(None, &eps).unwrap();
+    let alias = enforce_alias_create_derived(&eps).unwrap();
     assert_eq!(alias, "api.openai.com");
 }
 
@@ -2737,7 +2737,7 @@ fn enforce_alias_create_ip_requires_explicit() {
         host: "10.0.1.1".into(),
         port: 443,
     }];
-    let err = enforce_alias_create(None, &eps).unwrap_err();
+    let err = enforce_alias_create_derived(&eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2748,7 +2748,7 @@ fn enforce_alias_create_ip_accepts_explicit() {
         host: "10.0.1.1".into(),
         port: 443,
     }];
-    let alias = enforce_alias_create(Some("my-backend"), &eps).unwrap();
+    let alias = enforce_alias_create_with("my-backend", &eps).unwrap();
     assert_eq!(alias, "my-backend");
 }
 
@@ -2764,7 +2764,7 @@ fn enforce_alias_update_hostname_to_hostname_different_alias_rejected() {
         host: "new.vendor.com".into(),
         port: 443,
     }];
-    let err = enforce_alias_update(None, &new_eps, "old.vendor.com", &old_eps).unwrap_err();
+    let err = enforce_alias_update_derived(&new_eps, "old.vendor.com", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2795,7 +2795,7 @@ fn enforce_alias_update_hostname_to_hostname_same_alias_allowed() {
             port: 443,
         },
     ];
-    let alias = enforce_alias_update(None, &new_eps, "vendor.com", &old_eps).unwrap();
+    let alias = enforce_alias_update_derived(&new_eps, "vendor.com", &old_eps).unwrap();
     assert_eq!(alias, "vendor.com");
 }
 
@@ -2820,7 +2820,7 @@ fn enforce_alias_update_hostname_multi_endpoint_changes_alias_rejected() {
             port: 443,
         },
     ];
-    let err = enforce_alias_update(None, &new_eps, "my.company.com", &old_eps).unwrap_err();
+    let err = enforce_alias_update_derived(&new_eps, "my.company.com", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2836,7 +2836,7 @@ fn enforce_alias_update_hostname_to_ip_requires_alias() {
         host: "10.0.1.1".into(),
         port: 443,
     }];
-    let err = enforce_alias_update(None, &new_eps, "api.openai.com", &old_eps).unwrap_err();
+    let err = enforce_alias_update_derived(&new_eps, "api.openai.com", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2854,7 +2854,7 @@ fn enforce_alias_update_hostname_to_ip_with_alias_also_rejected() {
         port: 443,
     }];
     let err =
-        enforce_alias_update(Some("my-backend"), &new_eps, "api.openai.com", &old_eps).unwrap_err();
+        enforce_alias_update_with("my-backend", &new_eps, "api.openai.com", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2870,7 +2870,7 @@ fn enforce_alias_update_ip_to_ip_retains_existing() {
         host: "10.0.1.2".into(),
         port: 443,
     }];
-    let alias = enforce_alias_update(None, &new_eps, "my-backend", &old_eps).unwrap();
+    let alias = enforce_alias_update_derived(&new_eps, "my-backend", &old_eps).unwrap();
     assert_eq!(alias, "my-backend");
 }
 
@@ -2887,7 +2887,7 @@ fn enforce_alias_update_ip_to_ip_rejects_alias_change() {
         host: "10.0.1.2".into(),
         port: 443,
     }];
-    let err = enforce_alias_update(Some("new-name"), &new_eps, "my-backend", &old_eps).unwrap_err();
+    let err = enforce_alias_update_with("new-name", &new_eps, "my-backend", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2904,7 +2904,7 @@ fn enforce_alias_update_ip_to_ip_tolerates_same_alias() {
         host: "10.0.1.2".into(),
         port: 443,
     }];
-    let alias = enforce_alias_update(Some("my-backend"), &new_eps, "my-backend", &old_eps).unwrap();
+    let alias = enforce_alias_update_with("my-backend", &new_eps, "my-backend", &old_eps).unwrap();
     assert_eq!(alias, "my-backend");
 }
 
@@ -2921,7 +2921,7 @@ fn enforce_alias_update_ip_to_hostname_rejected_when_alias_changes() {
         host: "api.openai.com".into(),
         port: 443,
     }];
-    let err = enforce_alias_update(None, &new_eps, "my-backend", &old_eps).unwrap_err();
+    let err = enforce_alias_update_derived(&new_eps, "my-backend", &old_eps).unwrap_err();
     assert!(matches!(err, DomainError::Validation { .. }));
 }
 
@@ -2938,7 +2938,7 @@ fn enforce_alias_update_ip_to_hostname_allowed_when_alias_matches() {
         host: "api.openai.com".into(),
         port: 443,
     }];
-    let alias = enforce_alias_update(None, &new_eps, "api.openai.com", &old_eps).unwrap();
+    let alias = enforce_alias_update_derived(&new_eps, "api.openai.com", &old_eps).unwrap();
     assert_eq!(alias, "api.openai.com");
 }
 
