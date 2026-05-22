@@ -2,6 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
+const ENV_EXCLUDED_CRATES: &str = "DE1201_DOCS_RS_ALL_FEATURES_EXCLUDED_CRATES";
 const LINT_NAME: &str = "de1201_docs_rs_all_features";
 
 #[test]
@@ -14,6 +15,13 @@ fn cargo_lint_fixtures_cover_manifest_cases() {
     );
     assert_contains(&missing_docs_rs, "`package.metadata.docs.rs` is missing");
 
+    let env_excluded = run_fixture_with_env(
+        "missing_docs_rs",
+        &[(ENV_EXCLUDED_CRATES, "de1201_missing_docs_rs")],
+    );
+    assert_success("missing_docs_rs env exclusion", &env_excluded);
+    assert_not_contains(&env_excluded, "DE1201");
+
     for fixture in ["all_features_true", "publish_false", "excluded_crate"] {
         let output = run_fixture(fixture);
         assert_success(fixture, &output);
@@ -22,12 +30,17 @@ fn cargo_lint_fixtures_cover_manifest_cases() {
 }
 
 fn run_fixture(name: &str) -> Output {
+    run_fixture_with_env(name, &[])
+}
+
+fn run_fixture_with_env(name: &str, extra_env: &[(&str, &str)]) -> Output {
     let fixture = fixtures_dir().join(name);
     let manifest_path = fixture.join("Cargo.toml");
     let lint_parent_dir = lint_parent_dir();
     let target_dir = target_dir().join("de1201_cargo_fixtures").join(name);
 
-    let output = Command::new("cargo")
+    let mut command = Command::new("cargo");
+    command
         .arg("dylint")
         .arg("--path")
         .arg(&lint_parent_dir)
@@ -38,10 +51,17 @@ fn run_fixture(name: &str) -> Output {
         .arg("--no-deps")
         .arg("--quiet")
         .env("CARGO_TARGET_DIR", target_dir)
+        .env_remove(ENV_EXCLUDED_CRATES)
         .env_remove("DYLINT_RUSTFLAGS")
         .env_remove("DYLINT_TOML")
         .env_remove("RUSTFLAGS")
-        .current_dir(&fixture)
+        .current_dir(&fixture);
+
+    for (key, value) in extra_env {
+        command.env(key, value);
+    }
+
+    let output = command
         .output()
         .unwrap_or_else(|error| panic!("failed to run cargo dylint for fixture `{name}`: {error}"));
 

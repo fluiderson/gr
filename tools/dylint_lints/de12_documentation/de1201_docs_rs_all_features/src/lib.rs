@@ -10,6 +10,8 @@ use serde_json::Value;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
+const ENV_EXCLUDED_CRATES: &str = "DE1201_DOCS_RS_ALL_FEATURES_EXCLUDED_CRATES";
+
 #[derive(Default, serde::Deserialize)]
 struct Config {
     #[serde(default)]
@@ -23,9 +25,10 @@ struct De1201DocsRsAllFeatures {
 impl De1201DocsRsAllFeatures {
     pub fn new() -> Self {
         let config: Config = dylint_linting::config_or_default(env!("CARGO_PKG_NAME"));
-        Self {
-            excluded_crates: config.excluded_crates.into_iter().collect(),
-        }
+        let mut excluded_crates: HashSet<String> = config.excluded_crates.into_iter().collect();
+        excluded_crates.extend(env_excluded_crates());
+
+        Self { excluded_crates }
     }
 }
 
@@ -52,6 +55,7 @@ dylint_linting::impl_late_lint! {
     /// - Applies to crates where Cargo metadata says publishing is allowed.
     /// - Skips crates with `publish = false`.
     /// - Skips crate names listed in `[de1201_docs_rs_all_features].excluded_crates`.
+    /// - Skips crate names listed in `DE1201_DOCS_RS_ALL_FEATURES_EXCLUDED_CRATES`.
     pub DE1201_DOCS_RS_ALL_FEATURES,
     Warn,
     "publishable crates must set package.metadata.docs.rs.all-features = true (DE1201)",
@@ -105,7 +109,7 @@ impl LateLintPass<'_> for De1201DocsRsAllFeatures {
                 package.name
             ));
             diag.help(format!(
-                "{}; add `[package.metadata.docs.rs] all-features = true` to `{}` or add `{}` to `[de1201_docs_rs_all_features].excluded_crates` in `dylint.toml`",
+                "{}; add `[package.metadata.docs.rs] all-features = true` to `{}` or add `{}` to `[de1201_docs_rs_all_features].excluded_crates` in `dylint.toml` or `{ENV_EXCLUDED_CRATES}`",
                 status.help_reason(),
                 package.manifest_path,
                 package.name,
@@ -116,6 +120,29 @@ impl LateLintPass<'_> for De1201DocsRsAllFeatures {
 
 fn current_manifest_path() -> Result<PathBuf, std::env::VarError> {
     std::env::var("CARGO_MANIFEST_DIR").map(|dir| PathBuf::from(dir).join("Cargo.toml"))
+}
+
+fn env_excluded_crates() -> Vec<String> {
+    let mut excluded_crates = Vec::new();
+
+    if let Some(value) = option_env!("DE1201_DOCS_RS_ALL_FEATURES_EXCLUDED_CRATES") {
+        excluded_crates.extend(parse_excluded_crates(value));
+    }
+
+    std::env::var(ENV_EXCLUDED_CRATES)
+        .map(|value| excluded_crates.extend(parse_excluded_crates(&value)))
+        .ok();
+
+    excluded_crates
+}
+
+fn parse_excluded_crates(value: &str) -> Vec<String> {
+    value
+        .split(|ch: char| ch == ',' || ch.is_ascii_whitespace())
+        .map(str::trim)
+        .filter(|crate_name| !crate_name.is_empty())
+        .map(ToOwned::to_owned)
+        .collect()
 }
 
 fn find_current_package<'metadata>(
@@ -198,7 +225,7 @@ fn docs_rs_metadata(metadata: &Value) -> Option<&Value> {
 mod tests {
     use super::{
         DocsRsAllFeaturesStatus, docs_rs_all_features_status, docs_rs_all_features_violation,
-        is_publishable,
+        is_publishable, parse_excluded_crates,
     };
     use serde_json::json;
     use std::collections::HashSet;
@@ -327,6 +354,14 @@ mod tests {
         assert_eq!(
             docs_rs_all_features_violation("publishable-crate", None, &json!({}), &exclusions),
             Some(DocsRsAllFeaturesStatus::MissingDocsRsTable)
+        );
+    }
+
+    #[test]
+    fn parses_env_excluded_crates() {
+        assert_eq!(
+            parse_excluded_crates("crate-one, crate-two\ncrate-three\tcrate-four"),
+            vec!["crate-one", "crate-two", "crate-three", "crate-four"]
         );
     }
 }
