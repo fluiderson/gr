@@ -34,6 +34,7 @@ use modkit_canonical_errors::{CanonicalError, resource_error};
 use tracing::warn;
 
 use crate::domain::error::DomainError;
+use crate::domain::metrics::{AM_CROSS_TENANT_DENIAL, MetricKind, emit_metric};
 
 // ---------------------------------------------------------------------------
 // Resource markers — kept in sync with account_management_sdk::gts via
@@ -145,7 +146,15 @@ impl From<DomainError> for AccountManagementError {
             DomainError::FeatureDisabled { detail } => Self::FeatureDisabled { detail },
 
             // ---- Authorization ----
-            DomainError::CrossTenantDenied { cause: _ } => Self::CrossTenantDenied,
+            // Single funnel for every cross-tenant denial (PDP enforcer + storage
+            // scope-clamp); also reached on the REST path via the composed
+            // From<DomainError> for CanonicalError. The metadata visibility probe
+            // that swallows this into Ok(false) bypasses this mapping, so it is
+            // correctly not counted.
+            DomainError::CrossTenantDenied { cause: _ } => {
+                emit_metric(AM_CROSS_TENANT_DENIAL, MetricKind::Counter, &[]);
+                Self::CrossTenantDenied
+            }
 
             // ---- Transactional ----
             DomainError::Aborted { reason: _, detail } => Self::SerializationConflict { detail },
