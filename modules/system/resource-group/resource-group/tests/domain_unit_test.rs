@@ -122,17 +122,20 @@ fn validate_membership_type_code_rejects_empty() {
 }
 
 #[test]
-fn validate_membership_type_code_accepts_trailing_wildcard_after_tilde() {
-    // Wildcard form per ADR-001 `x-gts-ref` convention.
+fn validate_membership_type_code_rejects_trailing_wildcard_after_tilde() {
+    // Wildcard patterns are not accepted: `gts_type_allowed_membership`
+    // stores a SMALLINT FK to a concrete registered type, not a pattern.
     let result = validation::validate_membership_type_code("gts.cf.core.rg.type.v1~*");
-    assert!(result.is_ok(), "Expected ok, got {result:?}");
+    assert!(result.is_err(), "Expected err, got {result:?}");
+    assert!(matches!(result.unwrap_err(), DomainError::Validation { .. }));
 }
 
 #[test]
-fn validate_membership_type_code_accepts_trailing_wildcard_after_dot() {
-    // `gts.cf.core.am.*` -- pattern matching any AM-vendored type.
+fn validate_membership_type_code_rejects_trailing_wildcard_after_dot() {
+    // `gts.cf.*` -- a wildcard pattern, rejected like any other wildcard.
     let result = validation::validate_membership_type_code("gts.cf.*");
-    assert!(result.is_ok(), "Expected ok, got {result:?}");
+    assert!(result.is_err(), "Expected err, got {result:?}");
+    assert!(matches!(result.unwrap_err(), DomainError::Validation { .. }));
 }
 
 #[test]
@@ -144,7 +147,6 @@ fn validate_membership_type_code_rejects_malformed_gts_path() {
 
 #[test]
 fn validate_membership_type_code_rejects_mid_string_wildcard() {
-    // GtsWildcard allows `*` only at the very end of the pattern.
     let result = validation::validate_membership_type_code("gts.cf.*.user.v1~");
     assert!(result.is_err());
     assert!(matches!(result.unwrap_err(), DomainError::Validation { .. }));

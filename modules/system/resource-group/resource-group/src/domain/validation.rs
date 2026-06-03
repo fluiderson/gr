@@ -52,28 +52,27 @@ pub fn validate_type_code(code: &str) -> Result<(), DomainError> {
 /// types (e.g. `gts.cf.core.idp.user.v1~`, `gts.cf.vendor.lms.course.v1~`)
 /// and need not live in the RG type-registry namespace.
 ///
-/// Format validation is delegated to [`gts::GtsWildcard::new`], the
-/// canonical GTS parser. This accepts both exact GTS IDs
-/// (`gts.cf.core.idp.user.v1~`) and trailing-wildcard patterns
-/// (`gts.cf.core.am.*`, `gts.cf.core.rg.type.v1~*`) — matching the
-/// `x-gts-ref` convention from ADR-001 (e.g. `"x-gts-ref": "gts.*"`).
-///
-/// **Note on wildcard storage**: wildcard codes pass *validation* here
-/// but `gts_type_allowed_membership` is a junction table with
-/// `SMALLINT FK → gts_type.id`, so the downstream `resolve_ids` call
-/// will still fail for wildcards that do not correspond to a registered
-/// concrete type. Pattern-based membership matching requires a separate
-/// schema change (e.g. a nullable pattern column on the junction row)
-/// and is out of scope for this validation pass.
+/// Format validation is delegated to [`gts::GtsID::new`], the canonical
+/// GTS parser. Only **exact** GTS IDs (`gts.cf.core.idp.user.v1~`) are
+/// accepted; trailing-wildcard patterns (`gts.cf.core.am.*`) are
+/// rejected. `allowed_memberships` entries must resolve to a registered
+/// concrete type — `gts_type_allowed_membership` is a junction table
+/// with `SMALLINT FK → gts_type.id`, which cannot store a pattern.
 ///
 /// # Errors
 ///
 /// Returns [`DomainError::validation`] if the code is not a valid GTS
-/// ID or trailing-wildcard pattern.
+/// ID, or if it is a wildcard pattern.
 pub fn validate_membership_type_code(code: &str) -> Result<(), DomainError> {
-    gts::GtsWildcard::new(code).map(|_| ()).map_err(|e| {
+    let parsed = gts::GtsID::new(code).map_err(|e| {
         DomainError::validation(format!("Invalid membership type code '{code}': {e}"))
-    })
+    })?;
+    if parsed.gts_id_segments.iter().any(|seg| seg.is_wildcard) {
+        return Err(DomainError::validation(format!(
+            "Membership type code '{code}' must be a concrete GTS type, not a wildcard pattern"
+        )));
+    }
+    Ok(())
 }
 
 /// Validate that a `metadata_schema` value is a valid JSON Schema.
