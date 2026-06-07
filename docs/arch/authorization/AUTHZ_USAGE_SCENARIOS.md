@@ -104,7 +104,7 @@ Projection tables allow PEP to JOIN against local data, making authorization O(1
 
 **Closure tables** specifically solve the hierarchy traversal problem. A closure table contains all ancestor-descendant pairs, allowing subtree queries with a simple `WHERE ancestor_id = X` instead of recursive tree walking.
 
-> **Progressive projection:** do not add projections speculatively — each one creates an additional database and sync load. In a **monolith** with a single shared DB, no projections are needed (PEP JOINs against canonical tables). In **microservices**, start with `resource_group` + `resource_group_closure` (small tables, covers hierarchy). Only add `resource_group_membership` when profiling confirms the two-request pattern is unacceptable for the latency budget — this table grows as `M_resources × N_groups_per_resource` and is expected to be **10×+ larger** than hierarchy tables (see [RG DESIGN §Storage Estimates](../../../modules/system/resource-group/docs/DESIGN.md#storage-estimates)).
+> **Progressive projection:** do not add projections speculatively — each one creates an additional database and sync load. In a **monolith** with a single shared DB, no projections are needed (PEP JOINs against canonical tables). In **microservices**, start with `resource_group` + `resource_group_closure` (small tables, covers hierarchy). Only add `resource_group_membership` when profiling confirms the two-request pattern is unacceptable for the latency budget — this table grows as `M_resources × N_groups_per_resource` and is expected to be **10×+ larger** than hierarchy tables (see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates)).
 
 ### Choosing Projection Tables
 
@@ -149,7 +149,7 @@ The choice depends on the application's tenant structure, resource organization,
 
 ### `resource_group_membership` — When to Project
 
-The `resource_group_membership` table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than other projection tables. Concrete estimates depend on vendor scale — see [RG DESIGN §Storage Estimates](../../../modules/system/resource-group/docs/DESIGN.md#storage-estimates). Do not project it speculatively.
+The `resource_group_membership` table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than other projection tables. Concrete estimates depend on vendor scale — see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates). Do not project it speculatively.
 
 **Decision guide:**
 
@@ -2230,7 +2230,7 @@ The constraint acts as a [compare-and-swap](https://en.wikipedia.org/wiki/Compar
 
 The **`tr-authz-plugin`** implements tenant-based access enforcement backed by `TenantResolverClient`. It does not depend on `resource-group-sdk` directly — all hierarchy queries go through the Tenant Resolver.
 
-This section enumerates the 8 decision rules (R1–R8) that govern how `Service::evaluate` must translate an incoming request into an access predicate. They are referenced by the PR-2 review comments on `modules/system/authz-resolver/plugins/tr-authz-plugin/src/domain/service.rs` and are the target implementation for `evaluate`.
+This section enumerates the 8 decision rules (R1–R8) that govern how `Service::evaluate` must translate an incoming request into an access predicate. They are referenced by the PR-2 review comments on `gears/system/authz-resolver/plugins/tr-authz-plugin/src/domain/service.rs` and are the target implementation for `evaluate`.
 
 Example hierarchy used throughout:
 

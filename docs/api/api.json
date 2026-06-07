@@ -211,6 +211,107 @@
         ],
         "type": "object"
       },
+      "ChildConversionRequestDto": {
+        "description": "Response projection for the parent-side conversion REST surface\n(`/child-conversions` family). Minimal cross-barrier projection per\n`dod-managed-self-managed-modes-parent-side-minimal-surface`: every\nfield is derivable from the conversion row itself or the converting\ntenant's own row (`child_tenant_name`); no closure / metadata /\ninventory data leaks across the parent-child barrier.\n\n`request_id` is the conversion row's id (the parent-side projection\nrenames it to make the cross-barrier minimal contract explicit on\nthe wire — the field set is what the parent is allowed to see).",
+        "properties": {
+          "approved_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "approved_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelled_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelled_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "child_tenant_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "initiator_side": {
+            "$ref": "#/components/schemas/ConversionSideDto"
+          },
+          "rejected_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rejected_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "request_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "requested_by": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "requested_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved_at": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConversionStatusDto"
+          },
+          "target_mode": {
+            "$ref": "#/components/schemas/TargetModeDto"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "tenant_id",
+          "child_tenant_name",
+          "target_mode",
+          "initiator_side",
+          "status",
+          "requested_by",
+          "created_at",
+          "expires_at"
+        ],
+        "type": "object"
+      },
       "Citation": {
         "description": "A citation extracted from provider annotations.",
         "properties": {
@@ -318,6 +419,56 @@
           "updated_at"
         ],
         "type": "object"
+      },
+      "ConversionPatchDto": {
+        "additionalProperties": false,
+        "description": "Request body for\n`PATCH /tenants/{tenant_id}/conversions/{request_id}` and\n`PATCH /tenants/{tenant_id}/child-conversions/{request_id}`.\n\n`status` is required and narrowed to the three admissible terminal\ntransitions ([`ConversionPatchStatusDto`]). `comment` is optional\nand follows the same length contract as the POST body.\n\nThe handler routes each admissible status to the matching service\nmethod (`approve` / `cancel` / `reject`) — the wire DTO does NOT\nknow about the service handle. See\n[`crate::api::rest::handlers::conversions`] for the dispatch.",
+        "properties": {
+          "comment": {
+            "description": "Optional caller-supplied rationale. Same `1..=1000` chars\ncontract as [`RequestOwnConversionDto::comment`]; persisted\nto the per-transition column matching the chosen `status`\n(`approved_comment` / `cancelled_comment` / `rejected_comment`).",
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConversionPatchStatusDto"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "ConversionPatchStatusDto": {
+        "description": "Admissible terminal transitions for PATCH (approved | cancelled |\nrejected). `pending` is reached only via POST initiation; `expired` is\nreaper-owned, so a caller `PATCH`ing to it would falsify `actor_kind`.",
+        "enum": [
+          "approved",
+          "cancelled",
+          "rejected"
+        ],
+        "type": "string"
+      },
+      "ConversionSideDto": {
+        "description": "Wire-shape enum for `initiator_side` on every conversion-request\nresponse. Mirrors [`ConversionSide`] one-to-one. Response-only — a\ncaller never supplies `initiator_side` on the request body (the\nservice derives it from the URL collection per the `caller`).",
+        "enum": [
+          "child",
+          "parent"
+        ],
+        "type": "string"
+      },
+      "ConversionStatusDto": {
+        "description": "Wire-shape enum for the conversion-request lifecycle status on\nevery read surface (`OwnConversionRequestDto`,\n`ChildConversionRequestDto`). Mirrors\n[`ConversionStatus`] one-to-one. Defined locally on the wire so the\nserved `OpenAPI` carries the explicit `pending | approved |\ncancelled | rejected | expired` enum rather than `String`.",
+        "enum": [
+          "pending",
+          "approved",
+          "cancelled",
+          "rejected",
+          "expired"
+        ],
+        "type": "string"
       },
       "CorsConfig": {
         "properties": {
@@ -1511,6 +1662,21 @@
         ],
         "type": "object"
       },
+      "NewUserPasswordDto": {
+        "description": "Mirrors [`NewUserPassword`](account_management_sdk::NewUserPassword).\n`value` is redacted in `Debug`; do not log this struct directly.",
+        "properties": {
+          "temporary": {
+            "type": "boolean"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
       "NodeDto": {
         "description": "Node response DTO",
         "properties": {
@@ -1661,6 +1827,114 @@
         ],
         "type": "object"
       },
+      "OwnConversionRequestDto": {
+        "description": "Response projection for the child-side conversion REST surface\n(`/conversions` family). Full conversion-row projection — the\nconverting tenant has no cross-barrier projection rules because the\nrequest lives inside its own scope.",
+        "properties": {
+          "approved_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "approved_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelled_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cancelled_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "child_tenant_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "initiator_side": {
+            "$ref": "#/components/schemas/ConversionSideDto"
+          },
+          "parent_id": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rejected_by": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rejected_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requested_by": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "requested_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved_at": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConversionStatusDto"
+          },
+          "target_mode": {
+            "$ref": "#/components/schemas/TargetModeDto"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "child_tenant_name",
+          "target_mode",
+          "initiator_side",
+          "status",
+          "requested_by",
+          "created_at",
+          "expires_at"
+        ],
+        "type": "object"
+      },
       "PageInfo": {
         "properties": {
           "limit": {
@@ -1691,6 +1965,24 @@
           "items": {
             "items": {
               "$ref": "#/components/schemas/ChatDetailDto"
+            },
+            "type": "array"
+          },
+          "page_info": {
+            "$ref": "#/components/schemas/PageInfo"
+          }
+        },
+        "required": [
+          "items",
+          "page_info"
+        ],
+        "type": "object"
+      },
+      "Page_ChildConversionRequestDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChildConversionRequestDto"
             },
             "type": "array"
           },
@@ -1781,6 +2073,60 @@
           "items": {
             "items": {
               "$ref": "#/components/schemas/MessageDto"
+            },
+            "type": "array"
+          },
+          "page_info": {
+            "$ref": "#/components/schemas/PageInfo"
+          }
+        },
+        "required": [
+          "items",
+          "page_info"
+        ],
+        "type": "object"
+      },
+      "Page_OwnConversionRequestDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OwnConversionRequestDto"
+            },
+            "type": "array"
+          },
+          "page_info": {
+            "$ref": "#/components/schemas/PageInfo"
+          }
+        },
+        "required": [
+          "items",
+          "page_info"
+        ],
+        "type": "object"
+      },
+      "Page_TenantDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TenantDto"
+            },
+            "type": "array"
+          },
+          "page_info": {
+            "$ref": "#/components/schemas/PageInfo"
+          }
+        },
+        "required": [
+          "items",
+          "page_info"
+        ],
+        "type": "object"
+      },
+      "Page_TenantMetadataEntryDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TenantMetadataEntryDto"
             },
             "type": "array"
           },
@@ -2331,6 +2677,18 @@
         ],
         "type": "object"
       },
+      "PutTenantMetadataDto": {
+        "description": "Request body for `PUT /tenants/{tenant_id}/metadata/{type_id}`.\n\nThe wire shape is the JSON payload to upsert, transmitted in-place\nas `TenantMetadataValue` (`type: object, additionalProperties: true`\nper `OpenAPI`). No metadata fields cross the request envelope -- the\nchained `type_id` is the path parameter, not part of the body.",
+        "properties": {
+          "value": {
+            "description": "GTS-schema-validated metadata payload. The service rejects\n`null` (`DomainError::Validation`) before any state read."
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
       "QuotaPeriod": {
         "description": "Quota period classification.",
         "enum": [
@@ -2679,6 +3037,33 @@
         ],
         "type": "object"
       },
+      "RequestChildConversionDto": {
+        "additionalProperties": false,
+        "description": "Request body for `POST /tenants/{tenant_id}/child-conversions`\n(initiator = parent acting on a direct child). Same field set as\n[`RequestOwnConversionDto`] plus the explicit `child_tenant_id`\nbecause the URL binds the parent — the converting child has to be\nidentified in the body.",
+        "properties": {
+          "child_tenant_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "comment": {
+            "description": "Optional caller-supplied rationale. Same `1..=1000` chars\ncontract as [`RequestOwnConversionDto::comment`].",
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_mode": {
+            "$ref": "#/components/schemas/TargetModeDto"
+          }
+        },
+        "required": [
+          "child_tenant_id",
+          "target_mode"
+        ],
+        "type": "object"
+      },
       "RequestHeaderRules": {
         "properties": {
           "add": {
@@ -2715,6 +3100,50 @@
             "type": "object"
           }
         },
+        "type": "object"
+      },
+      "RequestOwnConversionDto": {
+        "additionalProperties": false,
+        "description": "Request body for\n`POST /tenants/{tenant_id}/conversions` (initiator = converting\ntenant). `target_mode` is REQUIRED — the service rejects any value\nother than the strict binary inverse of the tenant's current\n`self_managed` flag with `code=validation`. `comment` is optional\n(1..=1000 chars when supplied; empty strings are a contract bug and\nsurface as `code=validation`).",
+        "properties": {
+          "comment": {
+            "description": "Optional caller-supplied rationale. The service rejects\n`Some(\"\")` and any value over 1000 chars with\n`code=validation` BEFORE the DB write. The `min_length` /\n`max_length` constraints below advertise the same contract\nto the served `OpenAPI` so codegen clients see the bound\nstatically rather than discovering it via a runtime 400.",
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_mode": {
+            "$ref": "#/components/schemas/TargetModeDto"
+          }
+        },
+        "required": [
+          "target_mode"
+        ],
+        "type": "object"
+      },
+      "ResolvedTenantMetadataDto": {
+        "description": "Effective-value resolution result for the inheritance-aware walk-up\nsurface.\n\n`resolved == false` carries no `value` — the terminal empty state\nof an `OverrideOnly` schema, a `self_managed` barrier, or a walk\nthat reached the root without a hit. Distinct from\n`metadata_entry_not_found` (which only fires on the single-entry\n`GET` path); `resolve` always returns HTTP 200 per FEATURE §3.",
+        "properties": {
+          "resolved": {
+            "type": "boolean"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "type_id": {
+            "type": "string"
+          },
+          "value": {}
+        },
+        "required": [
+          "tenant_id",
+          "type_id",
+          "resolved"
+        ],
         "type": "object"
       },
       "ResponseHeaderRules": {
@@ -3165,6 +3594,158 @@
           "is_header",
           "cells"
         ],
+        "type": "object"
+      },
+      "TargetModeDto": {
+        "description": "Wire-shape enum for `target_mode` on every conversion-request\nsurface. Mirrors [`TargetMode`] one-to-one. Defined locally for the\nsame `OpenAPI`-enum-preservation reason as the other wire enums.",
+        "enum": [
+          "managed",
+          "self_managed"
+        ],
+        "type": "string"
+      },
+      "TenantCreateRequestDto": {
+        "additionalProperties": false,
+        "description": "Request body for `POST /tenants`.\n\nMirrors `TenantCreateRequest` in the `OpenAPI` spec. `name`,\n`parent_id`, and `tenant_type` (chained GTS identifier) are\nrequired; `self_managed` defaults to `false` and\n`provisioning_metadata` is an opaque payload forwarded to the\n`IdP` plugin. The new child's UUID is **not** part of the request\n— AM allocates it server-side so two parallel clients cannot\ncollide on the same id.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "provisioning_metadata": {
+            "additionalProperties": {},
+            "description": "Opaque provider-specific provisioning context forwarded to the\n`IdP` plugin. Typed as a JSON object (not `Value`) so the wire\ncontract — yaml `type: [object, 'null']` — is enforced by serde\nat the boundary: arrays / scalars are rejected with a clean\n400 before the request ever touches the service or the plugin.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "self_managed": {
+            "type": "boolean"
+          },
+          "tenant_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "parent_id",
+          "tenant_type"
+        ],
+        "type": "object"
+      },
+      "TenantDto": {
+        "description": "AM-internal projection. Wider than `tenant_resolver_sdk::TenantInfo` for\nadmin/UI consumers (carries lifecycle timestamps + depth).\n\nInternal columns (raw `tenant_type_uuid`, retention/claim columns) never\ncross this boundary. `tenant_type: None` only on a transient registry\nblip — reads do not block on it.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deleted_at": {
+            "description": "Soft-delete tombstone. `Some(_)` exactly when `status == deleted`;\nomitted on the wire otherwise. Mirrors the SDK / storage column\n`Tenant.deleted_at`; the retention sweep becomes eligible at\n`deleted_at + retention_window` and is owned by the reaper.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "self_managed": {
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TenantStatusDto"
+          },
+          "tenant_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "self_managed",
+          "depth",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "TenantMetadataEntryDto": {
+        "description": "One metadata entry. `tenant_id` is echoed from the path so consumers carry\nthe full `(tenant_id, type_id)` identity tuple; the SDK projection drops\n`tenant_id` by design.",
+        "properties": {
+          "tenant_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "type_id": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "value": {}
+        },
+        "required": [
+          "tenant_id",
+          "type_id",
+          "value",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "TenantStatusDto": {
+        "description": "Wire-shape enum for `Tenant.status` on the REST surface.\n\nMirrors the SDK-visible variants of\n[`account_management_sdk::TenantStatus`] one-to-one (the\nAM-internal `provisioning` variant is never surfaced). Defined\nlocally rather than reusing the SDK enum because the upstream\ntype lives in `tenant-resolver-sdk` without a `utoipa::ToSchema`\nderive — surfacing the SDK enum verbatim through\n`#[schema(value_type = String)]` would erase the enum constraint\nfrom the served `OpenAPI`, leaving codegen clients with `String`\ninstead of `active | suspended | deleted`.",
+        "enum": [
+          "active",
+          "suspended",
+          "deleted"
+        ],
+        "type": "string"
+      },
+      "TenantUpdateRequestDto": {
+        "additionalProperties": false,
+        "description": "PATCH body for `/tenants/{tenant_id}`. Only `name` is mutable; status\ntransitions go through `/suspend`, `/unsuspend`, `DELETE`. Empty patch →\nservice returns `code=validation`. `deny_unknown_fields` keeps the wire\nenvelope locked.",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
         "type": "object"
       },
       "TextSpan": {
@@ -3630,39 +4211,90 @@
         ],
         "type": "object"
       },
-      "UserDto": {
-        "description": "REST DTO for user representation with serde/utoipa",
+      "UserCreateRequestDto": {
+        "description": "Mirrors `UserCreateRequest`. Trim/structural validation lives in\n`UserService::create_user` (via GTS schema) — this DTO only pins the\nwire shape.\n\n`password` is the atomic initial credential delivered together with the\nuser create request: when present, the `IdP` plugin sets it during creation\nso the caller can immediately password-grant. Omit it to create the user\nwithout a credential (admin-reset or invite-link flow).",
         "properties": {
-          "created_at": {
-            "format": "date-time",
-            "type": "string"
-          },
           "display_name": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "password": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NewUserPasswordDto"
+              }
+            ]
+          },
+          "username": {
             "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "type": "object"
+      },
+      "UserDto": {
+        "description": "Mirrors User. Tenant-minimal projection per\nadr-idp-user-identity-source-of-truth.",
+        "properties": {
+          "display_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "format": "uuid",
             "type": "string"
           },
-          "tenant_id": {
-            "format": "uuid",
-            "type": "string"
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "updated_at": {
-            "format": "date-time",
+          "username": {
             "type": "string"
           }
         },
         "required": [
           "id",
-          "tenant_id",
-          "email",
-          "display_name",
-          "created_at",
-          "updated_at"
+          "username"
         ],
         "type": "object"
       },
@@ -3792,12 +4424,3406 @@
     }
   },
   "info": {
-    "description": "Cyber Ware Example Server API Documentation",
-    "title": "Cyber Ware Example Server API",
+    "description": "CF/Gears Example Server API Documentation",
+    "title": "CF/Gears Example Server API",
     "version": "0.1.0"
   },
   "openapi": "3.1.0",
   "paths": {
+    "/account-management/v1/tenants": {
+      "post": {
+        "description": "Create a non-root tenant under an existing parent tenant. The server validates the chained `tenant_type` against the published GTS schema, derives the canonical UUIDv5 internally, and checks hierarchy constraints (parent exists + is `active`) before invoking the configured IdP tenant-provisioning contract. The new tenant id is server-allocated; clients receive it in the response body and in the `Location` header. Returns HTTP 201 Created with the post-create tenant projection in `status=active`.",
+        "operationId": "account_management.create_tenant",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantCreateRequestDto"
+              }
+            }
+          },
+          "description": "Tenant provisioning payload",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            },
+            "description": "Tenant created"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP plugin does not support tenant provisioning"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP / PDP / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a child tenant",
+        "tags": [
+          "Tenants"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}": {
+      "delete": {
+        "description": "Soft-delete a tenant. Flips `status=deleted` and stamps `deleted_at` to arm the retention sweep; the row is hard-deleted by the background reaper once the retention window elapses. Preconditions: the tenant has no non-deleted children (`tenant_has_children`), no resources owned in resource-group (`tenant_has_resources`), and is not the platform root (`root_tenant_cannot_delete`). Returns 204 No Content on success; the caller can re-read the post-delete projection (status=`deleted`, `deleted_at` set) via `GET /tenants/{tenant_id}`.",
+        "operationId": "account_management.delete_tenant",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tenant soft-deleted"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP plugin does not support tenant deprovisioning"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP / PDP / DB / RG transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Soft-delete a tenant",
+        "tags": [
+          "Tenants"
+        ]
+      },
+      "get": {
+        "description": "Read a tenant by id. The caller's PDP-narrowed scope clamps the lookup to its authorised subtree at the database -- a caller whose scope does not contain `tenant_id` sees `not_found`, never the row. Soft-deleted (`status=deleted`) tenants are SDK-visible; AM-internal `provisioning` rows are never surfaced.",
+        "operationId": "account_management.get_tenant",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            },
+            "description": "Tenant details"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read tenant details",
+        "tags": [
+          "Tenants"
+        ]
+      },
+      "patch": {
+        "description": "Patch mutable tenant fields. Only `name` may be changed via this endpoint; immutable fields (`parent_id`, `tenant_type`, `self_managed`) and lifecycle fields (`status`) are rejected by `additionalProperties: false`. Lifecycle transitions go through `POST /tenants/{tenant_id}/suspend` / `/unsuspend` (sub-resource fallback for the AIP-136 colon-method) and `DELETE /tenants/{tenant_id}`. An empty patch (no fields supplied) is a 400.",
+        "operationId": "account_management.update_tenant",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantUpdateRequestDto"
+              }
+            }
+          },
+          "description": "Mutable-fields patch",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            },
+            "description": "Updated tenant"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update mutable tenant fields",
+        "tags": [
+          "Tenants"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/child-conversions": {
+      "get": {
+        "description": "Cursor-paginated parent-side inbound listing. Surfaces only the cross-barrier minimal projection per `dod-managed-self-managed-modes-parent-side-minimal- surface`: no child-subtree data (tenant metadata beyond `child_tenant_name`, descendants, user records, resource inventories) leaks across the barrier. Returns ALL lifecycle statuses; clients filter via `?$filter=status eq 'pending'` the same way as the own listing. The listing accepts conversion requests targeting self-managed children whose closure barrier hides the child tenant from the parent -- the dual-consent flows live under the parent's URL authority.",
+        "operationId": "account_management.list_child_conversions",
+        "parameters": [
+          {
+            "description": "Parent tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of conversion requests to return",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Cursor for pagination",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 filter expression\n- id: eq|ne|in\n- tenant_id: eq|ne|in\n- parent_id: eq|ne|in\n- status: eq|ne|contains|startswith|endswith|in\n- target_mode: eq|ne|contains|startswith|endswith|in\n- initiator_side: eq|ne|contains|startswith|endswith|in\n- requested_by: eq|ne|in\n- created_at: eq|ne|gt|ge|lt|le|in\n- expires_at: eq|ne|gt|ge|lt|le|in\n- updated_at: eq|ne|gt|ge|lt|le|in",
+            "in": "query",
+            "name": "$filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 orderby expression\n- id asc\n- id desc\n- tenant_id asc\n- tenant_id desc\n- parent_id asc\n- parent_id desc\n- status asc\n- status desc\n- target_mode asc\n- target_mode desc\n- initiator_side asc\n- initiator_side desc\n- requested_by asc\n- requested_by desc\n- created_at asc\n- created_at desc\n- expires_at asc\n- expires_at desc\n- updated_at asc\n- updated_at desc",
+            "in": "query",
+            "name": "$orderby",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ChildConversionRequestDto"
+                }
+              }
+            },
+            "description": "Paginated list of inbound child conversion requests"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List inbound child conversion requests (parent-side)",
+        "tags": [
+          "Tenant Conversions"
+        ],
+        "x-odata-filter": {
+          "allowedFields": {
+            "created_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ],
+            "expires_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ],
+            "id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "initiator_side": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "parent_id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "requested_by": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "status": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "target_mode": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "tenant_id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "updated_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ]
+          }
+        },
+        "x-odata-orderby": {
+          "allowedFields": [
+            "id asc",
+            "id desc",
+            "tenant_id asc",
+            "tenant_id desc",
+            "parent_id asc",
+            "parent_id desc",
+            "status asc",
+            "status desc",
+            "target_mode asc",
+            "target_mode desc",
+            "initiator_side asc",
+            "initiator_side desc",
+            "requested_by asc",
+            "requested_by desc",
+            "created_at asc",
+            "created_at desc",
+            "expires_at asc",
+            "expires_at desc",
+            "updated_at asc",
+            "updated_at desc"
+          ]
+        }
+      },
+      "post": {
+        "description": "Parent-side initiation: the URL-bound parent requests a mode flip on one of its direct children. The body carries the child's `child_tenant_id`; the URL binds the parent. `target_mode` follows the same inverse-only contract as [`request_own_conversion`]. The service's URL-vs-row coherence guard surfaces a misrouted call (a `child_tenant_id` whose `parent_id` is not the URL-bound parent) as `code=not_found`. Response surfaces the cross-barrier minimal projection.",
+        "operationId": "account_management.request_child_conversion",
+        "parameters": [
+          {
+            "description": "Parent tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestChildConversionDto"
+              }
+            }
+          },
+          "description": "Parent-side conversion initiation payload",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildConversionRequestDto"
+                }
+              }
+            },
+            "description": "Conversion request created"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Initiate a conversion request on a direct child (parent-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/child-conversions/{request_id}": {
+      "get": {
+        "description": "Parent-side point read. Same cross-barrier minimal projection contract as the list endpoint. A `request_id` whose stored `parent_id` does NOT match the URL collapses to `code=not_found`.",
+        "operationId": "account_management.get_child_conversion",
+        "parameters": [
+          {
+            "description": "Parent tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Conversion request UUID",
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildConversionRequestDto"
+                }
+              }
+            },
+            "description": "Conversion request (cross-barrier minimal projection)"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read an inbound child conversion request (parent-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      },
+      "patch": {
+        "description": "Parent-side PATCH dispatcher. Same status-to-method routing as the own PATCH endpoint, constructed with the URL-bound parent caller so the service runs the counterparty-only rule for `approve` / `reject` and the initiator-only rule for `cancel` against the parent side. Response surfaces the cross-barrier minimal projection.",
+        "operationId": "account_management.patch_child_conversion",
+        "parameters": [
+          {
+            "description": "Parent tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Conversion request UUID",
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversionPatchDto"
+              }
+            }
+          },
+          "description": "Conversion resolution payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildConversionRequestDto"
+                }
+              }
+            },
+            "description": "Resolved conversion request (cross-barrier minimal projection)"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Resolve an inbound child conversion request (parent-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/children": {
+      "get": {
+        "description": "List direct children of the given tenant. Cursor-paginated with `(created_at ASC, id ASC)` as the effective sort so siblings sharing a `created_at` timestamp stay disambiguated across pages. Soft-deleted rows are hidden by default -- opt in with `?$filter=status eq 'deleted'`. AM-internal `provisioning` rows are never surfaced. The parent must exist and be SDK-visible, otherwise the call collapses to `not_found`.",
+        "operationId": "account_management.list_tenant_children",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of children to return",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Cursor for pagination",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 filter expression\n- id: eq|ne|in\n- status: eq|ne|contains|startswith|endswith|in\n- tenant_type_uuid: eq|ne|in\n- self_managed: eq|ne\n- created_at: eq|ne|gt|ge|lt|le|in\n- updated_at: eq|ne|gt|ge|lt|le|in",
+            "in": "query",
+            "name": "$filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 orderby expression\n- id asc\n- id desc\n- status asc\n- status desc\n- tenant_type_uuid asc\n- tenant_type_uuid desc\n- self_managed asc\n- self_managed desc\n- created_at asc\n- created_at desc\n- updated_at asc\n- updated_at desc",
+            "in": "query",
+            "name": "$orderby",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TenantDto"
+                }
+              }
+            },
+            "description": "Paginated list of direct child tenants"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List direct children of a tenant",
+        "tags": [
+          "Tenants"
+        ],
+        "x-odata-filter": {
+          "allowedFields": {
+            "created_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ],
+            "id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "self_managed": [
+              "eq",
+              "ne"
+            ],
+            "status": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "tenant_type_uuid": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "updated_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ]
+          }
+        },
+        "x-odata-orderby": {
+          "allowedFields": [
+            "id asc",
+            "id desc",
+            "status asc",
+            "status desc",
+            "tenant_type_uuid asc",
+            "tenant_type_uuid desc",
+            "self_managed asc",
+            "self_managed desc",
+            "created_at asc",
+            "created_at desc",
+            "updated_at asc",
+            "updated_at desc"
+          ]
+        }
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/conversions": {
+      "get": {
+        "description": "Cursor-paginated listing of the converting tenant's own conversion requests. Returns ALL lifecycle statuses (pending / approved / cancelled / rejected / expired) -- clients narrow to the actionable subset via standard `?$filter=status eq 'pending'`. Effective sort defaults to `(created_at DESC, id ASC)` when no `$orderby` is supplied; `id ASC` is the UNIQUE tiebreaker so cursor re-reads stay deterministic.",
+        "operationId": "account_management.list_own_conversions",
+        "parameters": [
+          {
+            "description": "Converting tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of conversion requests to return",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Cursor for pagination",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 filter expression\n- id: eq|ne|in\n- tenant_id: eq|ne|in\n- parent_id: eq|ne|in\n- status: eq|ne|contains|startswith|endswith|in\n- target_mode: eq|ne|contains|startswith|endswith|in\n- initiator_side: eq|ne|contains|startswith|endswith|in\n- requested_by: eq|ne|in\n- created_at: eq|ne|gt|ge|lt|le|in\n- expires_at: eq|ne|gt|ge|lt|le|in\n- updated_at: eq|ne|gt|ge|lt|le|in",
+            "in": "query",
+            "name": "$filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 orderby expression\n- id asc\n- id desc\n- tenant_id asc\n- tenant_id desc\n- parent_id asc\n- parent_id desc\n- status asc\n- status desc\n- target_mode asc\n- target_mode desc\n- initiator_side asc\n- initiator_side desc\n- requested_by asc\n- requested_by desc\n- created_at asc\n- created_at desc\n- expires_at asc\n- expires_at desc\n- updated_at asc\n- updated_at desc",
+            "in": "query",
+            "name": "$orderby",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OwnConversionRequestDto"
+                }
+              }
+            },
+            "description": "Paginated list of own conversion requests"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List own conversion requests",
+        "tags": [
+          "Tenant Conversions"
+        ],
+        "x-odata-filter": {
+          "allowedFields": {
+            "created_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ],
+            "expires_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ],
+            "id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "initiator_side": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "parent_id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "requested_by": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "status": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "target_mode": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "tenant_id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "updated_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ]
+          }
+        },
+        "x-odata-orderby": {
+          "allowedFields": [
+            "id asc",
+            "id desc",
+            "tenant_id asc",
+            "tenant_id desc",
+            "parent_id asc",
+            "parent_id desc",
+            "status asc",
+            "status desc",
+            "target_mode asc",
+            "target_mode desc",
+            "initiator_side asc",
+            "initiator_side desc",
+            "requested_by asc",
+            "requested_by desc",
+            "created_at asc",
+            "created_at desc",
+            "expires_at asc",
+            "expires_at desc",
+            "updated_at asc",
+            "updated_at desc"
+          ]
+        }
+      },
+      "post": {
+        "description": "Child-side initiation: the converting tenant requests a mode flip. `target_mode` is REQUIRED and MUST be the strict binary inverse of the tenant's current `self_managed` flag -- the service rejects any other value with `code=validation` so a concurrent peer-flip surfaces as a clean envelope rather than a silent implicit-inverse override. An optional `comment` (1..=1000 chars; empty strings rejected) is persisted to `requested_comment`. The `pending_exists` partial-unique-index collision is surfaced with `code=already_exists` (HTTP 409) carrying the existing `request_id` per the AIP-193 duplicate-on-create convention.",
+        "operationId": "account_management.request_own_conversion",
+        "parameters": [
+          {
+            "description": "Converting tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOwnConversionDto"
+              }
+            }
+          },
+          "description": "Conversion initiation payload",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnConversionRequestDto"
+                }
+              }
+            },
+            "description": "Conversion request created"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Initiate a conversion request (child-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/conversions/{request_id}": {
+      "get": {
+        "description": "Point read of a single conversion request owned by the URL-bound tenant. A `request_id` whose stored `tenant_id` does NOT match the URL collapses to `not_found` -- the existence channel is uniform with a real not-found miss so callers cannot probe row existence through the error code.",
+        "operationId": "account_management.get_own_conversion",
+        "parameters": [
+          {
+            "description": "Converting tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Conversion request UUID",
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnConversionRequestDto"
+                }
+              }
+            },
+            "description": "Conversion request"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read a conversion request (child-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      },
+      "patch": {
+        "description": "Drive a `pending` row to one of three admissible terminal statuses. The body's `status` field routes to the matching service method: `cancel` is initiator-only, `approve` and `reject` are counterparty-only (initiator gets `code=failed_precondition` with `invalid_actor_for_transition`). Idempotent retries on already-resolved rows surface `code=failed_precondition` with `already_resolved`. `pending` and `expired` are NOT admissible PATCH targets and are rejected at the wire layer with a clean 400 envelope. `comment` is optional (1..=1000 chars) and stamped on the matching per-transition column.",
+        "operationId": "account_management.patch_own_conversion",
+        "parameters": [
+          {
+            "description": "Converting tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Conversion request UUID",
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversionPatchDto"
+              }
+            }
+          },
+          "description": "Conversion resolution payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnConversionRequestDto"
+                }
+              }
+            },
+            "description": "Resolved conversion request"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Resolve a conversion request (child-side)",
+        "tags": [
+          "Tenant Conversions"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/metadata": {
+      "get": {
+        "description": "List the metadata entries written directly on a tenant. Direct-only -- inherited values are not included; clients reading effective values use the `/resolved` endpoint.",
+        "operationId": "account_management.list_tenant_metadata",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Maximum number of metadata entries to return",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Cursor for pagination",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 filter expression\n- updated_at: eq|ne|gt|ge|lt|le|in\n- schema_uuid: eq|ne|in",
+            "in": "query",
+            "name": "$filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 orderby expression\n- updated_at asc\n- updated_at desc\n- schema_uuid asc\n- schema_uuid desc",
+            "in": "query",
+            "name": "$orderby",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TenantMetadataEntryDto"
+                }
+              }
+            },
+            "description": "Paginated list of tenant metadata entries"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List tenant metadata entries",
+        "tags": [
+          "Tenant Metadata"
+        ],
+        "x-odata-filter": {
+          "allowedFields": {
+            "schema_uuid": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "updated_at": [
+              "eq",
+              "ne",
+              "gt",
+              "ge",
+              "lt",
+              "le",
+              "in"
+            ]
+          }
+        },
+        "x-odata-orderby": {
+          "allowedFields": [
+            "updated_at asc",
+            "updated_at desc",
+            "schema_uuid asc",
+            "schema_uuid desc"
+          ]
+        }
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/metadata/{type_id}": {
+      "delete": {
+        "description": "Hard-delete the metadata entry attached directly to the tenant for the given chained GTS `type_id`. Idempotent on missing rows: returns 204 whether the direct entry existed and was removed or was already absent (mirrors `delete_user` deprovision idempotency). The tenant-existence and schema-registration gates still raise their own 404 codes.",
+        "operationId": "account_management.delete_tenant_metadata",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Full chained GTS schema identifier",
+            "in": "path",
+            "name": "type_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Metadata entry deleted"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete a tenant metadata entry",
+        "tags": [
+          "Tenant Metadata"
+        ]
+      },
+      "get": {
+        "description": "Read the metadata entry attached directly to the tenant for the given chained GTS `type_id`. Does not walk up the ancestor chain -- use the `/resolved` endpoint for inheritance-aware reads.",
+        "operationId": "account_management.get_tenant_metadata",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Full chained GTS schema identifier",
+            "in": "path",
+            "name": "type_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantMetadataEntryDto"
+                }
+              }
+            },
+            "description": "Tenant metadata entry"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a tenant metadata entry",
+        "tags": [
+          "Tenant Metadata"
+        ]
+      },
+      "put": {
+        "description": "Upsert the metadata entry at (tenant_id, type_id). The request body is the GTS-validated payload; the chained `type_id` is the path parameter. Returns HTTP 200 with the post-write entry per RFC 7231 PUT semantics; the insert-vs-update distinction is preserved on the `am.events:metadata_upserted` audit line.",
+        "operationId": "account_management.put_tenant_metadata",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Full chained GTS schema identifier",
+            "in": "path",
+            "name": "type_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTenantMetadataDto"
+              }
+            }
+          },
+          "description": "GTS-validated metadata payload",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantMetadataEntryDto"
+                }
+              }
+            },
+            "description": "Tenant metadata entry stored"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create or replace a tenant metadata entry",
+        "tags": [
+          "Tenant Metadata"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/metadata/{type_id}/resolved": {
+      "get": {
+        "description": "Walk up the ancestor chain honouring `self_managed` barriers and the schema's `inheritance_policy`. Empty resolution returns HTTP 200 with `resolved=false`; a 404 is raised only if the tenant does not exist or the schema is not registered.",
+        "operationId": "account_management.resolve_tenant_metadata",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Full chained GTS schema identifier",
+            "in": "path",
+            "name": "type_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedTenantMetadataDto"
+                }
+              }
+            },
+            "description": "Effective metadata value (resolved=true) or empty (resolved=false)"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB / types-registry transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Resolve the effective metadata value for a tenant and schema",
+        "tags": [
+          "Tenant Metadata"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/suspend": {
+      "post": {
+        "description": "Flip the target tenant's `status` from `active` to `suspended`. Idempotent: a second call on an already-suspended row returns 200 with the same projection and does NOT bump `updated_at` (the service short-circuits on same-to-same inside the SERIALIZABLE write). AIP-136 specifies the colon-method shape `POST /tenants/{tenant_id}:suspend`, but axum 0.8.x pins `matchit = \"=0.8.4\"` which cannot split `{param}:suffix` in a single segment; this endpoint uses the in-tree sub-resource fallback until axum bumps matchit (PR https://github.com/tokio-rs/axum/pull/3702).",
+        "operationId": "account_management.suspend_tenant",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            },
+            "description": "Suspended tenant"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Suspend an active tenant",
+        "tags": [
+          "Tenants"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/unsuspend": {
+      "post": {
+        "description": "Flip the target tenant's `status` from `suspended` back to `active`. Idempotent on already-active rows (same short-circuit as `suspend_tenant`). Sub-resource fallback for the AIP-136 colon-method -- same axum/matchit constraint as the `suspend` endpoint.",
+        "operationId": "account_management.unsuspend_tenant",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            },
+            "description": "Unsuspended tenant"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "PDP / DB transport failure"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Unsuspend a suspended tenant",
+        "tags": [
+          "Tenants"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/users": {
+      "get": {
+        "description": "List users provisioned in the tenant via the configured IdP plugin. Filter via OData `$filter` over `id` (Uuid), `username`, `email`, `display_name`, `first_name`, `last_name` (String) with operators `eq`, `ne`, `in`, and `contains` / `startswith` / `endswith` on String fields (case-insensitive); combine via `and` / `or` / `not`. Sort via `$orderby` over the same fields (default: `username ASC, id ASC` with `id ASC` tiebreaker appended even when the caller supplies their own order). Point lookup is `$filter=id eq <uuid>` with `top=1`: empty page is the canonical \"user absent\" signal (no 404). Cursor pagination is opaque; caller MUST NOT change `$filter` or `$orderby` between continuation requests with the same cursor. AM persists no local user state; every read is a pass-through to the IdP.",
+        "operationId": "account_management.list_tenant_users",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 filter expression\n- id: eq|ne|in\n- username: eq|ne|contains|startswith|endswith|in\n- email: eq|ne|contains|startswith|endswith|in\n- display_name: eq|ne|contains|startswith|endswith|in\n- first_name: eq|ne|contains|startswith|endswith|in\n- last_name: eq|ne|contains|startswith|endswith|in",
+            "in": "query",
+            "name": "$filter",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "OData v4 orderby expression\n- id asc\n- id desc\n- username asc\n- username desc\n- email asc\n- email desc\n- display_name asc\n- display_name desc\n- first_name asc\n- first_name desc\n- last_name asc\n- last_name desc",
+            "in": "query",
+            "name": "$orderby",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_UserDto"
+                }
+              }
+            },
+            "description": "Paginated list of tenant users"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP plugin does not support the requested operation"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP unavailable (transport failure or timeout)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List users provisioned in a tenant",
+        "tags": [
+          "Tenant Users"
+        ],
+        "x-odata-filter": {
+          "allowedFields": {
+            "display_name": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "email": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "first_name": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "id": [
+              "eq",
+              "ne",
+              "in"
+            ],
+            "last_name": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ],
+            "username": [
+              "eq",
+              "ne",
+              "contains",
+              "startswith",
+              "endswith",
+              "in"
+            ]
+          }
+        },
+        "x-odata-orderby": {
+          "allowedFields": [
+            "id asc",
+            "id desc",
+            "username asc",
+            "username desc",
+            "email asc",
+            "email desc",
+            "display_name asc",
+            "display_name desc",
+            "first_name asc",
+            "first_name desc",
+            "last_name asc",
+            "last_name desc"
+          ]
+        }
+      },
+      "post": {
+        "description": "Provision a user in the tenant via the configured IdP plugin. AM persists no local user state -- the IdP becomes the source of truth on success. Returns HTTP 201 Created with the projected user body. AM does NOT expose a per-user GET; clients that need to re-read the user use the filtered listing `GET /tenants/{tenant_id}/users?$filter=id eq <uuid>&$top=1`.",
+        "operationId": "account_management.create_tenant_user",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateRequestDto"
+              }
+            }
+          },
+          "description": "User provisioning payload",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            },
+            "description": "Tenant user provisioned"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP plugin does not support user provisioning"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP unavailable (transport failure or timeout)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Provision a user in a tenant",
+        "tags": [
+          "Tenant Users"
+        ]
+      }
+    },
+    "/account-management/v1/tenants/{tenant_id}/users/{user_id}": {
+      "delete": {
+        "description": "Deprovision a user from the tenant via the configured IdP plugin. Idempotent: returns 204 No Content whether the IdP removed the row or reported the user as already absent; a subsequent retry of the same DELETE also returns 204. Provider implementations MUST NOT silently no-op on a genuinely supported mutating operation -- unsupported deprovision surfaces as `code=idp_unsupported_operation`.",
+        "operationId": "account_management.delete_tenant_user",
+        "parameters": [
+          {
+            "description": "Tenant UUID",
+            "in": "path",
+            "name": "tenant_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "IdP-issued UUID user identifier",
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deprovisioned"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP plugin does not support user deprovisioning"
+          },
+          "503": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "IdP unavailable (transport failure or timeout)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Deprovision a user from a tenant",
+        "tags": [
+          "Tenant Users"
+        ]
+      }
+    },
     "/file-parser/v1/info": {
       "get": {
         "operationId": "file_parser.get_parser_info",
@@ -11048,7 +15074,7 @@
   },
   "servers": [
     {
-      "url": "/cw"
+      "url": "/cf"
     }
   ]
 }

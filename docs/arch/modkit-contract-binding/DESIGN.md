@@ -1,10 +1,10 @@
-# Technical Design — ModKit Contract Binding
+# Technical Design — ToolKit Contract Binding
 
 ## 1. Architecture Overview
 
 ### 1.1 Architectural Vision
 
-The contract-binding system introduces a two-layer trait architecture for ModKit modules. The first layer is the **base trait** -- a plain Rust trait with zero annotations that defines the domain contract. The second layer is the **transport projection** -- a trait that extends the base and carries transport-specific annotations (HTTP paths, methods, streaming). A proc macro processes the projection and generates a REST client, OpenAPI spec, and any transport-specific logic.
+The contract-binding system introduces a two-layer trait architecture for ToolKit modules. The first layer is the **base trait** -- a plain Rust trait with zero annotations that defines the domain contract. The second layer is the **transport projection** -- a trait that extends the base and carries transport-specific annotations (HTTP paths, methods, streaming). A proc macro processes the projection and generates a REST client, OpenAPI spec, and any transport-specific logic.
 
 Four **contract types** encode operational semantics directly in the trait name. The contract type determines the failure domain, transaction scope, timeout requirements, and error handling strategy. There is no configuration file, no annotation, and no runtime flag that overrides what the name declares.
 
@@ -23,7 +23,7 @@ Consumers always depend on the base trait (`Arc<dyn NotificationBackend>`). Whet
   │    deliver()                                                     │
   │    stream_delivery()                                             │
   │                                                                  │
-  │  #[modkit_rest_contract]                                         │
+  │  #[toolkit_rest_contract]                                         │
   │  trait NotificationBackendRest: NotificationBackend              │
   │    #[post("/v1/deliver")]           (transport projection)       │
   │    deliver()                                                     │
@@ -149,11 +149,11 @@ The four-type segregation encodes this asymmetry in the type system. A migration
 | Requirement | Design Response |
 |-------------|-----------------|
 | `cpt-cf-binding-fr-base-trait-purity` | Base traits are plain Rust with zero annotations. No transport, no macros, no binding modes. Compile-time plugins implement the base trait directly. |
-| `cpt-cf-binding-fr-transport-projection` | Transport traits extend the base and carry HTTP annotations. The `#[modkit_rest_contract]` macro generates the REST client, OpenAPI spec, and SSE support. |
+| `cpt-cf-binding-fr-transport-projection` | Transport traits extend the base and carry HTTP annotations. The `#[toolkit_rest_contract]` macro generates the REST client, OpenAPI spec, and SSE support. |
 | `cpt-cf-binding-fr-compile-time-safety` | Redeclared methods in the transport trait are checked by the Rust compiler against the base trait signatures. Missing methods, wrong param types, wrong return types are caught at compile time. |
 | `cpt-cf-binding-fr-contract-types` | Four contract types (Api, Embedded, Backend, Extension) encode operational semantics in the trait name suffix. The name IS the contract. |
 | `cpt-cf-binding-fr-naming-convention` | Every trait ends with its contract type suffix. Transport projections append `Rest` or `Grpc`. Hard rules enforced by convention and future lint. |
-| `cpt-cf-binding-fr-rest-client-gen` | `#[modkit_rest_contract]` generates a `{Trait}Client` struct implementing both the base trait (HTTP dispatch) and the transport trait (default delegation). |
+| `cpt-cf-binding-fr-rest-client-gen` | `#[toolkit_rest_contract]` generates a `{Trait}Client` struct implementing both the base trait (HTTP dispatch) and the transport trait (default delegation). |
 | `cpt-cf-binding-fr-openapi-gen` | The macro generates an `{trait}_openapi_spec()` function returning a valid OpenAPI 3.1 spec with endpoint paths, HTTP methods, and JSON schemas (via `schemars`). |
 | `cpt-cf-binding-fr-sse-streaming` | Methods annotated with `#[streaming]` generate SSE-aware client code: `Accept: text/event-stream` header, SSE parser into typed `Stream`. |
 | `cpt-cf-binding-fr-retryable` | Methods annotated with `#[retryable]` generate retry logic with exponential backoff. Retry policy configured via `ClientConfig`. |
@@ -296,7 +296,7 @@ All contract traits use `#[async_trait]` from the `async-trait` crate. This incl
 
 - **Trait objects are required.** The entire design rests on consumers holding `Arc<dyn Backend>`. Native `async fn in Trait` (stable since Rust 1.75) is not dyn-compatible without boxing the returned future, which `async_trait` does transparently.
 - **The macro generates `async_trait`-compatible code.** The generated REST client is annotated `#[async_trait::async_trait]` and boxes returned futures accordingly. Native `async fn` in the same trait would require `#[trait_variant]` or `#[allow(async_fn_in_trait)]` gymnastics and would not be dyn-compatible.
-- **Consistency across the codebase.** ModKit SDK crates already use `async_trait`. This design keeps that convention.
+- **Consistency across the codebase.** ToolKit SDK crates already use `async_trait`. This design keeps that convention.
 
 The cost is one `Box<dyn Future>` allocation per async method call — negligible compared to HTTP serialization or network I/O. When native dyn-compatible `async fn` is stable and ergonomic, the platform can migrate, but that is not today.
 
@@ -351,7 +351,7 @@ Remote services expose their OpenAPI spec at `/.well-known/openapi.json`. The se
 
 | Alternative | Why Rejected |
 |-------------|-------------|
-| Single-trait annotations (`#[modkit_contract(binding = [compile, rest])]`) | Mixes transport with domain. REST annotations do not apply to gRPC. Compile-time plugins carry unnecessary annotation weight. Cannot add a new transport without modifying the base trait. |
+| Single-trait annotations (`#[toolkit_contract(binding = [compile, rest])]`) | Mixes transport with domain. REST annotations do not apply to gRPC. Compile-time plugins carry unnecessary annotation weight. Cannot add a new transport without modifying the base trait. |
 | Separate module for transport mapping (not a trait) | Loses compile-time signature checking. The mapping between base methods and HTTP endpoints would be a configuration file or a separate struct, not compiler-verified. A method rename in the base trait would silently break the mapping. |
 
 ### D2: Four Contract Types
@@ -373,7 +373,7 @@ Remote services expose their OpenAPI spec at `/.well-known/openapi.json`. The se
 
 - [ ] `p1` - **ID**: `cpt-cf-binding-decision-default-delegation`
 
-**Decision**: The contract and its protocol projection are **two distinct Rust traits** in the SDK crate. The base trait (e.g., `NotificationBackend`) carries the domain contract with zero transport annotations. The protocol projection (e.g., `NotificationBackendRest`) **extends** the base via a `: Base` supertrait bound and redeclares each method with protocol-specific annotations (`#[post]`, `#[streaming]`, `#[retryable]`). The `#[modkit_rest_contract]` macro converts the redeclared methods into default methods that delegate to the base trait via fully-qualified call syntax: `Base::method(self, ...)`. The generated REST client provides a single HTTP dispatch implementation of the base trait; the projection trait's empty impl picks up the delegating defaults.
+**Decision**: The contract and its protocol projection are **two distinct Rust traits** in the SDK crate. The base trait (e.g., `NotificationBackend`) carries the domain contract with zero transport annotations. The protocol projection (e.g., `NotificationBackendRest`) **extends** the base via a `: Base` supertrait bound and redeclares each method with protocol-specific annotations (`#[post]`, `#[streaming]`, `#[retryable]`). The `#[toolkit_rest_contract]` macro converts the redeclared methods into default methods that delegate to the base trait via fully-qualified call syntax: `Base::method(self, ...)`. The generated REST client provides a single HTTP dispatch implementation of the base trait; the projection trait's empty impl picks up the delegating defaults.
 
 **Why two traits, not one**:
 
@@ -396,7 +396,7 @@ pub trait NotificationBackend: Send + Sync {
 
 // 2. The protocol projection — extends the base with REST annotations.
 //    Lives alongside the contract, feature-gated behind `rest-client` if needed.
-#[modkit_rest_contract]
+#[toolkit_rest_contract]
 pub trait NotificationBackendRest: NotificationBackend {
     #[post("/v1/deliver")]
     async fn deliver(&self, req: &DeliverRequest) -> Result<DeliverResponse, Err>;
@@ -487,7 +487,7 @@ Perspective: **code that uses the protocol-specific surface** (projection-only m
 **Scenario 3: A compile-time plugin.** *Shows that in-process plugins depend only on the base trait and know nothing about REST.*
 
 ```
-  // Plugin crate — does NOT depend on reqwest, modkit-contract-runtime, or the
+  // Plugin crate — does NOT depend on reqwest, toolkit-contract-runtime, or the
   // projection trait. Depends only on the SDK crate's base trait.
   struct InProcEmailPlugin { /* SMTP client, whatever */ }
 
@@ -508,7 +508,7 @@ Perspective: **plugin author**. Point: the plugin implements the base trait like
 - Consumer code is identical regardless of binding mode (`Arc<dyn NotificationBackend>` always).
 - The contract author writes the domain trait once; the protocol author writes the projection once. Neither has to duplicate the other's work.
 - Signature drift between the contract and the projection is a compile error.
-- Adding a gRPC projection later is purely additive — a new trait `NotificationBackendGrpc: NotificationBackend`, a new macro `#[modkit_grpc_contract]`, a new generated client. The base trait and existing REST projection are untouched.
+- Adding a gRPC projection later is purely additive — a new trait `NotificationBackendGrpc: NotificationBackend`, a new macro `#[toolkit_grpc_contract]`, a new generated client. The base trait and existing REST projection are untouched.
 - A compile-time plugin that only implements the base trait works everywhere — because the projection trait's default delegation bridges the gap automatically.
 
 **Manual implementation is always allowed.** The macro generates a default client for the common case (POST + JSON, SSE streaming, exponential-backoff retry). When a module needs behavior the macro does not express — complex path templates, query parameter composition, custom authentication, connection pooling with per-tenant routing, bespoke retry strategies, request signing — the author can write a hand-crafted client that implements the same base trait directly. The consumer still gets `Arc<dyn NotificationBackend>`; the generated client and the hand-written client are indistinguishable from the consumer's perspective. The macro is a convenience for the common case, not a lock-in. Hand-written clients can coexist with macro-generated ones in the same codebase.
@@ -560,11 +560,11 @@ Generated `error_code` values: `NOTIFICATION_NOT_FOUND`, `DELIVERY_UNAVAILABLE`,
 
 | Crate | Type | Responsibility |
 |-------|------|----------------|
-| `cf-modkit-contract-macros` | proc-macro | `#[modkit_rest_contract]` -- generates REST client struct, OpenAPI spec function, SSE streaming, retryable methods. `#[derive(ContractError)]` -- generates Problem Details conversion with `error_code` + `error_domain`. Method annotations: `#[get]`, `#[post]`, `#[put]`, `#[delete]`, `#[patch]`. Parameter annotations: `#[path]`, `#[query]`, `#[header]`, `#[streaming]`, `#[retryable]`. |
-| `cf-modkit-contract-runtime` | lib | `ProblemDetails` struct (RFC 9457 with extension fields). SSE stream parser (byte stream to typed events). `ClientConfig` (base URL, timeout, retry policy). `RetryConfig` and `with_retry()` helper for exponential backoff. |
+| `cf-toolkit-contract-macros` | proc-macro | `#[toolkit_rest_contract]` -- generates REST client struct, OpenAPI spec function, SSE streaming, retryable methods. `#[derive(ContractError)]` -- generates Problem Details conversion with `error_code` + `error_domain`. Method annotations: `#[get]`, `#[post]`, `#[put]`, `#[delete]`, `#[patch]`. Parameter annotations: `#[path]`, `#[query]`, `#[header]`, `#[streaming]`, `#[retryable]`. |
+| `cf-toolkit-contract-runtime` | lib | `ProblemDetails` struct (RFC 9457 with extension fields). SSE stream parser (byte stream to typed events). `ClientConfig` (base URL, timeout, retry policy). `RetryConfig` and `with_retry()` helper for exponential backoff. |
 | Module SDK crates (e.g., `notification-sdk`) | lib | Base traits (zero annotations, no macro dependency). Transport projection traits (behind `rest-client` feature). Feature-gated: `rest-client` enables `reqwest`, `schemars`, and the generated REST client. Without the feature, only the base trait is available. |
-| `cf-modkit` (modified) | lib | ClientHub: fallback resolution (compile-time first, then REST proxy from directory). Module lifecycle: new proxy wiring phase after plugin discovery, before post-init. |
-| `cf-modkit-macros` (modified) | proc-macro | Alignment with ADR-0004 module/plugin declaration macros. |
+| `cf-toolkit` (modified) | lib | ClientHub: fallback resolution (compile-time first, then REST proxy from directory). Module lifecycle: new proxy wiring phase after plugin discovery, before post-init. |
+| `cf-toolkit-macros` (modified) | proc-macro | Alignment with ADR-0004 module/plugin declaration macros. |
 
 ### SDK Crate Layout (per module)
 
@@ -579,7 +579,7 @@ notification-sdk/
     extension.rs        -- NotificationFormatterExtension (base only, no projection)
   Cargo.toml
     [features]
-    rest-client = ["reqwest", "schemars", "cf-modkit-contract-macros", "cf-modkit-contract-runtime"]
+    rest-client = ["reqwest", "schemars", "cf-toolkit-contract-macros", "cf-toolkit-contract-runtime"]
 ```
 
 ## 5. Contract Enforcement
@@ -589,7 +589,7 @@ Contract integrity is enforced at multiple levels, from compile-time through to 
 | Tier | When | Mechanism | What It Catches |
 |------|------|-----------|-----------------|
 | 1. Compile-time | `cargo build` | Rust trait system (`: Base` supertrait), typed enums, `#[non_exhaustive]` on request/response structs | Signature mismatches between base and projection, missing methods, wrong param/return/error types, direct struct construction outside the crate |
-| 2. Macro-time | `cargo build` | `#[modkit_rest_contract]` macro validates that annotated methods cover the base trait surface | Missing REST annotations for base trait methods |
+| 2. Macro-time | `cargo build` | `#[toolkit_rest_contract]` macro validates that annotated methods cover the base trait surface | Missing REST annotations for base trait methods |
 | 3. Test-time | `cargo test` | Round-trip tests for `ContractError` (serialize to Problem Details, deserialize back, assert variant match) | Error code drift, serialization schema changes, lost context fields |
 | 4. Registration-time | Service boot | Directory fetches `/.well-known/openapi.json` and validates endpoint presence, HTTP methods, content types against the expected spec | Missing endpoints on remote services, wrong HTTP methods, content type mismatches |
 | 5. Design-time | Architecture | Naming convention (suffix = operational semantics), structural enforcement (no projection = local-only) | Architectural misuse (calling a remote contract in a transaction, adding a projection to an Extension) |
@@ -604,9 +604,9 @@ Every base trait method must be redeclared in the transport projection with HTTP
 
 ### [Risk] Proc Macro Complexity
 
-The `#[modkit_rest_contract]` macro must parse trait definitions, generate client structs, produce OpenAPI specs, handle SSE streaming, and implement retry logic. Proc macros are notoriously hard to debug.
+The `#[toolkit_rest_contract]` macro must parse trait definitions, generate client structs, produce OpenAPI specs, handle SSE streaming, and implement retry logic. Proc macros are notoriously hard to debug.
 
-**Mitigation**: The PoC (`modkit-binding-poc`) proves feasibility for the common patterns: POST/GET endpoints, streaming, retryable methods, ContractError round-trip. Edge cases (generics, lifetimes, complex associated types) are explicitly out of scope for phase 1.
+**Mitigation**: The PoC (`toolkit-binding-poc`) proves feasibility for the common patterns: POST/GET endpoints, streaming, retryable methods, ContractError round-trip. Edge cases (generics, lifetimes, complex associated types) are explicitly out of scope for phase 1.
 
 ### [Risk] schemars Dependency
 
@@ -630,7 +630,7 @@ Only the client is generated. Remote services must implement their REST endpoint
 
 Only REST transport projections are supported. gRPC follows the same pattern but is deferred.
 
-**Justification**: REST covers the immediate need (out-of-process plugins, third-party integrations). The two-layer architecture is transport-agnostic by design -- adding `#[modkit_grpc_contract]` later requires no changes to base traits, consumers, or the contract type system.
+**Justification**: REST covers the immediate need (out-of-process plugins, third-party integrations). The two-layer architecture is transport-agnostic by design -- adding `#[toolkit_grpc_contract]` later requires no changes to base traits, consumers, or the contract type system.
 
 ### [Constraint] Observability Hooks
 
@@ -647,7 +647,7 @@ The generated REST client carries retry, timeout, and error mapping. Without tra
 **Where the hooks live.** `ClientConfig` gains an optional parent `tracing::Span` and an optional `MetricsRegistry` handle. A new `ContractObservability` trait abstracts all three channels so platforms on OpenTelemetry, Prometheus, or a bespoke stack can supply their own wiring. A default implementation backed by the `tracing` and `metrics` crates ships with the runtime.
 
 ```rust
-// Runtime crate: cf-modkit-contract-runtime
+// Runtime crate: cf-toolkit-contract-runtime
 pub struct ClientConfig {
     pub base_url: String,
     pub timeout: Duration,
@@ -737,7 +737,7 @@ Circuit breakers, fallback methods, and degraded-mode behavior when remote plugi
 
 ### gRPC Transport Projection
 
-`#[modkit_grpc_contract]` macro design following the same two-layer pattern. Open questions include: proto-first vs. code-first generation, interaction with `tonic`, streaming semantics (server-streaming, client-streaming, bidirectional), and whether the gRPC projection can coexist with the REST projection on the same base trait.
+`#[toolkit_grpc_contract]` macro design following the same two-layer pattern. Open questions include: proto-first vs. code-first generation, interaction with `tonic`, streaming semantics (server-streaming, client-streaming, bidirectional), and whether the gRPC projection can coexist with the REST projection on the same base trait.
 
 ### Complex REST Annotations
 
@@ -745,7 +745,7 @@ Path variables (`#[path]`), query parameters (`#[query]`), header injection (`#[
 
 ### Method Annotation Naming Collision
 
-`#[post]`, `#[get]`, `#[streaming]` are short attribute names that may collide with other proc macro crates. If collisions arise, the annotations may need namespacing: `#[modkit_post]`, `#[modkit_get]`, `#[modkit_streaming]`. The PoC uses the short names without issue, but production may require the longer forms depending on the dependency graph.
+`#[post]`, `#[get]`, `#[streaming]` are short attribute names that may collide with other proc macro crates. If collisions arise, the annotations may need namespacing: `#[toolkit_post]`, `#[toolkit_get]`, `#[toolkit_streaming]`. The PoC uses the short names without issue, but production may require the longer forms depending on the dependency graph.
 
 ## 8. Traceability
 
@@ -753,5 +753,5 @@ Path variables (`#[path]`), query parameters (`#[query]`), header injection (`#[
 - **DESIGN** (this document): [`./DESIGN.md`](./DESIGN.md)
 - **ADR-0001** — contract source of truth: [`./ADR/0001-cpt-cf-binding-adr-contract-source-of-truth.md`](./ADR/0001-cpt-cf-binding-adr-contract-source-of-truth.md)
 - **ADR-0002** — OpenAPI spec limits: [`./ADR/0002-cpt-cf-binding-adr-openapi-spec-limits.md`](./ADR/0002-cpt-cf-binding-adr-openapi-spec-limits.md)
-- **PoC**: [striped-zebra-dev/modkit-binding-poc](https://github.com/striped-zebra-dev/modkit-binding-poc)
-- **Module/plugin declaration and resolution**: [PR #1380](https://github.com/cyberfabric/cyberfabric-core/pull/1380)
+- **PoC**: [striped-zebra-dev/toolkit-binding-poc](https://github.com/striped-zebra-dev/toolkit-binding-poc)
+- **Module/plugin declaration and resolution**: [PR #1380](https://github.com/constructorfabric/gears-rust/pull/1380)

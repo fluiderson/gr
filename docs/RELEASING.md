@@ -32,7 +32,7 @@ This repo is configured so that:
 
 ### Versioning policy (as implemented)
 
-- **Framework (`libs/modkit-*`)**: share a single version via `version.workspace = true` and the root workspace version (`Cargo.toml` → `[workspace.package] version`).
+- **Framework (`libs/toolkit-*`)**: share a single version via `version.workspace = true` and the root workspace version (`Cargo.toml` → `[workspace.package] version`).
 - **System SDKs (`libs/system-sdks/**`)**: each crate has its own explicit version.
 - **Modules (`modules/**`)**: each module and each `*-sdk` has its own explicit version.
 
@@ -45,7 +45,7 @@ release-plz publishes crates in the correct order for intra-workspace dependenci
 Before publishing, the root release workflow runs:
 
 ```bash
-cargo test --workspace --no-fail-fast --exclude cyberware-modkit-macros-tests --exclude cyberware-modkit-db-macros
+cargo test --workspace --no-fail-fast --exclude cf-gears-toolkit-macros-tests --exclude cf-gears-toolkit-db-macros
 ```
 
 ### Emergency / manual release
@@ -59,7 +59,7 @@ If you need a hotfix / manual release, prefer triggering the GitHub Actions work
 Note: the workflow already runs tests before publishing. Running tests locally is optional and just gives faster feedback.
 
 ```bash
-cargo test --workspace --no-fail-fast --exclude cyberware-modkit-macros-tests --exclude cyberware-modkit-db-macros
+cargo test --workspace --no-fail-fast --exclude cf-gears-toolkit-macros-tests --exclude cf-gears-toolkit-db-macros
 ```
 
 Fallback if CI is unavailable: publish locally from a clean checkout (you must have `CARGO_REGISTRY_TOKEN` set):

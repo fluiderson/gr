@@ -1,6 +1,6 @@
 # Dependencies Guidelines
 
-This document outlines the preferred dependencies and libraries to use in the Cyber Ware project.
+This document outlines the preferred dependencies and libraries to use in the Constructor Fabric Gears project.
 
 ## Serialization
 

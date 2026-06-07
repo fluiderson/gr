@@ -2,7 +2,7 @@
 
 # E2E Testing Guide
 
-This directory contains end-to-end tests for the Cyber Ware example server.
+This directory contains end-to-end tests for the Gears example server.
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ python3 scripts/ci.py e2e-docker
 
 ### Option 2: Local Mode (Faster for Development, advanced usage)
 
-This approach runs tests against a locally running cyberware-server.
+This approach runs tests against a locally running cf-gears-server.
 `scripts/ci.py e2e-local` will build and start the local server automatically.
 
 ```bash
@@ -66,9 +66,9 @@ Why local E2E defaults to `8086`:
 make quickstart
 
 # Run the tests in another terminal:
-E2E_BASE_URL=http://localhost:8087 python3 -m pytest testing/e2e/modules/nodes_registry
+E2E_BASE_URL=http://localhost:8087 python3 -m pytest testing/e2e/gears/nodes_registry
 # or for smoke tests only:
-E2E_BASE_URL=http://localhost:8087 python3 -m pytest testing/e2e/modules/nodes_registry -m smoke
+E2E_BASE_URL=http://localhost:8087 python3 -m pytest testing/e2e/gears/nodes_registry -m smoke
 ```
 
 #### Using auth token
@@ -88,7 +88,7 @@ The `scripts/ci.py` Python script accepts the following options:
 ## Writing Tests
 
 For philosophy, patterns, anti-flaking practices, and assert guidelines see the unified guide:
-[`docs/modkit_unified_system/13_e2e_testing.md`](../../docs/modkit_unified_system/13_e2e_testing.md)
+[`docs/toolkit_unified_system/13_e2e_testing.md`](../../docs/toolkit_unified_system/13_e2e_testing.md)
 
 Tests are written using pytest and httpx. See `modules/file_parser/test_file_parser_info.py` for an example.
 
@@ -134,7 +134,7 @@ async def test_my_endpoint(base_url, auth_headers):
 
 If you see "Server not responding" when running local tests:
 
-1. Check build/startup logs in `logs/cyberware-e2e.log` and `logs/cyberware-e2e-error.log`
+1. Check build/startup logs in `logs/cf-gears-e2e.log` and `logs/cf-gears-e2e-error.log`
 2. Check that the API is reachable on the configured port (default: 8086)
 3. Verify the health endpoint: `curl http://localhost:8086/healthz`
 4. Rebuild release artifacts: `make build`

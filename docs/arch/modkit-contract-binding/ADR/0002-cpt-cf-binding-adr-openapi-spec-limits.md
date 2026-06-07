@@ -9,7 +9,7 @@ date: 2026-04-10
 
 ## Context and Problem Statement
 
-ADR-0001 chose the Rust trait as the contract source of truth, with `#[modkit_rest_contract]` generating clients and OpenAPI specs via `schemars`. This decision inherits a structural limitation: a Rust trait signature plus `schemars`-derived JSON schemas cannot faithfully express the full REST surface. The generator cannot represent union request bodies (oneOf/anyOf with discriminators), content-type negotiation (e.g., `application/vnd.foo+json`), multiple response schemas per status code, non-body content (multipart, form, octet-stream), path parameters with regex/range validation, response headers, custom security schemes, complex query parameter serialization (arrays, deep objects), or responses that vary by input.
+ADR-0001 chose the Rust trait as the contract source of truth, with `#[toolkit_rest_contract]` generating clients and OpenAPI specs via `schemars`. This decision inherits a structural limitation: a Rust trait signature plus `schemars`-derived JSON schemas cannot faithfully express the full REST surface. The generator cannot represent union request bodies (oneOf/anyOf with discriminators), content-type negotiation (e.g., `application/vnd.foo+json`), multiple response schemas per status code, non-body content (multipart, form, octet-stream), path parameters with regex/range validation, response headers, custom security schemes, complex query parameter serialization (arrays, deep objects), or responses that vary by input.
 
 Option D (IDL-first) was rejected in ADR-0001 because no IDL captures REST and gRPC faithfully at once. The trait-first approach has a symmetric problem: Rust traits plus `schemars` cannot faithfully express everything REST permits. If the generated spec is treated as the authoritative specification for third-party implementors, two failure modes appear:
 
@@ -32,19 +32,19 @@ This ADR defines the role of the generated spec and the policy for everything it
 ## Considered Options
 
 * **Option A**: Narrow but honest — generator covers the common case, manual implementation fills the gaps, generated OpenAPI is declared the minimum conformance contract (current design)
-* **Option B**: Aggressive annotation vocabulary — extend `#[modkit_rest_contract]` with `#[content_type]`, `#[response_header]`, `#[multipart]`, `#[response(status=404, schema=…)]`, `#[path(pattern="…")]`, and similar attributes until the macro covers ~95% of REST
+* **Option B**: Aggressive annotation vocabulary — extend `#[toolkit_rest_contract]` with `#[content_type]`, `#[response_header]`, `#[multipart]`, `#[response(status=404, schema=…)]`, `#[path(pattern="…")]`, and similar attributes until the macro covers ~95% of REST
 * **Option C**: OpenAPI-first with augmentation — hand-write the spec, generate Rust types from it
 * **Option D**: Dual source — authors write both the Rust trait and the OpenAPI YAML, CI verifies they agree
 
 ## Decision Outcome
 
-Chosen option: **Option A — Narrow but honest.** The `#[modkit_rest_contract]` macro covers a deliberate subset of REST, the generated OpenAPI spec is documented as the **minimum conformance contract** (services may offer strictly more, never strictly less), and anything outside the subset is handled by manual implementation — authors write `impl Base for MyCustomRestClient` with full HTTP control, and the consumer interface (`Arc<dyn Base>`) is identical to the macro-generated case.
+Chosen option: **Option A — Narrow but honest.** The `#[toolkit_rest_contract]` macro covers a deliberate subset of REST, the generated OpenAPI spec is documented as the **minimum conformance contract** (services may offer strictly more, never strictly less), and anything outside the subset is handled by manual implementation — authors write `impl Base for MyCustomRestClient` with full HTTP control, and the consumer interface (`Arc<dyn Base>`) is identical to the macro-generated case.
 
 Option B was rejected because the attribute vocabulary required to cover 95% of REST approaches the complexity of a bespoke IDL embedded in Rust attribute syntax, reintroducing the "lowest common denominator" problem ADR-0001 used to reject IDL-first. Option C was rejected for the same reasons as ADR-0001 Option C. Option D was rejected because dual sources drift in practice regardless of CI discipline, and because it forces every author to learn two authoring surfaces.
 
 ### Phase 1 scope — what the macro generates
 
-The `#[modkit_rest_contract]` macro supports:
+The `#[toolkit_rest_contract]` macro supports:
 
 * `POST`, `GET`, `DELETE` with a single JSON request body (where applicable)
 * Path parameter extraction via the future `#[path]` annotation on method arguments
@@ -75,7 +75,7 @@ impl NotificationBackend for MyCustomRestClient {
 }
 ```
 
-The consumer continues to depend on `Arc<dyn NotificationBackend>`; it cannot tell whether the implementation was macro-generated or hand-written. For these methods, the OpenAPI spec is either hand-authored or the generated spec is augmented with vendor extensions (`x-modkit-*`) that describe the manual surface.
+The consumer continues to depend on `Arc<dyn NotificationBackend>`; it cannot tell whether the implementation was macro-generated or hand-written. For these methods, the OpenAPI spec is either hand-authored or the generated spec is augmented with vendor extensions (`x-toolkit-*`) that describe the manual surface.
 
 ### Consequences
 
@@ -83,14 +83,14 @@ The consumer continues to depend on `Arc<dyn NotificationBackend>`; it cannot te
 * CI must fail fast when a trait asks for an unsupported pattern (e.g., a method returning `Result<EnumWithMultipleVariants, _>` without a discriminator strategy). The macro must emit a compile error, not a silently-broken spec.
 * The directory's OpenAPI validator treats the registered spec as the **minimum conformance contract**: remote services may legitimately expose additional paths, headers, content types, or schema fields beyond what the spec declares, but they must honor every path, method, required field, and response shape the spec does declare.
 * Third-party integrators receive a **starting-point spec**, not a complete specification. Where a service uses manual implementation, the README for that SDK crate must state which methods are hand-written and how the OpenAPI spec was produced (generated, augmented, or hand-written).
-* The generator emits a top-level `x-modkit-spec-scope: minimum-conformance` vendor extension so downstream tooling can distinguish a generator-derived spec from a hand-curated one.
+* The generator emits a top-level `x-toolkit-spec-scope: minimum-conformance` vendor extension so downstream tooling can distinguish a generator-derived spec from a hand-curated one.
 * When a trait mixes macro-supported and manual methods, the macro generates the spec for its subset and the author appends the rest; the DESIGN document defines the merge strategy.
 * Extending the macro's scope later (e.g., adding `#[content_type]` in Phase 2) is a non-breaking change provided the attribute is optional and the default behavior remains the Phase 1 semantics.
 * The test suite must include a "rejected trait" fixture for every unsupported pattern listed above; each fixture must produce a compile error with a message pointing at the manual-implementation escape hatch.
 
 ### Confirmation
 
-The PoC at `~/projects/modkit-binding-poc/` validates the narrow-but-honest approach on the `notification-sdk` crate: `NotificationBackend` with POST+JSON and SSE streaming, a generated OpenAPI spec, and a manual-implementation path exercised by a secondary fixture. Anything more complex (multipart upload, header-driven response variants) falls to a hand-written client in the PoC. The evidence report `~/projects/modkit-binding-poc/docs/research/rest-grpc-unification-evidence.html` (referenced from the PoC README) documents the reasoning for keeping the generator narrow rather than attempting to model the full REST surface in Rust attributes.
+The PoC at `~/projects/toolkit-binding-poc/` validates the narrow-but-honest approach on the `notification-sdk` crate: `NotificationBackend` with POST+JSON and SSE streaming, a generated OpenAPI spec, and a manual-implementation path exercised by a secondary fixture. Anything more complex (multipart upload, header-driven response variants) falls to a hand-written client in the PoC. The evidence report `~/projects/toolkit-binding-poc/docs/research/rest-grpc-unification-evidence.html` (referenced from the PoC README) documents the reasoning for keeping the generator narrow rather than attempting to model the full REST surface in Rust attributes.
 
 ## Pros and Cons of the Options
 
@@ -133,7 +133,7 @@ Extend the macro with attributes for every REST feature: `#[content_type]`, `#[r
 **Disadvantages:**
 
 * The attribute surface reintroduces the "lowest common denominator IDL" problem that ADR-0001 used to reject Option D — REST semantics are encoded in attribute syntax that must be parsed, validated, and maintained.
-* Procedural-macro complexity balloons; `cf-modkit-contract-macros` becomes a non-trivial artifact with its own changelog and release cadence.
+* Procedural-macro complexity balloons; `cf-toolkit-contract-macros` becomes a non-trivial artifact with its own changelog and release cadence.
 * Each new attribute is a new failure mode at macro-expansion time, with error messages that must point back into the author's trait.
 * Attributes interact (`#[multipart]` with `#[response_header]` with `#[streaming]`) producing combinatorial edge cases.
 * The incremental return diminishes sharply past ~80% coverage; the last 15% still requires manual implementation, which now must coexist with a much larger macro surface.
@@ -176,6 +176,6 @@ Authors write the Rust trait and the OpenAPI YAML. CI verifies the two agree on 
 * PRD: [`../PRD.md`](../PRD.md)
 * DESIGN: [`../DESIGN.md`](../DESIGN.md)
 * ADR-0001 — contract source of truth: [`./0001-cpt-cf-binding-adr-contract-source-of-truth.md`](./0001-cpt-cf-binding-adr-contract-source-of-truth.md)
-* Evidence report on REST/gRPC unification limits: [rest-grpc-unification-evidence.html](https://github.com/striped-zebra-dev/modkit-binding-poc/blob/main/docs/research/rest-grpc-unification-evidence.html)
-* PoC repository: [striped-zebra-dev/modkit-binding-poc](https://github.com/striped-zebra-dev/modkit-binding-poc) (the README links the evidence report)
+* Evidence report on REST/gRPC unification limits: [rest-grpc-unification-evidence.html](https://github.com/striped-zebra-dev/toolkit-binding-poc/blob/main/docs/research/rest-grpc-unification-evidence.html)
+* PoC repository: [striped-zebra-dev/toolkit-binding-poc](https://github.com/striped-zebra-dev/toolkit-binding-poc) (the README links the evidence report)
 * RFC 9457 Problem Details: https://www.rfc-editor.org/rfc/rfc9457

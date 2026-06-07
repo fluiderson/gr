@@ -1,5 +1,5 @@
 // Created: 2026-04-14 by Constructor Tech
-// simulated_dir=/workspace/modules/system/types-registry/types-registry/src/api/rest/
+// simulated_dir=/workspace/gears/system/types-registry/types-registry/src/api/rest/
 #[cfg(test)]
 // Small inline test block (under threshold) — should NOT trigger DE1101
 mod tests {

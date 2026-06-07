@@ -2,13 +2,13 @@
 
 # Resource Group Model — AuthZ Perspective
 
-This document describes how Cyber Ware's authorization system uses Resource Groups (RG) for access control. For the full RG module design (domain model, API contracts, database schemas, type system), see [RG Technical Design](../../../modules/system/resource-group/docs/DESIGN.md).
+This document describes how Gears' authorization system uses Resource Groups (RG) for access control. For the full RG module design (domain model, API contracts, database schemas, type system), see [RG Technical Design](../../../gears/system/resource-group/docs/DESIGN.md).
 
 ---
 
 ## Overview
 
-Cyber Ware uses **resource groups** as an optional organizational layer for grouping resources. The primary purpose from the AuthZ perspective is **access control** — granting permissions at the group level rather than per-resource.
+Gears use **resource groups** as an optional organizational layer for grouping resources. The primary purpose from the AuthZ perspective is **access control** — granting permissions at the group level rather than per-resource.
 
 ```
 Tenant T1
@@ -26,11 +26,11 @@ Tenant T1
 Key principles:
 - **Optional** — resources may exist without group membership
 - **Many-to-many** — a resource can belong to multiple groups
-- **Hierarchical** — groups form a strict forest (single parent, no cycles); **multiple roots are allowed**, but among them there is **at most one tenant-type root** (the "main tenant"). All other tenants are sub-tenants below that main tenant; non-tenant roots may coexist and carry the main tenant's `tenant_id` but are not tenants themselves — see [RG DESIGN §Tenant Root Uniqueness](../../../modules/system/resource-group/docs/DESIGN.md#tenant-root-uniqueness).
+- **Hierarchical** — groups form a strict forest (single parent, no cycles); **multiple roots are allowed**, but among them there is **at most one tenant-type root** (the "main tenant"). All other tenants are sub-tenants below that main tenant; non-tenant roots may coexist and carry the main tenant's `tenant_id` but are not tenants themselves — see [RG DESIGN §Tenant Root Uniqueness](../../../gears/system/resource-group/docs/DESIGN.md#tenant-root-uniqueness).
 - **Tenant-scoped** — groups exist within tenant boundaries
 - **Typed** — groups have dynamic GTS types with configurable parent/membership rules
 
-For topology details (forest invariants, type system, query profiles), see [RG DESIGN §Domain Model](../../../modules/system/resource-group/docs/DESIGN.md#31-domain-model).
+For topology details (forest invariants, type system, query profiles), see [RG DESIGN §Domain Model](../../../gears/system/resource-group/docs/DESIGN.md#31-domain-model).
 
 ---
 
@@ -56,7 +56,7 @@ Whether and which tables to project depends on the deployment topology and acces
 |------------|------------------------|-----------|
 | **Monolith** (single shared DB) | **None** — all tables are already co-located | PEP JOINs against canonical tables directly; no extra databases or sync needed |
 | **Microservices** (separate DBs, typical case) | **`resource_group` + `resource_group_closure`** | Enables `in_group_subtree` predicates locally; hierarchy tables are small (~100 K rows). Membership resolved by PDP via capability degradation → `in` predicates |
-| **Microservices** with membership filtering/pagination | **`resource_group` + `resource_group_closure` + `resource_group_membership`** | Only when profiling confirms the two-request pattern (RG API → domain service) is unacceptable for latency budget. Membership table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables — see [RG DESIGN §Storage Estimates](../../../modules/system/resource-group/docs/DESIGN.md#storage-estimates) for concrete numbers |
+| **Microservices** with membership filtering/pagination | **`resource_group` + `resource_group_closure` + `resource_group_membership`** | Only when profiling confirms the two-request pattern (RG API → domain service) is unacceptable for latency budget. Membership table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables — see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates) for concrete numbers |
 
 > **Important:** When a domain service query includes filters by resource group attributes (e.g., `GET /tasks?status=pending&project={projectX}&after=…&limit=50`), the two-request pattern means N additional round-trips to the RG Membership API (one per filter page or group), not just +1. If this N-request fan-out violates the latency budget, that is the signal to project the membership table locally.
 >
@@ -64,7 +64,7 @@ Whether and which tables to project depends on the deployment topology and acces
 
 PEP within the RG module compiles `in_group`/`in_group_subtree` predicates into SQL subqueries using the membership table. Domain services without the membership projection receive degraded `in` predicates and do not need group-related projection tables for authorization filtering.
 
-- RG canonical table schemas: [RG DESIGN §Database Schemas](../../../modules/system/resource-group/docs/DESIGN.md#37-database-schemas--tables)
+- RG canonical table schemas: [RG DESIGN §Database Schemas](../../../gears/system/resource-group/docs/DESIGN.md#37-database-schemas--tables)
 - When to use which table: [AUTHZ_USAGE_SCENARIOS §Choosing Projection Tables](./AUTHZ_USAGE_SCENARIOS.md#choosing-projection-tables)
 
 ### Access Inheritance
@@ -74,7 +74,7 @@ PEP within the RG module compiles `in_group`/`in_group_subtree` predicates into 
 
 ### Integration Path
 
-AuthZ plugin reads RG hierarchy via `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract). In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer` (the plugin cannot evaluate itself). In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../modules/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
+AuthZ plugin reads RG hierarchy via `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract). In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer` (the plugin cannot evaluate itself). In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../gears/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
 
 ---
 
@@ -101,16 +101,16 @@ Resource groups operate **within** tenant boundaries — groups are tenant-scope
 **Further reading:**
 
 - Tenant topology, barriers, closure tables: [TENANT_MODEL.md](./TENANT_MODEL.md)
-- Tenant-hierarchy-compatible validation on group writes: [RG DESIGN §Tenant Scope for Ownership Graph](../../../modules/system/resource-group/docs/DESIGN.md#tenant-scope-for-ownership-graph)
+- Tenant-hierarchy-compatible validation on group writes: [RG DESIGN §Tenant Scope for Ownership Graph](../../../gears/system/resource-group/docs/DESIGN.md#tenant-scope-for-ownership-graph)
 - Tenant constraint compilation: [DESIGN.md](./DESIGN.md)
 
 ---
 
 ## References
 
-- [RG Technical Design](../../../modules/system/resource-group/docs/DESIGN.md) — Full RG module design (domain model, API, database schemas, security, auth modes)
-- [RG PRD](../../../modules/system/resource-group/docs/PRD.md) — Product requirements
-- [RG OpenAPI](../../../modules/system/resource-group/docs/openapi.yaml) — REST API specification
+- [RG Technical Design](../../../gears/system/resource-group/docs/DESIGN.md) — Full RG module design (domain model, API, database schemas, security, auth modes)
+- [RG PRD](../../../gears/system/resource-group/docs/PRD.md) — Product requirements
+- [RG OpenAPI](../../../gears/system/resource-group/docs/openapi.yaml) — REST API specification
 - [DESIGN.md](./DESIGN.md) — Core authorization design
 - [TENANT_MODEL.md](./TENANT_MODEL.md) — Tenant topology, barriers, closure tables
 - [AUTHZ_USAGE_SCENARIOS.md](./AUTHZ_USAGE_SCENARIOS.md) — Authorization scenarios with resource group examples

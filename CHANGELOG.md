@@ -9,7 +9,7 @@ release-plz updates this file in the Release PR.
 
 ## [Unreleased]
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-account-management-v0.1.0...cyberware-account-management-v0.1.1) - 2026-05-07
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-account-management-v0.1.0...cf-gears-account-management-v0.1.1) - 2026-05-07
 
 ### Other
 
@@ -19,7 +19,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-account-management-sdk-v0.1.0...cyberware-account-management-sdk-v0.1.1) - 2026-05-07
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-account-management-sdk-v0.1.0...cf-gears-account-management-sdk-v0.1.1) - 2026-05-07
 
 ### Other
 
@@ -29,7 +29,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-tr-authz-plugin-v0.1.2...cf-tr-authz-plugin-v0.1.3) - 2026-05-07
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-tr-authz-plugin-v0.1.2...cf-tr-authz-plugin-v0.1.3) - 2026-05-07
 
 ### Other
 
@@ -39,7 +39,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.21](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.20...cyberware-static-tr-plugin-v0.1.21) - 2026-05-07
+## [0.1.21](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.20...cf-gears-static-tr-plugin-v0.1.21) - 2026-05-07
 
 ### Other
 
@@ -49,7 +49,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.17...cyberware-static-credstore-plugin-v0.1.18) - 2026-05-07
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.17...cf-gears-static-credstore-plugin-v0.1.18) - 2026-05-07
 
 ### Other
 
@@ -59,7 +59,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.20](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.19...cyberware-static-authz-plugin-v0.1.20) - 2026-05-07
+## [0.1.20](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.19...cf-gears-static-authz-plugin-v0.1.20) - 2026-05-07
 
 ### Other
 
@@ -69,7 +69,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.10...cyberware-static-authn-plugin-v0.3.0) - 2026-05-07
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.10...cf-gears-static-authn-plugin-v0.3.0) - 2026-05-07
 
 ### Added
 
@@ -86,7 +86,7 @@ release-plz updates this file in the Release PR.
 * @Artifizer
 * @capybutler
 
-## [0.1.22](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.21...cf-single-tenant-tr-plugin-v0.1.22) - 2026-05-07
+## [0.1.22](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.21...cf-single-tenant-tr-plugin-v0.1.22) - 2026-05-07
 
 ### Other
 
@@ -96,7 +96,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-rg-tr-plugin-v0.1.2...cyberware-rg-tr-plugin-v0.1.3) - 2026-05-07
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-rg-tr-plugin-v0.1.2...cf-gears-rg-tr-plugin-v0.1.3) - 2026-05-07
 
 ### Other
 
@@ -106,7 +106,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.6.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.6.9...cyberware-modkit-v0.6.10) - 2026-05-07
+## [0.6.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.6.9...cf-gears-toolkit-v0.6.10) - 2026-05-07
 
 ### Other
 
@@ -120,55 +120,55 @@ release-plz updates this file in the Release PR.
 * @Artifizer
 * @asmith987
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-account-management-v0.1.0...cyberware-account-management-v0.1.1) - 2026-05-07
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-account-management-v0.1.0...cf-gears-account-management-v0.1.1) - 2026-05-07
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk, cyberware-tenant-resolver-sdk, cyberware-resource-group-sdk, cyberware-account-management-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk, cf-gears-tenant-resolver-sdk, cf-gears-resource-group-sdk, cf-gears-account-management-sdk
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-account-management-sdk-v0.1.0...cyberware-account-management-sdk-v0.1.1) - 2026-05-07
-
-### Other
-
-- updated the following local packages: cyberware-tenant-resolver-sdk
-
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-tr-authz-plugin-v0.1.2...cf-tr-authz-plugin-v0.1.3) - 2026-05-07
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-account-management-sdk-v0.1.0...cf-gears-account-management-sdk-v0.1.1) - 2026-05-07
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-tenant-resolver-sdk
 
-## [0.1.21](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.20...cyberware-static-tr-plugin-v0.1.21) - 2026-05-07
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.17...cyberware-static-credstore-plugin-v0.1.18) - 2026-05-07
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-tr-authz-plugin-v0.1.2...cf-tr-authz-plugin-v0.1.3) - 2026-05-07
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-credstore-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk, cf-gears-tenant-resolver-sdk
 
-## [0.1.20](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.19...cyberware-static-authz-plugin-v0.1.20) - 2026-05-07
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.1.22](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.21...cf-single-tenant-tr-plugin-v0.1.22) - 2026-05-07
+## [0.1.21](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.20...cf-gears-static-tr-plugin-v0.1.21) - 2026-05-07
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-rg-tr-plugin-v0.1.2...cyberware-rg-tr-plugin-v0.1.3) - 2026-05-07
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.17...cf-gears-static-credstore-plugin-v0.1.18) - 2026-05-07
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-resource-group-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-account-management-v0.1.0) - 2026-05-06
+## [0.1.20](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.19...cf-gears-static-authz-plugin-v0.1.20) - 2026-05-07
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.1.22](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.21...cf-single-tenant-tr-plugin-v0.1.22) - 2026-05-07
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-rg-tr-plugin-v0.1.2...cf-gears-rg-tr-plugin-v0.1.3) - 2026-05-07
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-resource-group-sdk
+
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-account-management-v0.1.0) - 2026-05-06
 
 ### Added
 
@@ -185,7 +185,7 @@ release-plz updates this file in the Release PR.
 
 * @diffora
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-account-management-sdk-v0.1.0) - 2026-05-06
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-account-management-sdk-v0.1.0) - 2026-05-06
 
 ### Added
 
@@ -200,7 +200,7 @@ release-plz updates this file in the Release PR.
 
 * @diffora
 
-## [0.6.3](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.6.2...types-sdk-v0.6.3) - 2026-05-06
+## [0.6.3](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.6.2...types-sdk-v0.6.3) - 2026-05-06
 
 ### Other
 
@@ -210,19 +210,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cf-tr-authz-plugin-v0.1.1...cf-tr-authz-plugin-v0.1.2) - 2026-05-06
-
-### Other
-
-- release (by @github-actions[bot]) - #1827
-- massive renaming of different artifacts from HyperSport -> CyberWare to finalize project transition under CyberFabric (by @Artifizer) - #1805
-
-### Contributors
-
-* @github-actions[bot]
-* @Artifizer
-
-## [0.1.20](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.19...cyberware-static-tr-plugin-v0.1.20) - 2026-05-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-tr-authz-plugin-v0.1.1...cf-tr-authz-plugin-v0.1.2) - 2026-05-06
 
 ### Other
 
@@ -234,7 +222,19 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.16...cyberware-static-credstore-plugin-v0.1.17) - 2026-05-06
+## [0.1.20](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.19...cf-gears-static-tr-plugin-v0.1.20) - 2026-05-06
+
+### Other
+
+- release (by @github-actions[bot]) - #1827
+- massive renaming of different artifacts from HyperSport -> CyberWare to finalize project transition under CyberFabric (by @Artifizer) - #1805
+
+### Contributors
+
+* @github-actions[bot]
+* @Artifizer
+
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.16...cf-gears-static-credstore-plugin-v0.1.17) - 2026-05-06
 
 ### Other
 
@@ -247,7 +247,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.1.19](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.18...cyberware-static-authz-plugin-v0.1.19) - 2026-05-06
+## [0.1.19](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.18...cf-gears-static-authz-plugin-v0.1.19) - 2026-05-06
 
 ### Other
 
@@ -260,7 +260,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.2.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.9...cyberware-static-authn-plugin-v0.2.10) - 2026-05-06
+## [0.2.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.9...cf-gears-static-authn-plugin-v0.2.10) - 2026-05-06
 
 ### Other
 
@@ -273,7 +273,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.1.21](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.20...cf-single-tenant-tr-plugin-v0.1.21) - 2026-05-06
+## [0.1.21](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.20...cf-single-tenant-tr-plugin-v0.1.21) - 2026-05-06
 
 ### Other
 
@@ -285,7 +285,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-rg-tr-plugin-v0.1.1...cyberware-rg-tr-plugin-v0.1.2) - 2026-05-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-rg-tr-plugin-v0.1.1...cf-gears-rg-tr-plugin-v0.1.2) - 2026-05-06
 
 ### Other
 
@@ -297,55 +297,55 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @Artifizer
 
-## [0.6.3](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.6.2...types-sdk-v0.6.3) - 2026-05-06
+## [0.6.3](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.6.2...types-sdk-v0.6.3) - 2026-05-06
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-odata
+- updated the following local packages: cf-gears-toolkit-odata
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cf-tr-authz-plugin-v0.1.0...cf-tr-authz-plugin-v0.1.1) - 2026-05-01
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk
-
-## [0.1.19](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.18...cyberware-static-tr-plugin-v0.1.19) - 2026-05-01
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-tr-authz-plugin-v0.1.0...cf-tr-authz-plugin-v0.1.1) - 2026-05-01
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.1.16](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.15...cyberware-static-credstore-plugin-v0.1.16) - 2026-05-01
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-credstore-sdk, cyberware-types-registry-sdk
-
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.17...cyberware-static-authz-plugin-v0.1.18) - 2026-05-01
+## [0.1.19](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.18...cf-gears-static-tr-plugin-v0.1.19) - 2026-05-01
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk, cyberware-types-registry-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.2.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.8...cyberware-static-authn-plugin-v0.2.9) - 2026-05-01
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-types-registry-sdk, cyberware-authn-resolver-sdk
-
-## [0.1.20](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.19...cf-single-tenant-tr-plugin-v0.1.20) - 2026-05-01
+## [0.1.16](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.15...cf-gears-static-credstore-plugin-v0.1.16) - 2026-05-01
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-credstore-sdk, cf-gears-types-registry-sdk
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-rg-tr-plugin-v0.1.0...cyberware-rg-tr-plugin-v0.1.1) - 2026-05-01
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.17...cf-gears-static-authz-plugin-v0.1.18) - 2026-05-01
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk, cyberware-resource-group-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cf-tr-authz-plugin-v0.1.0) - 2026-04-30
+## [0.2.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.8...cf-gears-static-authn-plugin-v0.2.9) - 2026-05-01
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-types-registry-sdk, cf-gears-authn-resolver-sdk
+
+## [0.1.20](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.19...cf-single-tenant-tr-plugin-v0.1.20) - 2026-05-01
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk
+
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-rg-tr-plugin-v0.1.0...cf-gears-rg-tr-plugin-v0.1.1) - 2026-05-01
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk, cf-gears-resource-group-sdk
+
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-tr-authz-plugin-v0.1.0) - 2026-04-30
 
 ### Added
 
@@ -362,7 +362,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @ffedoroff
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.17...cyberware-static-tr-plugin-v0.1.18) - 2026-04-30
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.17...cf-gears-static-tr-plugin-v0.1.18) - 2026-04-30
 
 ### Other
 
@@ -373,7 +373,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.14...cyberware-static-credstore-plugin-v0.1.15) - 2026-04-30
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.14...cf-gears-static-credstore-plugin-v0.1.15) - 2026-04-30
 
 ### Other
 
@@ -384,7 +384,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.16...cyberware-static-authz-plugin-v0.1.17) - 2026-04-30
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.16...cf-gears-static-authz-plugin-v0.1.17) - 2026-04-30
 
 ### Other
 
@@ -395,7 +395,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.7...cyberware-static-authn-plugin-v0.2.8) - 2026-04-30
+## [0.2.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.7...cf-gears-static-authn-plugin-v0.2.8) - 2026-04-30
 
 ### Other
 
@@ -406,7 +406,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.19](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-30
+## [0.1.19](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-30
 
 ### Other
 
@@ -417,7 +417,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-rg-tr-plugin-v0.1.0) - 2026-04-30
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-rg-tr-plugin-v0.1.0) - 2026-04-30
 
 ### Added
 
@@ -435,18 +435,18 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @ffedoroff
 
-## [0.6.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.6.6...cyberware-modkit-v0.6.7) - 2026-04-30
+## [0.6.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.6.6...cf-gears-toolkit-v0.6.7) - 2026-04-30
 
 ### Other
 
 - Merge pull request #1738 from asmith987/refactor/migrate-to-canonical-errors-pt1 (by @Artifizer) - #1738
-- Merge pull request #1732 from cyberfabric/release-plz-2026-04-28T09-32-57Z (by @Artifizer) - #1732
+- Merge pull request #1732 from constructorfabric/release-plz-2026-04-28T09-32-57Z (by @Artifizer) - #1732
 
 ### Contributors
 
 * @Artifizer
 
-## [0.7.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-canonical-errors-v0.7.0...cyberware-modkit-canonical-errors-v0.7.1) - 2026-04-30
+## [0.7.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-canonical-errors-v0.7.0...cf-gears-toolkit-canonical-errors-v0.7.1) - 2026-04-30
 
 ### Added
 
@@ -462,7 +462,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.7.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-canonical-errors-v0.7.0...cyberware-modkit-canonical-errors-v0.7.1) - 2026-04-30
+## [0.7.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-canonical-errors-v0.7.0...cf-gears-toolkit-canonical-errors-v0.7.1) - 2026-04-30
 
 ### Other
 
@@ -474,7 +474,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cf-tr-authz-plugin-v0.1.0) - 2026-04-30
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-tr-authz-plugin-v0.1.0) - 2026-04-30
 
 ### Added
 
@@ -490,7 +490,7 @@ release-plz updates this file in the Release PR.
 * @ffedoroff
 * @github-actions[bot]
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.17...cyberware-static-tr-plugin-v0.1.18) - 2026-04-30
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.17...cf-gears-static-tr-plugin-v0.1.18) - 2026-04-30
 
 ### Other
 
@@ -500,7 +500,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.14...cyberware-static-credstore-plugin-v0.1.15) - 2026-04-30
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.14...cf-gears-static-credstore-plugin-v0.1.15) - 2026-04-30
 
 ### Other
 
@@ -510,7 +510,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.16...cyberware-static-authz-plugin-v0.1.17) - 2026-04-30
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.16...cf-gears-static-authz-plugin-v0.1.17) - 2026-04-30
 
 ### Other
 
@@ -520,7 +520,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.7...cyberware-static-authn-plugin-v0.2.8) - 2026-04-30
+## [0.2.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.7...cf-gears-static-authn-plugin-v0.2.8) - 2026-04-30
 
 ### Other
 
@@ -530,7 +530,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.19](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-30
+## [0.1.19](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-30
 
 ### Other
 
@@ -540,7 +540,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-rg-tr-plugin-v0.1.0) - 2026-04-30
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-rg-tr-plugin-v0.1.0) - 2026-04-30
 
 ### Added
 
@@ -557,7 +557,7 @@ release-plz updates this file in the Release PR.
 * @ffedoroff
 * @github-actions[bot]
 
-## [0.6.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.6.5...cyberware-modkit-v0.6.6) - 2026-04-30
+## [0.6.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.6.5...cf-gears-toolkit-v0.6.6) - 2026-04-30
 
 ### Added
 
@@ -567,37 +567,37 @@ release-plz updates this file in the Release PR.
 
 * @ffedoroff
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.17...cyberware-static-tr-plugin-v0.1.18) - 2026-04-27
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.17...cf-gears-static-tr-plugin-v0.1.18) - 2026-04-27
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.14...cyberware-static-credstore-plugin-v0.1.15) - 2026-04-27
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.16...cyberware-static-authz-plugin-v0.1.17) - 2026-04-27
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.14...cf-gears-static-credstore-plugin-v0.1.15) - 2026-04-27
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.2.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.7...cyberware-static-authn-plugin-v0.2.8) - 2026-04-27
-
-### Other
-
-- updated the following local packages: cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.19](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-27
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.16...cf-gears-static-authz-plugin-v0.1.17) - 2026-04-27
 
 ### Other
 
-- updated the following local packages: cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.7.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-canonical-errors-v0.6.1...cyberware-modkit-canonical-errors-v0.7.0) - 2026-04-22
+## [0.2.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.7...cf-gears-static-authn-plugin-v0.2.8) - 2026-04-27
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.19](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.18...cf-single-tenant-tr-plugin-v0.1.19) - 2026-04-27
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.7.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-canonical-errors-v0.6.1...cf-gears-toolkit-canonical-errors-v0.7.0) - 2026-04-22
 
 ### Other
 
@@ -609,7 +609,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @lansfy
 
-## [0.6.1](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-modkit-canonical-errors-macro-v0.6.1) - 2026-04-22
+## [0.6.1](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-toolkit-canonical-errors-macro-v0.6.1) - 2026-04-22
 
 ### Other
 
@@ -621,7 +621,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @lansfy
 
-## [0.6.2](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.6.1...types-sdk-v0.6.2) - 2026-04-22
+## [0.6.2](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.6.1...types-sdk-v0.6.2) - 2026-04-22
 
 ### Other
 
@@ -631,7 +631,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.16...cyberware-static-tr-plugin-v0.1.17) - 2026-04-22
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.16...cf-gears-static-tr-plugin-v0.1.17) - 2026-04-22
 
 ### Added
 
@@ -641,7 +641,7 @@ release-plz updates this file in the Release PR.
 
 - Some real code split (by @ffedoroff) - #1462
 - release (by @github-actions[bot]) - #1381
-- *(modkit)* split required and defaulted module config loading (by @fluiderson)
+- *(toolkit)* split required and defaulted module config loading (by @fluiderson)
 
 ### Contributors
 
@@ -650,13 +650,13 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.13...cyberware-static-credstore-plugin-v0.1.14) - 2026-04-22
+## [0.1.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.13...cf-gears-static-credstore-plugin-v0.1.14) - 2026-04-22
 
 ### Other
 
 - Some real code split (by @ffedoroff) - #1462
 - release (by @github-actions[bot]) - #1381
-- *(modkit)* split required and defaulted module config loading (by @fluiderson)
+- *(toolkit)* split required and defaulted module config loading (by @fluiderson)
 
 ### Contributors
 
@@ -664,7 +664,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.16](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.15...cyberware-static-authz-plugin-v0.1.16) - 2026-04-22
+## [0.1.16](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.15...cf-gears-static-authz-plugin-v0.1.16) - 2026-04-22
 
 ### Added
 
@@ -675,7 +675,7 @@ release-plz updates this file in the Release PR.
 
 - Some real code split (by @ffedoroff) - #1462
 - release (by @github-actions[bot]) - #1381
-- *(modkit)* split required and defaulted module config loading (by @fluiderson)
+- *(toolkit)* split required and defaulted module config loading (by @fluiderson)
 
 ### Contributors
 
@@ -683,13 +683,13 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.2.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.6...cyberware-static-authn-plugin-v0.2.7) - 2026-04-22
+## [0.2.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.6...cf-gears-static-authn-plugin-v0.2.7) - 2026-04-22
 
 ### Other
 
 - Some real code split (by @ffedoroff) - #1462
 - release (by @github-actions[bot]) - #1381
-- *(modkit)* split required and defaulted module config loading (by @fluiderson)
+- *(toolkit)* split required and defaulted module config loading (by @fluiderson)
 
 ### Contributors
 
@@ -697,7 +697,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.17...cf-single-tenant-tr-plugin-v0.1.18) - 2026-04-22
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.17...cf-single-tenant-tr-plugin-v0.1.18) - 2026-04-22
 
 ### Added
 
@@ -714,7 +714,7 @@ release-plz updates this file in the Release PR.
 * @ffedoroff
 * @github-actions[bot]
 
-## [0.6.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.6.2...cyberware-modkit-http-v0.6.3) - 2026-04-22
+## [0.6.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.6.2...cf-gears-toolkit-http-v0.6.3) - 2026-04-22
 
 ### Other
 
@@ -724,12 +724,12 @@ release-plz updates this file in the Release PR.
 
 * @fluiderson
 
-## [0.6.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.6.3...cyberware-modkit-v0.6.4) - 2026-04-22
+## [0.6.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.6.3...cf-gears-toolkit-v0.6.4) - 2026-04-22
 
 ### Fixed
 
 - *(bootstrap)* unify crypto provider init in main() for both FIPS and non-FIPS modes (by @MikeFalcon77)
-- *(modkit)* pass fresh deadline token to stop() for graceful shutdown
+- *(toolkit)* pass fresh deadline token to stop() for graceful shutdown
 
 ### Other
 
@@ -746,29 +746,19 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @fluiderson
 
-## [0.6.2](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.6.1...types-sdk-v0.6.2) - 2026-04-08
+## [0.6.2](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.6.1...types-sdk-v0.6.2) - 2026-04-08
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata
 
-## [0.1.18](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.17...cf-single-tenant-tr-plugin-v0.1.18) - 2026-04-08
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.6.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-canonical-errors-v0.6.0...cyberware-modkit-canonical-errors-v0.6.1) - 2026-03-30
+## [0.1.18](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.17...cf-single-tenant-tr-plugin-v0.1.18) - 2026-04-08
 
 ### Other
 
-- Set individual version for each package. (by @genericaccount-de) - #1227
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-### Contributors
-
-* @genericaccount-de
-
-## [0.6.1](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.6.0...types-sdk-v0.6.1) - 2026-03-30
+## [0.6.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-canonical-errors-v0.6.0...cf-gears-toolkit-canonical-errors-v0.6.1) - 2026-03-30
 
 ### Other
 
@@ -778,7 +768,17 @@ release-plz updates this file in the Release PR.
 
 * @genericaccount-de
 
-## [0.1.16](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.15...cyberware-static-tr-plugin-v0.1.16) - 2026-03-30
+## [0.6.1](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.6.0...types-sdk-v0.6.1) - 2026-03-30
+
+### Other
+
+- Set individual version for each package. (by @genericaccount-de) - #1227
+
+### Contributors
+
+* @genericaccount-de
+
+## [0.1.16](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.15...cf-gears-static-tr-plugin-v0.1.16) - 2026-03-30
 
 ### Other
 
@@ -788,7 +788,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.12...cyberware-static-credstore-plugin-v0.1.13) - 2026-03-30
+## [0.1.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.12...cf-gears-static-credstore-plugin-v0.1.13) - 2026-03-30
 
 ### Other
 
@@ -798,7 +798,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.14...cyberware-static-authz-plugin-v0.1.15) - 2026-03-30
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.14...cf-gears-static-authz-plugin-v0.1.15) - 2026-03-30
 
 ### Other
 
@@ -808,7 +808,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.5...cyberware-static-authn-plugin-v0.2.6) - 2026-03-30
+## [0.2.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.5...cf-gears-static-authn-plugin-v0.2.6) - 2026-03-30
 
 ### Other
 
@@ -818,7 +818,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.16...cf-single-tenant-tr-plugin-v0.1.17) - 2026-03-30
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.16...cf-single-tenant-tr-plugin-v0.1.17) - 2026-03-30
 
 ### Other
 
@@ -828,12 +828,12 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.6.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.6.1...cyberware-modkit-http-v0.6.2) - 2026-03-30
+## [0.6.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.6.1...cf-gears-toolkit-http-v0.6.2) - 2026-03-30
 
 ### Added
 
 - *(outbox)* leased handler API with drop-based cancellation (by @striped-zebra-dev)
-- *(modkit)* add FIPS-140-3 support via aws-lc-fips-sys
+- *(toolkit)* add FIPS-140-3 support via aws-lc-fips-sys
 
 ### Other
 
@@ -844,11 +844,11 @@ release-plz updates this file in the Release PR.
 * @striped-zebra-dev
 * @genericaccount-de
 
-## [0.6.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.6.1...cyberware-modkit-v0.6.2) - 2026-03-30
+## [0.6.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.6.1...cf-gears-toolkit-v0.6.2) - 2026-03-30
 
 ### Added
 
-- *(modkit)* add FIPS-140-3 support via aws-lc-fips-sys
+- *(toolkit)* add FIPS-140-3 support via aws-lc-fips-sys
 
 ### Fixed
 
@@ -864,77 +864,67 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @lansfy
 
-## [0.1.16](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.15...cyberware-static-tr-plugin-v0.1.16) - 2026-03-25
+## [0.1.16](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.15...cf-gears-static-tr-plugin-v0.1.16) - 2026-03-25
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.12...cyberware-static-credstore-plugin-v0.1.13) - 2026-03-25
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.14...cyberware-static-authz-plugin-v0.1.15) - 2026-03-25
+## [0.1.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.12...cf-gears-static-credstore-plugin-v0.1.13) - 2026-03-25
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.2.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.5...cyberware-static-authn-plugin-v0.2.6) - 2026-03-25
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.17](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.16...cf-single-tenant-tr-plugin-v0.1.17) - 2026-03-25
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.14...cf-gears-static-authz-plugin-v0.1.15) - 2026-03-25
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.14...cyberware-static-tr-plugin-v0.1.15) - 2026-03-24
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.12](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.11...cyberware-static-credstore-plugin-v0.1.12) - 2026-03-24
+## [0.2.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.5...cf-gears-static-authn-plugin-v0.2.6) - 2026-03-25
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-## [0.1.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.13...cyberware-static-authz-plugin-v0.1.14) - 2026-03-24
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.2.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.4...cyberware-static-authn-plugin-v0.2.5) - 2026-03-24
+## [0.1.17](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.16...cf-single-tenant-tr-plugin-v0.1.17) - 2026-03-25
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.16](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.15...cf-single-tenant-tr-plugin-v0.1.16) - 2026-03-24
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.13...cyberware-static-tr-plugin-v0.1.14) - 2026-03-23
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.14...cf-gears-static-tr-plugin-v0.1.15) - 2026-03-24
 
 ### Other
 
-- release (by @github-actions[bot]) - #1273
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-### Contributors
+## [0.1.12](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.11...cf-gears-static-credstore-plugin-v0.1.12) - 2026-03-24
 
-* @github-actions[bot]
+### Other
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.10...cyberware-static-credstore-plugin-v0.1.11) - 2026-03-23
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
+
+## [0.1.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.13...cf-gears-static-authz-plugin-v0.1.14) - 2026-03-24
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.2.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.4...cf-gears-static-authn-plugin-v0.2.5) - 2026-03-24
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.16](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.15...cf-single-tenant-tr-plugin-v0.1.16) - 2026-03-24
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.13...cf-gears-static-tr-plugin-v0.1.14) - 2026-03-23
 
 ### Other
 
@@ -944,7 +934,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.12...cyberware-static-authz-plugin-v0.1.13) - 2026-03-23
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.10...cf-gears-static-credstore-plugin-v0.1.11) - 2026-03-23
 
 ### Other
 
@@ -954,7 +944,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.3...cyberware-static-authn-plugin-v0.2.4) - 2026-03-23
+## [0.1.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.12...cf-gears-static-authz-plugin-v0.1.13) - 2026-03-23
 
 ### Other
 
@@ -964,7 +954,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.14...cf-single-tenant-tr-plugin-v0.1.15) - 2026-03-23
+## [0.2.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.3...cf-gears-static-authn-plugin-v0.2.4) - 2026-03-23
 
 ### Other
 
@@ -974,93 +964,93 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.5.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.5.10...cyberware-modkit-v0.5.11) - 2026-03-23
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.14...cf-single-tenant-tr-plugin-v0.1.15) - 2026-03-23
+
+### Other
+
+- release (by @github-actions[bot]) - #1273
+
+### Contributors
+
+* @github-actions[bot]
+
+## [0.5.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.5.10...cf-gears-toolkit-v0.5.11) - 2026-03-23
 
 ### Fixed
 
-- *(modkit)* reject duplicate YAML mapping keys during config parsing (by @mattgarmon)
+- *(toolkit)* reject duplicate YAML mapping keys during config parsing (by @mattgarmon)
 
 ### Contributors
 
 * @mattgarmon
 
-## [0.1.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.13...cyberware-static-tr-plugin-v0.1.14) - 2026-03-22
+## [0.1.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.13...cf-gears-static-tr-plugin-v0.1.14) - 2026-03-22
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.10...cyberware-static-credstore-plugin-v0.1.11) - 2026-03-22
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.12...cyberware-static-authz-plugin-v0.1.13) - 2026-03-22
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.10...cf-gears-static-credstore-plugin-v0.1.11) - 2026-03-22
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.2.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.3...cyberware-static-authn-plugin-v0.2.4) - 2026-03-22
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.15](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.14...cf-single-tenant-tr-plugin-v0.1.15) - 2026-03-22
+## [0.1.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.12...cf-gears-static-authz-plugin-v0.1.13) - 2026-03-22
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.12...cyberware-static-tr-plugin-v0.1.13) - 2026-03-19
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.9...cyberware-static-credstore-plugin-v0.1.10) - 2026-03-19
+## [0.2.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.3...cf-gears-static-authn-plugin-v0.2.4) - 2026-03-22
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-## [0.1.12](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.11...cyberware-static-authz-plugin-v0.1.12) - 2026-03-19
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.2.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.2...cyberware-static-authn-plugin-v0.2.3) - 2026-03-19
+## [0.1.15](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.14...cf-single-tenant-tr-plugin-v0.1.15) - 2026-03-22
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.14](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.13...cf-single-tenant-tr-plugin-v0.1.14) - 2026-03-19
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.10...cyberware-static-authz-plugin-v0.1.11) - 2026-03-19
+## [0.1.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.12...cf-gears-static-tr-plugin-v0.1.13) - 2026-03-19
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.10...cyberware-static-tr-plugin-v0.1.11) - 2026-03-18
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.9...cf-gears-static-credstore-plugin-v0.1.10) - 2026-03-19
 
 ### Other
 
-- release (by @github-actions[bot]) - #1135
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-### Contributors
+## [0.1.12](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.11...cf-gears-static-authz-plugin-v0.1.12) - 2026-03-19
 
-* @github-actions[bot]
+### Other
 
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.7...cyberware-static-credstore-plugin-v0.1.8) - 2026-03-18
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.2.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.2...cf-gears-static-authn-plugin-v0.2.3) - 2026-03-19
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.14](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.13...cf-single-tenant-tr-plugin-v0.1.14) - 2026-03-19
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.10...cf-gears-static-authz-plugin-v0.1.11) - 2026-03-19
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.10...cf-gears-static-tr-plugin-v0.1.11) - 2026-03-18
 
 ### Other
 
@@ -1070,7 +1060,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.9...cyberware-static-authz-plugin-v0.1.10) - 2026-03-18
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.7...cf-gears-static-credstore-plugin-v0.1.8) - 2026-03-18
 
 ### Other
 
@@ -1080,7 +1070,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.0...cyberware-static-authn-plugin-v0.2.1) - 2026-03-18
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.9...cf-gears-static-authz-plugin-v0.1.10) - 2026-03-18
 
 ### Other
 
@@ -1090,7 +1080,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.12](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.11...cf-single-tenant-tr-plugin-v0.1.12) - 2026-03-18
+## [0.2.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.0...cf-gears-static-authn-plugin-v0.2.1) - 2026-03-18
 
 ### Other
 
@@ -1100,7 +1090,17 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.5.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.5.5...cyberware-modkit-v0.5.8) - 2026-03-18
+## [0.1.12](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.11...cf-single-tenant-tr-plugin-v0.1.12) - 2026-03-18
+
+### Other
+
+- release (by @github-actions[bot]) - #1135
+
+### Contributors
+
+* @github-actions[bot]
+
+## [0.5.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.5.5...cf-gears-toolkit-v0.5.8) - 2026-03-18
 
 ### Added
 
@@ -1108,7 +1108,7 @@ release-plz updates this file in the Release PR.
 
 ### Fixed
 
-- *(modkit)* deserialize vendor config without cloning raw value (by @aviator5)
+- *(toolkit)* deserialize vendor config without cloning raw value (by @aviator5)
 - embed not maintained odata-params crate (by @lansfy) - #1120
 
 ### Other
@@ -1121,47 +1121,37 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @lansfy
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.10...cyberware-static-tr-plugin-v0.1.11) - 2026-03-17
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.10...cf-gears-static-tr-plugin-v0.1.11) - 2026-03-17
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.7...cyberware-static-credstore-plugin-v0.1.8) - 2026-03-17
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.9...cyberware-static-authz-plugin-v0.1.10) - 2026-03-17
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.7...cf-gears-static-credstore-plugin-v0.1.8) - 2026-03-17
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.2.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.2.0...cyberware-static-authn-plugin-v0.2.1) - 2026-03-17
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.12](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.11...cf-single-tenant-tr-plugin-v0.1.12) - 2026-03-17
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.9...cf-gears-static-authz-plugin-v0.1.10) - 2026-03-17
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.9...cyberware-static-tr-plugin-v0.1.10) - 2026-03-14
+## [0.2.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.2.0...cf-gears-static-authn-plugin-v0.2.1) - 2026-03-17
 
 ### Other
 
-- release (by @github-actions[bot]) - #1022
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-### Contributors
+## [0.1.12](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.11...cf-single-tenant-tr-plugin-v0.1.12) - 2026-03-17
 
-* @github-actions[bot]
+### Other
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.6...cyberware-static-credstore-plugin-v0.1.7) - 2026-03-14
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.9...cf-gears-static-tr-plugin-v0.1.10) - 2026-03-14
 
 ### Other
 
@@ -1171,7 +1161,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.8...cyberware-static-authz-plugin-v0.1.9) - 2026-03-14
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.6...cf-gears-static-credstore-plugin-v0.1.7) - 2026-03-14
 
 ### Other
 
@@ -1181,7 +1171,17 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.8...cyberware-static-authn-plugin-v0.2.0) - 2026-03-14
+## [0.1.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.8...cf-gears-static-authz-plugin-v0.1.9) - 2026-03-14
+
+### Other
+
+- release (by @github-actions[bot]) - #1022
+
+### Contributors
+
+* @github-actions[bot]
+
+## [0.2.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.8...cf-gears-static-authn-plugin-v0.2.0) - 2026-03-14
 
 ### Added
 
@@ -1199,7 +1199,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-14
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-14
 
 ### Other
 
@@ -1209,13 +1209,13 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.5.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.5.4...cyberware-modkit-http-v0.5.5) - 2026-03-14
+## [0.5.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.5.4...cf-gears-toolkit-http-v0.5.5) - 2026-03-14
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.9...cyberware-static-tr-plugin-v0.1.10) - 2026-03-12
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.9...cf-gears-static-tr-plugin-v0.1.10) - 2026-03-12
 
 ### Other
 
@@ -1225,7 +1225,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.6...cyberware-static-credstore-plugin-v0.1.7) - 2026-03-12
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.6...cf-gears-static-credstore-plugin-v0.1.7) - 2026-03-12
 
 ### Other
 
@@ -1235,7 +1235,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.8...cyberware-static-authz-plugin-v0.1.9) - 2026-03-12
+## [0.1.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.8...cf-gears-static-authz-plugin-v0.1.9) - 2026-03-12
 
 ### Other
 
@@ -1245,7 +1245,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.2.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.8...cyberware-static-authn-plugin-v0.2.0) - 2026-03-12
+## [0.2.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.8...cf-gears-static-authn-plugin-v0.2.0) - 2026-03-12
 
 ### Added
 
@@ -1261,7 +1261,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-12
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-12
 
 ### Other
 
@@ -1271,155 +1271,145 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.5.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.5.3...cyberware-modkit-v0.5.4) - 2026-03-12
+## [0.5.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.5.3...cf-gears-toolkit-v0.5.4) - 2026-03-12
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.9...cyberware-static-tr-plugin-v0.1.10) - 2026-03-12
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.9...cf-gears-static-tr-plugin-v0.1.10) - 2026-03-12
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.6...cyberware-static-credstore-plugin-v0.1.7) - 2026-03-12
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk, cyberware-types-registry-sdk
-
-## [0.1.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.8...cyberware-static-authz-plugin-v0.1.9) - 2026-03-12
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.6...cf-gears-static-credstore-plugin-v0.1.7) - 2026-03-12
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk, cyberware-types-registry-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk, cf-gears-types-registry-sdk
 
-## [0.1.11](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-12
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk, cyberware-types-registry-sdk
-
-## [0.1.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.8...cyberware-static-tr-plugin-v0.1.9) - 2026-03-11
+## [0.1.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.8...cf-gears-static-authz-plugin-v0.1.9) - 2026-03-12
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.7...cyberware-static-authz-plugin-v0.1.8) - 2026-03-11
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.7...cyberware-static-authn-plugin-v0.1.8) - 2026-03-11
+## [0.1.11](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.10...cf-single-tenant-tr-plugin-v0.1.11) - 2026-03-12
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk, cf-gears-types-registry-sdk
 
-## [0.1.10](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.9...cf-single-tenant-tr-plugin-v0.1.10) - 2026-03-11
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.4...cyberware-static-credstore-plugin-v0.1.5) - 2026-03-10
+## [0.1.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.8...cf-gears-static-tr-plugin-v0.1.9) - 2026-03-11
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.6...cyberware-static-authz-plugin-v0.1.7) - 2026-03-10
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.6...cyberware-static-authn-plugin-v0.1.7) - 2026-03-10
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.7...cf-gears-static-authz-plugin-v0.1.8) - 2026-03-11
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.9](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.8...cf-single-tenant-tr-plugin-v0.1.9) - 2026-03-10
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.7...cyberware-static-tr-plugin-v0.1.8) - 2026-03-10
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.7...cf-gears-static-authn-plugin-v0.1.8) - 2026-03-11
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.3...cyberware-static-credstore-plugin-v0.1.4) - 2026-03-10
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.5...cyberware-static-authz-plugin-v0.1.6) - 2026-03-10
+## [0.1.10](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.9...cf-single-tenant-tr-plugin-v0.1.10) - 2026-03-11
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.5...cyberware-static-authn-plugin-v0.1.6) - 2026-03-10
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.8](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.7...cf-single-tenant-tr-plugin-v0.1.8) - 2026-03-10
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.4...cf-gears-static-credstore-plugin-v0.1.5) - 2026-03-10
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.6...cyberware-static-tr-plugin-v0.1.7) - 2026-03-09
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.2...cyberware-static-credstore-plugin-v0.1.3) - 2026-03-09
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.6...cf-gears-static-authz-plugin-v0.1.7) - 2026-03-10
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.4...cyberware-static-authz-plugin-v0.1.5) - 2026-03-09
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.4...cyberware-static-authn-plugin-v0.1.5) - 2026-03-09
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.6...cf-gears-static-authn-plugin-v0.1.7) - 2026-03-10
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-## [0.1.7](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.6...cf-single-tenant-tr-plugin-v0.1.7) - 2026-03-09
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
-
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.5...cyberware-static-tr-plugin-v0.1.6) - 2026-03-08
+## [0.1.9](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.8...cf-single-tenant-tr-plugin-v0.1.9) - 2026-03-10
 
 ### Other
 
-- release (by @github-actions[bot]) - #937
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-### Contributors
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.7...cf-gears-static-tr-plugin-v0.1.8) - 2026-03-10
 
-* @github-actions[bot]
+### Other
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.1...cyberware-static-credstore-plugin-v0.1.2) - 2026-03-08
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.3...cf-gears-static-credstore-plugin-v0.1.4) - 2026-03-10
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
+
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.5...cf-gears-static-authz-plugin-v0.1.6) - 2026-03-10
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.5...cf-gears-static-authn-plugin-v0.1.6) - 2026-03-10
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.8](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.7...cf-single-tenant-tr-plugin-v0.1.8) - 2026-03-10
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.6...cf-gears-static-tr-plugin-v0.1.7) - 2026-03-09
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.2...cf-gears-static-credstore-plugin-v0.1.3) - 2026-03-09
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
+
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.4...cf-gears-static-authz-plugin-v0.1.5) - 2026-03-09
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.4...cf-gears-static-authn-plugin-v0.1.5) - 2026-03-09
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.7](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.6...cf-single-tenant-tr-plugin-v0.1.7) - 2026-03-09
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.5...cf-gears-static-tr-plugin-v0.1.6) - 2026-03-08
 
 ### Other
 
@@ -1429,7 +1419,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.3...cyberware-static-authz-plugin-v0.1.4) - 2026-03-08
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.1...cf-gears-static-credstore-plugin-v0.1.2) - 2026-03-08
 
 ### Other
 
@@ -1439,7 +1429,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.3...cyberware-static-authn-plugin-v0.1.4) - 2026-03-08
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.3...cf-gears-static-authz-plugin-v0.1.4) - 2026-03-08
 
 ### Other
 
@@ -1449,7 +1439,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.5...cf-single-tenant-tr-plugin-v0.1.6) - 2026-03-08
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.3...cf-gears-static-authn-plugin-v0.1.4) - 2026-03-08
 
 ### Other
 
@@ -1459,37 +1449,47 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.5...cyberware-static-tr-plugin-v0.1.6) - 2026-03-08
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.5...cf-single-tenant-tr-plugin-v0.1.6) - 2026-03-08
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- release (by @github-actions[bot]) - #937
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.1...cyberware-static-credstore-plugin-v0.1.2) - 2026-03-08
+### Contributors
 
-### Other
+* @github-actions[bot]
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-credstore-sdk
-
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.3...cyberware-static-authz-plugin-v0.1.4) - 2026-03-08
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.5...cf-gears-static-tr-plugin-v0.1.6) - 2026-03-08
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.3...cyberware-static-authn-plugin-v0.1.4) - 2026-03-08
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
-
-## [0.1.6](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.5...cf-single-tenant-tr-plugin-v0.1.6) - 2026-03-08
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.1...cf-gears-static-credstore-plugin-v0.1.2) - 2026-03-08
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-credstore-sdk
 
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.4...cyberware-static-tr-plugin-v0.1.5) - 2026-03-07
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.3...cf-gears-static-authz-plugin-v0.1.4) - 2026-03-08
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
+
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.3...cf-gears-static-authn-plugin-v0.1.4) - 2026-03-08
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
+
+## [0.1.6](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.5...cf-single-tenant-tr-plugin-v0.1.6) - 2026-03-08
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.4...cf-gears-static-tr-plugin-v0.1.5) - 2026-03-07
 
 ### Other
 
@@ -1499,7 +1499,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-credstore-plugin-v0.1.0...cyberware-static-credstore-plugin-v0.1.1) - 2026-03-07
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-credstore-plugin-v0.1.0...cf-gears-static-credstore-plugin-v0.1.1) - 2026-03-07
 
 ### Added
 
@@ -1516,7 +1516,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.2...cyberware-static-authz-plugin-v0.1.3) - 2026-03-07
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.2...cf-gears-static-authz-plugin-v0.1.3) - 2026-03-07
 
 ### Other
 
@@ -1526,7 +1526,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.2...cyberware-static-authn-plugin-v0.1.3) - 2026-03-07
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.2...cf-gears-static-authn-plugin-v0.1.3) - 2026-03-07
 
 ### Other
 
@@ -1536,7 +1536,7 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.4...cf-single-tenant-tr-plugin-v0.1.5) - 2026-03-07
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.4...cf-single-tenant-tr-plugin-v0.1.5) - 2026-03-07
 
 ### Other
 
@@ -1546,31 +1546,31 @@ release-plz updates this file in the Release PR.
 
 * @github-actions[bot]
 
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.4...cyberware-static-tr-plugin-v0.1.5) - 2026-03-06
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.4...cf-gears-static-tr-plugin-v0.1.5) - 2026-03-06
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.2...cyberware-static-authz-plugin-v0.1.3) - 2026-03-06
-
-### Other
-
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authz-resolver-sdk
-
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.2...cyberware-static-authn-plugin-v0.1.3) - 2026-03-06
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.2...cf-gears-static-authz-plugin-v0.1.3) - 2026-03-06
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-macros, cyberware-modkit, cyberware-authn-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authz-resolver-sdk
 
-## [0.1.5](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.4...cf-single-tenant-tr-plugin-v0.1.5) - 2026-03-06
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.2...cf-gears-static-authn-plugin-v0.1.3) - 2026-03-06
 
 ### Other
 
-- updated the following local packages: cyberware-modkit-security, cyberware-modkit-odata, cyberware-modkit-macros, cyberware-modkit, cyberware-tenant-resolver-sdk
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-authn-resolver-sdk
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.5](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.4...cf-single-tenant-tr-plugin-v0.1.5) - 2026-03-06
+
+### Other
+
+- updated the following local packages: cf-gears-toolkit-security, cf-gears-toolkit-odata, cf-gears-toolkit-macros, cf-gears-toolkit, cf-gears-tenant-resolver-sdk
+
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1585,7 +1585,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-06
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-06
 
 ### Added
 
@@ -1605,7 +1605,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1620,7 +1620,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1635,7 +1635,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1650,11 +1650,11 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.3.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.1) - 2026-03-06
+## [0.3.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.1) - 2026-03-06
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -1662,7 +1662,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1677,7 +1677,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-06
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-06
 
 ### Added
 
@@ -1697,7 +1697,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1712,7 +1712,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1727,7 +1727,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1742,11 +1742,11 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.3.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.1) - 2026-03-06
+## [0.3.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.1) - 2026-03-06
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -1754,7 +1754,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.3.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.14...cyberware-modkit-v0.3.1) - 2026-03-06
+## [0.3.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.14...cf-gears-toolkit-v0.3.1) - 2026-03-06
 
 ### Added
 
@@ -1772,7 +1772,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @genericaccount-de
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1787,7 +1787,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-06
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-06
 
 ### Added
 
@@ -1807,7 +1807,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1822,7 +1822,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1837,7 +1837,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1852,11 +1852,11 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.3.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.1) - 2026-03-06
+## [0.3.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.1) - 2026-03-06
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -1864,7 +1864,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.3.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.14...cyberware-modkit-v0.3.1) - 2026-03-06
+## [0.3.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.14...cf-gears-toolkit-v0.3.1) - 2026-03-06
 
 ### Added
 
@@ -1882,7 +1882,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @genericaccount-de
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1897,7 +1897,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-06
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-06
 
 ### Added
 
@@ -1917,7 +1917,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1932,7 +1932,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-06
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-06
 
 ### Added
 
@@ -1947,7 +1947,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-06
 
 ### Added
 
@@ -1962,11 +1962,11 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.0) - 2026-03-06
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.0) - 2026-03-06
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -1974,7 +1974,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.14...cyberware-modkit-v0.3.0) - 2026-03-06
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.14...cf-gears-toolkit-v0.3.0) - 2026-03-06
 
 ### Added
 
@@ -1991,7 +1991,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @genericaccount-de
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-05
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-05
 
 ### Added
 
@@ -2006,7 +2006,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-05
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-05
 
 ### Added
 
@@ -2026,7 +2026,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-05
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-05
 
 ### Added
 
@@ -2041,7 +2041,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-05
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-05
 
 ### Added
 
@@ -2056,7 +2056,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-05
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-05
 
 ### Added
 
@@ -2071,11 +2071,11 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @fluiderson
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.0) - 2026-03-05
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.0) - 2026-03-05
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -2083,7 +2083,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.14...cyberware-modkit-v0.3.0) - 2026-03-05
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.14...cf-gears-toolkit-v0.3.0) - 2026-03-05
 
 ### Added
 
@@ -2100,7 +2100,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @genericaccount-de
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.3...cyberware-static-tr-plugin-v0.1.4) - 2026-03-05
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.3...cf-gears-static-tr-plugin-v0.1.4) - 2026-03-05
 
 ### Added
 
@@ -2110,7 +2110,7 @@ release-plz updates this file in the Release PR.
 
 * @fluiderson
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-credstore-plugin-v0.1.0) - 2026-03-05
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-credstore-plugin-v0.1.0) - 2026-03-05
 
 ### Added
 
@@ -2128,7 +2128,7 @@ release-plz updates this file in the Release PR.
 * @fluiderson
 * @refur-nfn
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.1...cyberware-static-authz-plugin-v0.1.2) - 2026-03-05
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.1...cf-gears-static-authz-plugin-v0.1.2) - 2026-03-05
 
 ### Added
 
@@ -2138,7 +2138,7 @@ release-plz updates this file in the Release PR.
 
 * @fluiderson
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.1...cyberware-static-authn-plugin-v0.1.2) - 2026-03-05
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.1...cf-gears-static-authn-plugin-v0.1.2) - 2026-03-05
 
 ### Added
 
@@ -2148,7 +2148,7 @@ release-plz updates this file in the Release PR.
 
 * @fluiderson
 
-## [0.1.4](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-05
+## [0.1.4](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.3...cf-single-tenant-tr-plugin-v0.1.4) - 2026-03-05
 
 ### Added
 
@@ -2158,11 +2158,11 @@ release-plz updates this file in the Release PR.
 
 * @fluiderson
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.14...cyberware-modkit-http-v0.3.0) - 2026-03-05
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.14...cf-gears-toolkit-http-v0.3.0) - 2026-03-05
 
 ### Other
 
-- Set AllowInsecureHttp by default in modkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
+- Set AllowInsecureHttp by default in toolkit-http config, add deny_insecure_http method for TLS enforcement. (by @genericaccount-de) - #868
 - *(cargo)* unify TLS stack and clean up SeaORM/sqlx feature wiring (by @MikeFalcon77)
 
 ### Contributors
@@ -2170,7 +2170,7 @@ release-plz updates this file in the Release PR.
 * @genericaccount-de
 * @MikeFalcon77
 
-## [0.3.0](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.14...cyberware-modkit-v0.3.0) - 2026-03-05
+## [0.3.0](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.14...cf-gears-toolkit-v0.3.0) - 2026-03-05
 
 ### Added
 
@@ -2187,7 +2187,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @genericaccount-de
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.2...cyberware-static-tr-plugin-v0.1.3) - 2026-02-26
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.2...cf-gears-static-tr-plugin-v0.1.3) - 2026-02-26
 
 ### Other
 
@@ -2199,60 +2199,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.0...cyberware-static-authz-plugin-v0.1.1) - 2026-02-26
-
-### Other
-
-- release (by @github-actions[bot]) - #755
-- release (by @github-actions[bot]) - #749
-- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
-- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
-
-### Contributors
-
-* @github-actions[bot]
-* @MikeFalcon77
-* @aviator5
-
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.0...cyberware-static-authn-plugin-v0.1.1) - 2026-02-26
-
-### Other
-
-- release (by @github-actions[bot]) - #749
-- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
-- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
-
-### Contributors
-
-* @github-actions[bot]
-* @MikeFalcon77
-* @aviator5
-
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
-
-### Other
-
-- release (by @github-actions[bot]) - #749
-- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
-
-### Contributors
-
-* @github-actions[bot]
-* @aviator5
-
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.2...cyberware-static-tr-plugin-v0.1.3) - 2026-02-26
-
-### Other
-
-- release (by @github-actions[bot]) - #749
-- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
-
-### Contributors
-
-* @github-actions[bot]
-* @aviator5
-
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.0...cyberware-static-authz-plugin-v0.1.1) - 2026-02-26
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.0...cf-gears-static-authz-plugin-v0.1.1) - 2026-02-26
 
 ### Other
 
@@ -2267,7 +2214,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.0...cyberware-static-authn-plugin-v0.1.1) - 2026-02-26
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.0...cf-gears-static-authn-plugin-v0.1.1) - 2026-02-26
 
 ### Other
 
@@ -2281,7 +2228,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
 
 ### Other
 
@@ -2293,7 +2240,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.2...cyberware-static-tr-plugin-v0.1.3) - 2026-02-26
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.2...cf-gears-static-tr-plugin-v0.1.3) - 2026-02-26
 
 ### Other
 
@@ -2305,7 +2252,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.0...cyberware-static-authz-plugin-v0.1.1) - 2026-02-26
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.0...cf-gears-static-authz-plugin-v0.1.1) - 2026-02-26
 
 ### Other
 
@@ -2320,7 +2267,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.0...cyberware-static-authn-plugin-v0.1.1) - 2026-02-26
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.0...cf-gears-static-authn-plugin-v0.1.1) - 2026-02-26
 
 ### Other
 
@@ -2334,7 +2281,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
 
 ### Other
 
@@ -2346,7 +2293,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.2...cyberware-static-tr-plugin-v0.1.3) - 2026-02-25
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.2...cf-gears-static-tr-plugin-v0.1.3) - 2026-02-26
 
 ### Other
 
@@ -2358,7 +2305,22 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.0...cyberware-static-authz-plugin-v0.1.1) - 2026-02-25
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.0...cf-gears-static-authz-plugin-v0.1.1) - 2026-02-26
+
+### Other
+
+- release (by @github-actions[bot]) - #755
+- release (by @github-actions[bot]) - #749
+- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
+- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
+
+### Contributors
+
+* @github-actions[bot]
+* @MikeFalcon77
+* @aviator5
+
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.0...cf-gears-static-authn-plugin-v0.1.1) - 2026-02-26
 
 ### Other
 
@@ -2372,7 +2334,31 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.0...cyberware-static-authn-plugin-v0.1.1) - 2026-02-25
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-26
+
+### Other
+
+- release (by @github-actions[bot]) - #749
+- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
+
+### Contributors
+
+* @github-actions[bot]
+* @aviator5
+
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.2...cf-gears-static-tr-plugin-v0.1.3) - 2026-02-25
+
+### Other
+
+- release (by @github-actions[bot]) - #749
+- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
+
+### Contributors
+
+* @github-actions[bot]
+* @aviator5
+
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.0...cf-gears-static-authz-plugin-v0.1.1) - 2026-02-25
 
 ### Other
 
@@ -2386,7 +2372,21 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-25
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.0...cf-gears-static-authn-plugin-v0.1.1) - 2026-02-25
+
+### Other
+
+- release (by @github-actions[bot]) - #749
+- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
+- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
+
+### Contributors
+
+* @github-actions[bot]
+* @MikeFalcon77
+* @aviator5
+
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-25
 
 ### Other
 
@@ -2398,7 +2398,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-credstore-sdk-v0.1.0) - 2026-02-25
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-credstore-sdk-v0.1.0) - 2026-02-25
 
 ### Added
 
@@ -2408,7 +2408,7 @@ release-plz updates this file in the Release PR.
 
 * @refur-nfn
 
-## [0.2.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-oagw-v0.2.13...cyberware-oagw-v0.2.14) - 2026-02-25
+## [0.2.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-oagw-v0.2.13...cf-gears-oagw-v0.2.14) - 2026-02-25
 
 ### Added
 
@@ -2431,7 +2431,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @striped-zebra-dev
 
-## [0.2.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-oagw-sdk-v0.2.13...cyberware-oagw-sdk-v0.2.14) - 2026-02-25
+## [0.2.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-oagw-sdk-v0.2.13...cf-gears-oagw-sdk-v0.2.14) - 2026-02-25
 
 ### Added
 
@@ -2453,7 +2453,7 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @striped-zebra-dev
 
-## [0.2.14](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.13...cyberware-modkit-v0.2.14) - 2026-02-25
+## [0.2.14](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.13...cf-gears-toolkit-v0.2.14) - 2026-02-25
 
 ### Fixed
 
@@ -2463,7 +2463,7 @@ release-plz updates this file in the Release PR.
 
 * @Bechma
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.2...cyberware-static-tr-plugin-v0.1.3) - 2026-02-25
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.2...cf-gears-static-tr-plugin-v0.1.3) - 2026-02-25
 
 ### Other
 
@@ -2473,19 +2473,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authz-plugin-v0.1.0...cyberware-static-authz-plugin-v0.1.1) - 2026-02-25
-
-### Other
-
-- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
-- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
-
-### Contributors
-
-* @MikeFalcon77
-* @aviator5
-
-## [0.1.1](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-authn-plugin-v0.1.0...cyberware-static-authn-plugin-v0.1.1) - 2026-02-25
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authz-plugin-v0.1.0...cf-gears-static-authz-plugin-v0.1.1) - 2026-02-25
 
 ### Other
 
@@ -2497,7 +2485,19 @@ release-plz updates this file in the Release PR.
 * @MikeFalcon77
 * @aviator5
 
-## [0.1.3](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-25
+## [0.1.1](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-authn-plugin-v0.1.0...cf-gears-static-authn-plugin-v0.1.1) - 2026-02-25
+
+### Other
+
+- Merge pull request #660 from aviator5/module-oncelock-refactoring (by @MikeFalcon77) - #660
+- migrate modules from ArcSwapOption to OnceLock (by @aviator5) - #660
+
+### Contributors
+
+* @MikeFalcon77
+* @aviator5
+
+## [0.1.3](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.2...cf-single-tenant-tr-plugin-v0.1.3) - 2026-02-25
 
 ### Other
 
@@ -2507,7 +2507,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-credstore-sdk-v0.1.0) - 2026-02-25
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-credstore-sdk-v0.1.0) - 2026-02-25
 
 ### Added
 
@@ -2517,7 +2517,7 @@ release-plz updates this file in the Release PR.
 
 * @refur-nfn
 
-## [0.2.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-oagw-v0.2.12...cyberware-oagw-v0.2.13) - 2026-02-25
+## [0.2.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-oagw-v0.2.12...cf-gears-oagw-v0.2.13) - 2026-02-25
 
 ### Added
 
@@ -2535,7 +2535,7 @@ release-plz updates this file in the Release PR.
 
 * @striped-zebra-dev
 
-## [0.2.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-oagw-sdk-v0.2.12...cyberware-oagw-sdk-v0.2.13) - 2026-02-25
+## [0.2.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-oagw-sdk-v0.2.12...cf-gears-oagw-sdk-v0.2.13) - 2026-02-25
 
 ### Added
 
@@ -2552,7 +2552,7 @@ release-plz updates this file in the Release PR.
 
 * @striped-zebra-dev
 
-## [0.2.13](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.12...cyberware-modkit-v0.2.13) - 2026-02-25
+## [0.2.13](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.12...cf-gears-toolkit-v0.2.13) - 2026-02-25
 
 ### Fixed
 
@@ -2561,8 +2561,8 @@ release-plz updates this file in the Release PR.
 
 ### Other
 
-- Merge pull request #641 from genericaccount-de/feature/REAL-162-production-hardening-of-cyberware-rust (by @MikeFalcon77) - #641
-- Add production hardening changes to cyberware-rust and cyberware-server, partly REAL-162
+- Merge pull request #641 from genericaccount-de/feature/REAL-162-production-hardening-of-cf-gears-rust (by @MikeFalcon77) - #641
+- Add production hardening changes to cf-gears-rust and cf-gears-server, partly REAL-162
 - Merge pull request #540 from KvizadSaderah/feature/500-list-modules-api (by @Artifizer) - #540
 - Merge branch 'main' into fix-oop-example (by @Bechma) - #670
 - - fix oop example (by @Bechma) - #670
@@ -2573,13 +2573,13 @@ release-plz updates this file in the Release PR.
 * @Artifizer
 * @Bechma
 
-## [0.2.12](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.2.11...types-sdk-v0.2.12) - 2026-02-18
+## [0.2.12](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.2.11...types-sdk-v0.2.12) - 2026-02-18
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.1...cyberware-static-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.1...cf-gears-static-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2604,7 +2604,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authz-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authz-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2618,7 +2618,7 @@ release-plz updates this file in the Release PR.
 ### Other
 
 - release (by @github-actions[bot]) - #595
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2629,7 +2629,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @github-actions[bot]
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authn-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authn-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2644,7 +2644,7 @@ release-plz updates this file in the Release PR.
 - release (by @github-actions[bot]) - #652
 - release (by @github-actions[bot]) - #595
 - *(config)* streamline quickstart.yaml auth configuration (by @aviator5)
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2655,7 +2655,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2680,13 +2680,13 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.2.11](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.2.10...types-sdk-v0.2.11) - 2026-02-18
+## [0.2.11](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.2.10...types-sdk-v0.2.11) - 2026-02-18
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.1...cyberware-static-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.1...cf-gears-static-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2711,7 +2711,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authz-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authz-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2725,7 +2725,7 @@ release-plz updates this file in the Release PR.
 ### Other
 
 - release (by @github-actions[bot]) - #595
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2736,7 +2736,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @github-actions[bot]
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authn-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authn-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2750,7 +2750,7 @@ release-plz updates this file in the Release PR.
 
 - release (by @github-actions[bot]) - #595
 - *(config)* streamline quickstart.yaml auth configuration (by @aviator5)
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2761,7 +2761,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2786,13 +2786,13 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.2.10](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.2.9...types-sdk-v0.2.10) - 2026-02-18
+## [0.2.10](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.2.9...types-sdk-v0.2.10) - 2026-02-18
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-static-tr-plugin-v0.1.1...cyberware-static-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-gears-static-tr-plugin-v0.1.1...cf-gears-static-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2817,7 +2817,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authz-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authz-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2830,7 +2830,7 @@ release-plz updates this file in the Release PR.
 ### Other
 
 - release (by @github-actions[bot]) - #595
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2841,7 +2841,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authn-plugin-v0.1.0) - 2026-02-18
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authn-plugin-v0.1.0) - 2026-02-18
 
 ### Added
 
@@ -2855,7 +2855,7 @@ release-plz updates this file in the Release PR.
 
 - release (by @github-actions[bot]) - #595
 - *(config)* streamline quickstart.yaml auth configuration (by @aviator5)
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2866,7 +2866,7 @@ release-plz updates this file in the Release PR.
 * @github-actions[bot]
 * @aviator5
 
-## [0.1.2](https://github.com/cyberfabric/cyberware-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
+## [0.1.2](https://github.com/constructorfabric/gears-rust/compare/cf-single-tenant-tr-plugin-v0.1.1...cf-single-tenant-tr-plugin-v0.1.2) - 2026-02-18
 
 ### Added
 
@@ -2891,7 +2891,7 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @yoskini
 
-## [0.2.10](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.8...cyberware-modkit-http-v0.2.10) - 2026-02-18
+## [0.2.10](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.8...cf-gears-toolkit-http-v0.2.10) - 2026-02-18
 
 ### Other
 
@@ -2901,13 +2901,13 @@ release-plz updates this file in the Release PR.
 
 * @lansfy
 
-## [0.2.9](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.2.8...types-sdk-v0.2.9) - 2026-02-17
+## [0.2.9](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.2.8...types-sdk-v0.2.9) - 2026-02-17
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authz-plugin-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authz-plugin-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -2919,7 +2919,7 @@ release-plz updates this file in the Release PR.
 
 ### Other
 
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2929,7 +2929,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-static-authn-plugin-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-static-authn-plugin-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -2942,7 +2942,7 @@ release-plz updates this file in the Release PR.
 ### Other
 
 - *(config)* streamline quickstart.yaml auth configuration (by @aviator5)
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2952,7 +2952,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-authz-resolver-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-authz-resolver-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -2964,13 +2964,13 @@ release-plz updates this file in the Release PR.
 
 ### Other
 
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Contributors
 
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-authz-resolver-sdk-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-authz-resolver-sdk-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -2978,7 +2978,7 @@ release-plz updates this file in the Release PR.
 
 ### Other
 
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Security
 
@@ -2988,7 +2988,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-authn-resolver-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-authn-resolver-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -3000,13 +3000,13 @@ release-plz updates this file in the Release PR.
 
 ### Other
 
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 
 ### Contributors
 
 * @aviator5
 
-## [0.2.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-http-v0.2.8...cyberware-modkit-http-v0.2.9) - 2026-02-17
+## [0.2.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-http-v0.2.8...cf-gears-toolkit-http-v0.2.9) - 2026-02-17
 
 ### Other
 
@@ -3016,7 +3016,7 @@ release-plz updates this file in the Release PR.
 
 * @lansfy
 
-## [0.1.0](https://github.com/cyberfabric/cyberware-rust/releases/tag/cyberware-authn-resolver-sdk-v0.1.0) - 2026-02-17
+## [0.1.0](https://github.com/constructorfabric/gears-rust/releases/tag/cf-gears-authn-resolver-sdk-v0.1.0) - 2026-02-17
 
 ### Added
 
@@ -3026,7 +3026,7 @@ release-plz updates this file in the Release PR.
 
 * @aviator5
 
-## [0.2.9](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.8...cyberware-modkit-v0.2.9) - 2026-02-17
+## [0.2.9](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.8...cf-gears-toolkit-v0.2.9) - 2026-02-17
 
 ### Added
 
@@ -3039,7 +3039,7 @@ release-plz updates this file in the Release PR.
 ### Other
 
 - Merge pull request #612 from aviator5/authn-authz-impl-p1 (by @MikeFalcon77) - #612
-- *(plugins)* extract shared choose_plugin_instance into modkit::plugins (by @aviator5)
+- *(plugins)* extract shared choose_plugin_instance into toolkit::plugins (by @aviator5)
 - enable let_underscore_must_use because coderabbitai check it (by @lansfy) - #616
 - Merge pull request #594 from lansfy/fix_random_fail_in_test (by @MikeFalcon77) - #594
 
@@ -3049,17 +3049,17 @@ release-plz updates this file in the Release PR.
 * @aviator5
 * @lansfy
 
-## [0.2.8](https://github.com/cyberfabric/cyberware-rust/compare/types-sdk-v0.2.7...types-sdk-v0.2.8) - 2026-02-12
+## [0.2.8](https://github.com/constructorfabric/gears-rust/compare/types-sdk-v0.2.7...types-sdk-v0.2.8) - 2026-02-12
 
 ### Other
 
 - update Cargo.toml dependencies
 
-## [0.2.7](https://github.com/cyberfabric/cyberware-rust/compare/cyberware-modkit-v0.2.1...cyberware-modkit-v0.2.7) - 2026-02-12
+## [0.2.7](https://github.com/constructorfabric/gears-rust/compare/cf-gears-toolkit-v0.2.1...cf-gears-toolkit-v0.2.7) - 2026-02-12
 
 ### Added
 
-- *(modkit-http)* introduce HttpClient (hyper+tower), replace reqwest and harden JWKS handling (by @MikeFalcon77)
+- *(toolkit-http)* introduce HttpClient (hyper+tower), replace reqwest and harden JWKS handling (by @MikeFalcon77)
 
 ### Fixed
 

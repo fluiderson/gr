@@ -95,7 +95,7 @@ fn start_active(curve: Curve) -> Result<Box<dyn ActiveKeyExchange>, Error> {
 
     let private = SecKey::new(&opts).map_err(|e| {
         Error::General(format!(
-            "cyberware-rustls-corecrypto-provider: SecKey::new failed for P-{}: domain={} code={}",
+            "cf-gears-rustls-corecrypto-provider: SecKey::new failed for P-{}: domain={} code={}",
             curve.size_bits(),
             e.domain(),
             e.code()
@@ -108,13 +108,13 @@ fn start_active(curve: Curve) -> Result<Box<dyn ActiveKeyExchange>, Error> {
     // future regressions — not reachable in normal operation.
     let public = private.public_key().ok_or_else(|| {
         Error::General(
-            "cyberware-rustls-corecrypto-provider: generated SecKey has no associated public key"
+            "cf-gears-rustls-corecrypto-provider: generated SecKey has no associated public key"
                 .to_owned(),
         )
     })?;
     let cf_data = public.external_representation().ok_or_else(|| {
         Error::General(
-            "cyberware-rustls-corecrypto-provider: public_key.external_representation() returned None"
+            "cf-gears-rustls-corecrypto-provider: public_key.external_representation() returned None"
                 .to_owned(),
         )
     })?;
@@ -157,7 +157,7 @@ impl ActiveKeyExchange for ActiveEcdh {
         let expected = 1 + 2 * self.curve.coord_len();
         if peer_pub_key.len() != expected || peer_pub_key[0] != 0x04 {
             return Err(Error::General(format!(
-                "cyberware-rustls-corecrypto-provider: invalid peer public key (len {}, expected {} with 0x04 prefix)",
+                "cf-gears-rustls-corecrypto-provider: invalid peer public key (len {}, expected {} with 0x04 prefix)",
                 peer_pub_key.len(),
                 expected,
             )));
@@ -170,7 +170,7 @@ impl ActiveKeyExchange for ActiveEcdh {
             // `CoreFoundation` variant for malformed input; `NullKey` is a
             // defensive belt that we do not deliberately exercise).
             Error::General(format!(
-                "cyberware-rustls-corecrypto-provider: peer public-key import failed: {e}"
+                "cf-gears-rustls-corecrypto-provider: peer public-key import failed: {e}"
             ))
         })?;
 
@@ -184,7 +184,7 @@ impl ActiveKeyExchange for ActiveEcdh {
             )
             .map_err(|e| {
                 Error::General(format!(
-                    "cyberware-rustls-corecrypto-provider: SecKey::key_exchange failed: domain={} code={}",
+                    "cf-gears-rustls-corecrypto-provider: SecKey::key_exchange failed: domain={} code={}",
                     e.domain(),
                     e.code()
                 ))

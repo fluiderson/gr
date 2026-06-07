@@ -1,4 +1,5 @@
 # Copyright 2026 CyberFabric Foundation
+# Copyright 2026 Constructro Fabric Foundation
 # SPDX-License-Identifier: Apache-2.0
 
 FROM gcr.io/oss-fuzz-base/base-builder-rust
@@ -18,8 +19,8 @@ RUN rustup toolchain install nightly --force && \
     rustup component add rust-src --toolchain nightly
 
 # Copy source code
-COPY . $SRC/cyberware
-WORKDIR $SRC/cyberware
+COPY . $SRC/gears-rust
+WORKDIR $SRC/gears-rust
 
 # Copy build script
 COPY .clusterfuzzlite/build.sh $SRC/

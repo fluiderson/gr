@@ -1,6 +1,6 @@
 ---
 name: gts-analyze
-description: Analyze how the GTS (Global Type System) is used in a Cyber Ware module — defined types, declared instances, and references across sdk / main / plugin / docs. Thin wrapper around the `gts-analyze` CLI under tools/.
+description: Analyze how the GTS (Global Type System) is used in a Gear — defined types, declared instances, and references across sdk / main / plugin / docs. Thin wrapper around the `gts-analyze` CLI under tools/.
 user-invocable: true
 allowed-tools: Bash
 ---

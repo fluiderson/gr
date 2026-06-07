@@ -1,7 +1,7 @@
 [package]
 name = "de0205_operation_builder"
 version = "0.1.0"
-authors = ["Cyber Fabric"]
+authors = ["Constructor Fabric"]
 description = "Requires operation builders to have tag and summary (DE0205)"
 edition.workspace = true
 publish = false
@@ -29,7 +29,7 @@ lint_utils.workspace = true
 [dev-dependencies]
 dylint_testing.workspace = true
 tokio = { workspace = true, features = ["macros", "rt"] }
-modkit = { workspace = true }
+toolkit = { workspace = true }
 
 [package.metadata.rust-analyzer]
 rustc_private = true

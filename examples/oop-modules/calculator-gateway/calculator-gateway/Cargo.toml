@@ -11,11 +11,11 @@ description = "Calculator gateway module - example in-process REST service"
 # External SDKs (dependencies on other modules)
 calculator-sdk = { path = "../../calculator/calculator-sdk" }
 
-# ModKit
-modkit = { workspace = true }
-modkit-canonical-errors = { workspace = true, features = ["axum"] }
-modkit-security = { workspace = true }
-modkit-macros = { workspace = true }
+# ToolKit
+toolkit = { workspace = true }
+toolkit-canonical-errors = { workspace = true, features = ["axum"] }
+toolkit-security = { workspace = true }
+toolkit-macros = { workspace = true }
 
 # Axum & HTTP
 axum = { workspace = true }

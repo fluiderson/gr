@@ -2,7 +2,7 @@
 """Pytest configuration and fixtures for account-management E2E tests.
 
 Cross-process seam tests for the AM module's REST surface. Mirrors the
-``testing/e2e/modules/resource_group/conftest.py`` shape and conventions
+``testing/e2e/gears/resource_group/conftest.py`` shape and conventions
 so the two suites share a single mental model.
 
 The AM module is wired into the same gateway process that hosts every
@@ -264,7 +264,7 @@ def create_metadata_schema(am_base_url, am_headers):
             "entities": [
                 {
                     "$id": f"gts://{type_id}",
-                    "$schema": "gts://gts.cf.core.am.tenant_metadata.v1~",
+                    "$schema": "http://json-schema.org/draft-07/schema#",
                     "description": "E2E test metadata schema",
                     "type": "object",
                     "x-gts-traits": {

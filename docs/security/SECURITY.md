@@ -1,26 +1,50 @@
-# Security in Cyber Ware
+# Security in Gears
 
-Cyber Ware takes a **defense-in-depth** approach to security, combining Rust's compile-time safety guarantees with layered static analysis, runtime enforcement, continuous scanning, and structured development processes. This document summarizes the security measures in place across the project.
+Gears take a **defense-in-depth** approach to security, combining Rust's compile-time safety guarantees with layered static analysis, runtime enforcement, continuous scanning, and structured development processes. This document summarizes the security measures in place across the project.
 
 ---
 
 ## Table of Contents
 
-- [1. Rust Language Safety](#1-rust-language-safety)
-- [2. Compile-Time Tenant Scoping (Secure ORM)](#2-compile-time-tenant-scoping-secure-orm)
-- [3. Authentication & Authorization Architecture](#3-authentication--authorization-architecture)
-- [4. Credentials Storage Architecture](#4-credentials-storage-architecture)
-- [5. Outbound API Gateway (OAGW)](#5-outbound-api-gateway-oagw)
-- [6. Compile-Time Linting — Clippy](#6-compile-time-linting--clippy)
-- [7. Compile-Time Linting — Custom Dylint Rules](#7-compile-time-linting--custom-dylint-rules)
-- [8. Dependency Security — cargo-deny](#8-dependency-security--cargo-deny)
-- [9. Cryptographic Stack & FIPS-140-3](#9-cryptographic-stack--fips-140-3)
-- [10. Continuous Fuzzing](#10-continuous-fuzzing)
-- [11. Security Scanners in CI](#11-security-scanners-in-ci)
-- [12. PR Review Bots](#12-pr-review-bots)
-- [13. Specification Templates & SDLC](#13-specification-templates--sdlc)
-- [14. Repository Scaffolding — Cyber Ware CLI](#14-repository-scaffolding--cyber-ware-cli)
-- [15. Opportunities for Improvement](#15-opportunities-for-improvement)
+- [Security in Gears](#security-in-gears)
+  - [Table of Contents](#table-of-contents)
+  - [1. Rust Language Safety](#1-rust-language-safety)
+  - [2. Compile-Time Tenant Scoping (Secure ORM)](#2-compile-time-tenant-scoping-secure-orm)
+  - [3. Authentication \& Authorization Architecture](#3-authentication--authorization-architecture)
+    - [SecurityContext](#securitycontext)
+    - [AuthN Resolver](#authn-resolver)
+    - [AuthZ Resolver (PDP) — AuthZEN with Constraint Extensions](#authz-resolver-pdp--authzen-with-constraint-extensions)
+    - [Multi-Tenancy — Tenant Resolver](#multi-tenancy--tenant-resolver)
+    - [Resource Groups](#resource-groups)
+    - [GTS-Based Attribute Access Control (ABAC)](#gts-based-attribute-access-control-abac)
+  - [4. Credentials Storage Architecture](#4-credentials-storage-architecture)
+    - [Secret Material Handling](#secret-material-handling)
+    - [Scoping Model](#scoping-model)
+    - [Plugin Isolation](#plugin-isolation)
+    - [Planned Encryption at Rest](#planned-encryption-at-rest)
+  - [5. Outbound API Gateway (OAGW)](#5-outbound-api-gateway-oagw)
+    - [Authorization (Platform PEP)](#authorization-platform-pep)
+    - [Credential Isolation](#credential-isolation)
+    - [Auth Plugins](#auth-plugins)
+    - [Request Hardening](#request-hardening)
+  - [6. Compile-Time Linting — Clippy](#6-compile-time-linting--clippy)
+  - [7. Compile-Time Linting — Custom Dylint Rules](#7-compile-time-linting--custom-dylint-rules)
+  - [8. Dependency Security — cargo-deny](#8-dependency-security--cargo-deny)
+  - [9. Cryptographic Stack \& FIPS-140-3](#9-cryptographic-stack--fips-140-3)
+    - [Default (non-FIPS) cryptographic stack](#default-non-fips-cryptographic-stack)
+    - [FIPS-140-3 build (`--features fips`)](#fips-140-3-build---features-fips)
+    - [Algorithm scope on the wire](#algorithm-scope-on-the-wire)
+    - [Build-time dependency-graph policy](#build-time-dependency-graph-policy)
+    - [Runtime Operational Environment validation](#runtime-operational-environment-validation)
+    - [How to verify a build is FIPS-conformant](#how-to-verify-a-build-is-fips-conformant)
+    - [What this does NOT claim](#what-this-does-not-claim)
+    - [Deep references](#deep-references)
+  - [10. Continuous Fuzzing](#10-continuous-fuzzing)
+  - [11. Security Scanners in CI](#11-security-scanners-in-ci)
+  - [12. PR Review Bots](#12-pr-review-bots)
+  - [13. Specification Templates \& SDLC](#13-specification-templates--sdlc)
+  - [14. Repository Scaffolding — Gears CLI](#14-repository-scaffolding--gears-cli)
+  - [15. Opportunities for Improvement](#15-opportunities-for-improvement)
 
 ---
 
@@ -44,9 +68,9 @@ Additional Rust-specific project practices:
 
 ## 2. Compile-Time Tenant Scoping (Secure ORM)
 
-> Source: [`libs/modkit-db-macros`](../../libs/modkit-db-macros/) · [`guidelines/SECURITY.md`](../../guidelines/SECURITY.md) · [`docs/modkit_unified_system/06_authn_authz_secure_orm.md`](../modkit_unified_system/06_authn_authz_secure_orm.md)
+> Source: [`libs/toolkit-db-macros`](../../libs/toolkit-db-macros/) · [`guidelines/SECURITY.md`](../../guidelines/SECURITY.md) · [`docs/toolkit_unified_system/06_authn_authz_secure_orm.md`](../toolkit_unified_system/06_authn_authz_secure_orm.md)
 
-Cyber Ware provides a **compile-time enforced** secure ORM layer over SeaORM. The `#[derive(Scopable)]` macro ensures every database entity explicitly declares its scoping dimensions:
+Gears provide a **compile-time enforced** secure ORM layer over SeaORM. The `#[derive(Scopable)]` macro ensures every database entity explicitly declares its scoping dimensions:
 
 ```rust
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Scopable)]
@@ -75,9 +99,9 @@ pub struct Model {
 
 ## 3. Authentication & Authorization Architecture
 
-> Source: [`docs/arch/authorization/`](../arch/authorization/) · [`modules/system/authn-resolver/`](../../modules/system/authn-resolver/) · [`modules/system/authz-resolver/`](../../modules/system/authz-resolver/) · [`modules/system/tenant-resolver/`](../../modules/system/tenant-resolver/)
+> Source: [`docs/arch/authorization/`](../arch/authorization/) · [`gears/system/authn-resolver/`](../../gears/system/authn-resolver/) · [`gears/system/authz-resolver/`](../../gears/system/authz-resolver/) · [`gears/system/tenant-resolver/`](../../gears/system/tenant-resolver/)
 
-Cyber Ware implements a **PDP/PEP authorization model** per NIST SP 800-162, extended with **OpenID AuthZEN 1.0** constraint semantics (see [ADR-0001](../arch/authorization/ADR/0001-pdp-pep-authorization-model.md)):
+Gears implement a **PDP/PEP authorization model** per NIST SP 800-162, extended with **OpenID AuthZEN 1.0** constraint semantics (see [ADR-0001](../arch/authorization/ADR/0001-pdp-pep-authorization-model.md)):
 
 ```
 Client → AuthN Middleware → AuthN Resolver (token validation)
@@ -104,7 +128,7 @@ pub struct SecurityContext {
 
 ### AuthN Resolver
 
-> Source: [`OIDC AuthN Plugin DESIGN.md`](../../modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) · [ADR-0002](../arch/authorization/ADR/0002-split-authn-authz-resolvers.md) · [ADR-0003](../arch/authorization/ADR/0003-authn-resolver-minimalist-interface.md)
+> Source: [`OIDC AuthN Plugin DESIGN.md`](../../gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) · [ADR-0002](../arch/authorization/ADR/0002-split-authn-authz-resolvers.md) · [ADR-0003](../arch/authorization/ADR/0003-authn-resolver-minimalist-interface.md)
 
 Validates bearer JWTs via OIDC discovery and JWKS, extracts claims, and constructs the `SecurityContext`. AuthN and AuthZ are **split into independent resolver modules** (ADR-0002) with pluggable vendor-specific implementations.
 
@@ -152,7 +176,7 @@ Constraints **OR** across alternatives, **AND** predicates within each constrain
 
 ### Multi-Tenancy — Tenant Resolver
 
-> Source: [`TENANT_MODEL.md`](../arch/authorization/TENANT_MODEL.md) · [`modules/system/tenant-resolver/`](../../modules/system/tenant-resolver/)
+> Source: [`TENANT_MODEL.md`](../arch/authorization/TENANT_MODEL.md) · [`gears/system/tenant-resolver/`](../../gears/system/tenant-resolver/)
 
 Hierarchical multi-tenancy with a **single-root tree topology** (exactly one tenant with no parent; all others descend from it):
 
@@ -181,9 +205,9 @@ Optional M:N, tenant-scoped resource grouping that acts as a **PIP** alongside t
 
 ### GTS-Based Attribute Access Control (ABAC)
 
-> Source: [gts-spec](https://github.com/globalTypeSystem/gts-spec/) · [`dylint_lints/de09_gts_layer/`](../../tools/dylint_lints/de09_gts_layer/) · [`modules/system/types-registry/`](../../modules/system/types-registry/)
+> Source: [gts-spec](https://github.com/globalTypeSystem/gts-spec/) · [`dylint_lints/de09_gts_layer/`](../../tools/dylint_lints/de09_gts_layer/) · [`gears/system/types-registry/`](../../gears/system/types-registry/)
 
-Cyber Ware uses the **Global Type System (GTS)** as the foundation for attribute-based access control. GTS defines a hierarchical identifier scheme for data types and instances:
+Gears use the **Global Type System (GTS)** as the foundation for attribute-based access control. GTS defines a hierarchical identifier scheme for data types and instances:
 
 ```
 gts.<vendor>.<package>.<namespace>.<type>.v<MAJOR>[.<MINOR>]~
@@ -212,9 +236,9 @@ Custom dylint rules (`DE0901`, `DE0902`) validate GTS identifier correctness at 
 
 ## 4. Credentials Storage Architecture
 
-> Source: [`modules/credstore/`](../../modules/credstore/) · [`modules/credstore/docs/DESIGN.md`](../../modules/credstore/docs/DESIGN.md)
+> Source: [`modules/credstore/`](../../gears/credstore/) · [`modules/credstore/docs/DESIGN.md`](../../gears/credstore/docs/DESIGN.md)
 
-Cyber Ware provides a **plugin-based credential storage gateway** for managing secrets across the platform. The architecture separates the gateway (routing, authorization) from storage backends (plugin implementations).
+Gears provide a **plugin-based credential storage gateway** for managing secrets across the platform. The architecture separates the gateway (routing, authorization) from storage backends (plugin implementations).
 
 ```
 Consumer → CredStoreClientV1 → Gateway Service → GTS Plugin Discovery
@@ -251,7 +275,7 @@ The credential storage design specifies **AES-256-GCM** encryption with **per-te
 
 ## 5. Outbound API Gateway (OAGW)
 
-> Source: [`modules/system/oagw/`](../../modules/system/oagw/) · [`modules/system/oagw/docs/DESIGN.md`](../../modules/system/oagw/docs/DESIGN.md)
+> Source: [`gears/system/oagw/`](../../gears/system/oagw/) · [`gears/system/oagw/docs/DESIGN.md`](../../gears/system/oagw/docs/DESIGN.md)
 
 OAGW is a **centralized outbound API gateway** built on [Pingora](https://github.com/cloudflare/pingora). All platform traffic to external HTTP services is routed through OAGW, enforcing security and observability policies via a **Control Plane / Data Plane** architecture.
 
@@ -355,7 +379,7 @@ The architectural lints in the `DE03xx` series enforce **strict layering** (cont
 
 ## 9. Cryptographic Stack & FIPS-140-3
 
-> Source: [FIPS PRD](fips/PRD.md) · [ADRs in `docs/security/fips/adrs/`](fips/adrs/) · [`libs/modkit/src/bootstrap/crypto.rs`](../../libs/modkit/src/bootstrap/crypto.rs) · [`libs/rustls-corecrypto-provider/`](../../libs/rustls-corecrypto-provider/) · [`deny-fips.toml`](../../deny-fips.toml)
+> Source: [FIPS PRD](fips/PRD.md) · [ADRs in `docs/security/fips/adrs/`](fips/adrs/) · [`libs/toolkit/src/bootstrap/crypto.rs`](../../libs/toolkit/src/bootstrap/crypto.rs) · [`libs/rustls-corecrypto-provider/`](../../libs/rustls-corecrypto-provider/) · [`deny-fips.toml`](../../deny-fips.toml)
 
 ### Default (non-FIPS) cryptographic stack
 
@@ -370,19 +394,19 @@ The project uses `aws-lc-rs` (via `rustls`) as its primary TLS cryptographic bac
 
 ### FIPS-140-3 build (`--features fips`)
 
-Cyber Ware applications can be built with FIPS 140-3 validated cryptography by enabling the `fips` feature flag on `cyberware-modkit`, `cyberware-modkit-http`, and any binary that ships TLS. A single feature flag selects a per-target CMVP-validated backend behind one shared `rustls 0.23` TLS state machine:
+Gears applications can be built with FIPS 140-3 validated cryptography by enabling the `fips` feature flag on `cf-gears-toolkit`, `cf-gears-toolkit-http`, and any binary that ships TLS. A single feature flag selects a per-target CMVP-validated backend behind one shared `rustls 0.23` TLS state machine:
 
 | Target | Validated module | How it routes |
 |---|---|---|
-| Linux (x86_64, aarch64) | **AWS-LC FIPS Provider v2** — CMVP cert [#4816](https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4816) | `rustls/fips` + `aws-lc-fips-sys`; activated via target-gated shim `cyberware-rustls-fips-shim` |
-| macOS (any arch) | **Apple corecrypto User-Space Module** — per-macOS-major CMVP cert (search by *"Apple corecrypto Module"* on the [CMVP database](https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules/search)) | In-tree `cyberware-rustls-corecrypto-provider` over `Security.framework` + `CommonCrypto` |
+| Linux (x86_64, aarch64) | **AWS-LC FIPS Provider v2** — CMVP cert [#4816](https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4816) | `rustls/fips` + `aws-lc-fips-sys`; activated via target-gated shim `cf-gears-rustls-fips-shim` |
+| macOS (any arch) | **Apple corecrypto User-Space Module** — per-macOS-major CMVP cert (search by *"Apple corecrypto Module"* on the [CMVP database](https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules/search)) | In-tree `cf-gears-rustls-corecrypto-provider` over `Security.framework` + `CommonCrypto` |
 | Windows (x86_64) | **Microsoft Windows CNG** (`bcrypt.dll`) — per-Windows-build CMVP cert | Community `rustls-cng-crypto` (caret-pinned `0.1.x`); requires OS-level FIPS-mode via `HKLM\System\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy = 1` |
 
 ```sh
-cargo build -p cyberware-server --features fips
+cargo build -p cf-gears-server --features fips
 ```
 
-`modkit::bootstrap::init_crypto_provider` is invoked automatically as the first step of `init_procedure` (used by `run_server` and `run_migrate`) — no explicit setup in `main()`. The function dispatches per `cfg(target_os, feature = "fips")` and installs the per-OS provider once via `OnceLock`. Subsequent calls return the cached first-call result.
+`toolkit::bootstrap::init_crypto_provider` is invoked automatically as the first step of `init_procedure` (used by `run_server` and `run_migrate`) — no explicit setup in `main()`. The function dispatches per `cfg(target_os, feature = "fips")` and installs the per-OS provider once via `OnceLock`. Subsequent calls return the cached first-call result.
 
 **Build prerequisites:**
 
@@ -428,7 +452,7 @@ A FIPS 140-3 claim is only valid when the running OS version lies inside the **O
 
 | Target | Runtime gate | Behaviour on mismatch |
 |---|---|---|
-| macOS | `cyberware_rustls_corecrypto_provider::oe::validate_oe()` reads `kern.osproductversion` via `sysctlbyname` and matches against [`SUPPORTED_OE_MACOS_MAJOR`](../../libs/rustls-corecrypto-provider/src/oe.rs). Fires as a side-effect of the first `fips_provider()` call. | Under `--features fips`: **panic** (deliberate fail-closed — cannot be silently caught by an intermediate `Result`-handling caller). Override via `CYBERWARE_FIPS_OE_OVERRIDE=1` for CI on pre-release macOS only. |
+| macOS | `cf_gears_rustls_corecrypto_provider::oe::validate_oe()` reads `kern.osproductversion` via `sysctlbyname` and matches against [`SUPPORTED_OE_MACOS_MAJOR`](../../libs/rustls-corecrypto-provider/src/oe.rs). Fires as a side-effect of the first `fips_provider()` call. | Under `--features fips`: **panic** (deliberate fail-closed — cannot be silently caught by an intermediate `Result`-handling caller). Override via `CF_GEARS_FIPS_OE_OVERRIDE=1` for CI on pre-release macOS only. |
 | Linux | Not yet implemented at runtime. | OE coverage verified manually per release (CMVP cert search for cert #4816). Tracked as **TODO-8** in [FIPS PRD §13](fips/PRD.md#13-open-questions). |
 | Windows | OS-level FIPS-mode flag check (via `rustls-cng-crypto`'s empty-provider gate). Build-number-vs-CMVP-OE check not yet implemented at runtime. | If `FipsAlgorithmPolicy = 0`: bootstrap refuses to install the provider. Build-number OE check tracked as **TODO-8**. |
 
@@ -436,39 +460,39 @@ A FIPS 140-3 claim is only valid when the running OS version lies inside the **O
 
 ```sh
 # 1. Wire-level — what the ClientHello actually offers:
-cargo run -p cyberware-fips-probe --features fips -- --url https://www.howsmyssl.com/a/check
+cargo run -p cf-gears-fips-probe --features fips -- --url https://www.howsmyssl.com/a/check
 # Expected: given_cipher_suites = AES-GCM only, given_named_groups = secp256r1/secp384r1,
 #           post_quantum_key_agreement: false, [OK] No ChaCha20 in ClientHello.
 
 # 2. Dep-graph regression (cheap, no compile step):
-cargo tree --target aarch64-apple-darwin -p cyberware-example-server --features fips \
+cargo tree --target aarch64-apple-darwin -p cf-gears-example-server --features fips \
   -e features | grep -E 'corecrypto|aws-lc-fips'
-# Expected on macOS: cyberware-rustls-corecrypto-provider present, aws-lc-fips-sys ABSENT.
+# Expected on macOS: cf-gears-rustls-corecrypto-provider present, aws-lc-fips-sys ABSENT.
 
-cargo tree --target x86_64-unknown-linux-gnu -p cyberware-example-server --features fips \
+cargo tree --target x86_64-unknown-linux-gnu -p cf-gears-example-server --features fips \
   -e features | grep 'aws-lc-fips'
 # Expected on Linux: aws-lc-fips-sys present.
 
-cargo tree --target x86_64-pc-windows-msvc -p cyberware-example-server --features fips \
+cargo tree --target x86_64-pc-windows-msvc -p cf-gears-example-server --features fips \
   -e features | grep -E 'cng-crypto|aws-lc-fips'
 # Expected on Windows: rustls-cng-crypto present, aws-lc-fips-sys ABSENT.
 
 # 3. Linkage smoke — confirm only OS-supplied crypto framework is loaded:
-otool -L target/release/cyberware-server | grep -E 'aws|crypto|ssl|ring'      # macOS — expect only Security.framework
-dumpbin /imports target\release\cyberware-server.exe | findstr /i "bcrypt aws"  # Windows — expect only bcrypt.dll
+otool -L target/release/cf-gears-server | grep -E 'aws|crypto|ssl|ring'      # macOS — expect only Security.framework
+dumpbin /imports target\release\cf-gears-server.exe | findstr /i "bcrypt aws"  # Windows — expect only bcrypt.dll
 
 # 4. Dep-graph policy regression (rejects non-FIPS crypto crates):
 make fips-policy
 
 # 5. Wire-shape regression for our macOS provider:
-cargo test -p cyberware-rustls-corecrypto-provider --features fips --test fips_provider_invariants
+cargo test -p cf-gears-rustls-corecrypto-provider --features fips --test fips_provider_invariants
 ```
 
-See [`examples/cyberware-fips-probe/README.md`](../../examples/cyberware-fips-probe/README.md) for the full four-layer verification chain (linkage, runtime, wire-level, cert-validation).
+See [`examples/cf-gears-fips-probe/README.md`](../../examples/cf-gears-fips-probe/README.md) for the full four-layer verification chain (linkage, runtime, wire-level, cert-validation).
 
 ### What this does NOT claim
 
-- **Cyber Ware itself is not on the CMVP Validated Modules list.** The validated modules are Apple corecrypto, AWS-LC FIPS Provider, and Microsoft Windows CNG. Cyber Ware is a *consumer* of those modules.
+- **Gears list itself is not on the CMVP Validated Modules list.** The validated modules are Apple corecrypto, AWS-LC FIPS Provider, and Microsoft Windows CNG. Gears are *consumers* of those modules.
 - **CMVP OE-coverage is the deployment's responsibility.** A FIPS claim is void if the running OS version is not inside the cert's OE. The macOS runtime gate is fail-closed; Linux + Windows OE coverage is verified manually per release.
 - **`CryptoProvider::fips() = true` is a runtime witness, not just design intent.** On macOS it reflects the OE check (`oe::fips_witness_ok`); on Windows, the OS FIPS-mode flag. On Linux, runtime OE-validation is not yet implemented; OE coverage is verified manually per release via the §release-checklist CMVP-cert search.
 - **TLS 1.2 PRF on macOS is not CAVS-listed.** Apple corecrypto exposes generic HMAC primitives but not a CAVS-listed dedicated TLS PRF (unlike `aws-lc-fips`'s `tls_prf::Algorithm`). Consequence: `fips_provider()` on macOS is TLS-1.3-only; customers requiring TLS 1.2 on macOS+FIPS must accept that those connections do not carry a FIPS claim.
@@ -479,8 +503,8 @@ See [`examples/cyberware-fips-probe/README.md`](../../examples/cyberware-fips-pr
 ### Deep references
 
 - **[FIPS PRD](fips/PRD.md)** — full strategy: requirements (FRs, NFRs), ecosystem constraints, alternatives we rejected (OpenSSL FIPS Provider 3.1.2, Go 1.25, `native-tls`), per-OS rationale, verification gates, open TODOs.
-- **[ADR 0001 — macOS FIPS via custom corecrypto CryptoProvider](fips/adrs/0001-macos-fips-via-corecrypto-provider.md)** — why we built `cyberware-rustls-corecrypto-provider` over Apple corecrypto rather than `native-tls` or "Linux-only FIPS".
-- **[ADR 0002 — FIPS feature flag via target-conditional shim crate](fips/adrs/0002-fips-feature-target-conditional-shim.md)** — empty `cyberware-rustls-fips-shim` crate that encodes per-target Cargo feature activation.
+- **[ADR 0001 — macOS FIPS via custom corecrypto CryptoProvider](fips/adrs/0001-macos-fips-via-corecrypto-provider.md)** — why we built `cf-gears-rustls-corecrypto-provider` over Apple corecrypto rather than `native-tls` or "Linux-only FIPS".
+- **[ADR 0002 — FIPS feature flag via target-conditional shim crate](fips/adrs/0002-fips-feature-target-conditional-shim.md)** — empty `cf-gears-rustls-fips-shim` crate that encodes per-target Cargo feature activation.
 - **[ADR 0003 — Windows FIPS via `rustls-cng-crypto`](fips/adrs/0003-windows-fips-via-rustls-cng-crypto.md)** — why `rustls-cng-crypto` over `rustls-symcrypt` today, plus documented migration trigger.
 - **[ADR 0004 — macOS server-side TLS via corecrypto](fips/adrs/0004-macos-server-side-tls-via-corecrypto.md)** — server-side TLS / mTLS signing via `SecKeyCreateSignature`; SEC1-publicKey-only EC key load that preserves the FIPS boundary; honest TLS-1.2-PRF posture.
 - **[ADR 0005 — Workspace-level FIPS dependency policy via cargo-deny](fips/adrs/0005-fips-dependency-policy.md)** — `deny-fips.toml`, `make fips-policy`, Phase A/B/C plan.
@@ -489,7 +513,7 @@ See [`examples/cyberware-fips-probe/README.md`](../../examples/cyberware-fips-pr
 
 > Source: [`fuzz/`](../../tools/fuzz/) · CI workflow: `.github/workflows/clusterfuzzlite.yml`
 
-Cyber Ware uses [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) with [ClusterFuzzLite](https://google.github.io/clusterfuzzlite/) for continuous fuzzing. Fuzzing discovers panics, logic bugs, and algorithmic complexity attacks in parsers and validators.
+Gears use [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) with [ClusterFuzzLite](https://google.github.io/clusterfuzzlite/) for continuous fuzzing. Fuzzing discovers panics, logic bugs, and algorithmic complexity attacks in parsers and validators.
 
 **Fuzz targets:**
 
@@ -529,7 +553,7 @@ Multiple automated scanners run on every pull request and/or on schedule:
 | **[Aikido](https://www.aikido.dev/)** | Application security posture management | Configured at repository/organization level |
 
 The OpenSSF Scorecard badge is displayed in the project README:
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cyberfabric/cyberware-rust/badge)](https://scorecard.dev/viewer/?uri=github.com/cyberfabric/cyberware-rust)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/constructorfabric/gears-rust/badge)](https://scorecard.dev/viewer/?uri=github.com/constructorfabric/gears-rust)
 
 ## 12. PR Review Bots
 
@@ -543,9 +567,9 @@ Every pull request is reviewed by automated bots before human review:
 
 ## 13. Specification Templates & SDLC
 
-> Source: [`docs/spec-templates/`](../spec-templates/) · [`docs/spec-templates/cyberware-sdlc/`](../spec-templates/cyberware-sdlc/)
+> Source: [`docs/spec-templates/`](../spec-templates/) · [`docs/spec-templates/gears-sdlc/`](../spec-templates/gears-sdlc/)
 
-Cyber Ware follows a **spec-driven development** lifecycle where PRD and DESIGN documents are written before implementation. Security is addressed at multiple points:
+Gears follow a **spec-driven development** lifecycle where PRD and DESIGN documents are written before implementation. Security is addressed at multiple points:
 
 - **PRD template** — Non-Functional Requirements section references project-wide security baselines and automated security scans
 - **DESIGN template** — dependency rules mandate `SecurityContext` propagation across all in-process calls
@@ -553,9 +577,9 @@ Cyber Ware follows a **spec-driven development** lifecycle where PRD and DESIGN 
 - **Testing strategy** — 90%+ code coverage target with explicit security testing category (unit, integration, e2e, security, performance)
 - **Git/PR record** — all changes flow through PRs with review and immutable merge/audit trail
 
-## 14. Repository Scaffolding — Cyber Ware CLI
+## 14. Repository Scaffolding — Gears CLI
 
-Cyber Ware provides a CLI tool for scaffolding new repositories that automatically inherit the platform's security posture:
+Gears provide a CLI tool for scaffolding new repositories that automatically inherit the platform's security posture:
 
 | Inherited Configuration | Description |
 |---|---|

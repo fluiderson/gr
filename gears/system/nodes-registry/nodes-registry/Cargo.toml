@@ -1,0 +1,36 @@
+[package]
+name = "cf-gears-nodes-registry"
+version = "0.1.25"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Nodes registry module"
+repository.workspace = true
+readme = "README.md"
+keywords = ["constructorfabric", "cf-gears"]
+categories = ["development-tools"]
+metadata.docs.rs.all-features = true
+
+[lib]
+name = "nodes_registry"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+inventory = { workspace = true }
+serde = { workspace = true }
+utoipa = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
+chrono = { workspace = true, features = ["serde"] }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+
+toolkit = { workspace = true }
+toolkit-canonical-errors = { workspace = true, features = ["axum"] }
+toolkit-node-info = { workspace = true }
+toolkit-macros = { workspace = true }
+nodes_registry-sdk = { package = "cf-gears-nodes-registry-sdk", version = "0.1.21", path = "../nodes-registry-sdk" }

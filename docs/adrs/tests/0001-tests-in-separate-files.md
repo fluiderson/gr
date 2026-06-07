@@ -2,7 +2,7 @@
 ---
 status: accepted
 date: 2026-04-15
-decision-makers: ffedoroff, Artifizer
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Enforce test code in separate files via dylint lint DE1101
@@ -16,7 +16,7 @@ decision-makers: ffedoroff, Artifizer
 
 ## Context and Problem Statement
 
-Rust modules in the cyberware-rust monorepo contain inline `#[cfg(test)] mod tests { ... }` blocks that mix production and test code in the same file. As modules grow, these inline test blocks cause large files (500+ lines of tests alongside production code), inaccurate LOC metrics, noisy PR diffs, and harder navigation for both humans and LLMs. Should the project adopt a stricter convention than the Rust Book default?
+Rust modules in the gears-rust monorepo contain inline `#[cfg(test)] mod tests { ... }` blocks that mix production and test code in the same file. As modules grow, these inline test blocks cause large files (500+ lines of tests alongside production code), inaccurate LOC metrics, noisy PR diffs, and harder navigation for both humans and LLMs. Should the project adopt a stricter convention than the Rust Book default?
 
 ## Decision Drivers
 
@@ -96,8 +96,8 @@ Move all tests to the `tests/` directory as integration tests.
 [de1101_tests_in_separate_files]
 max_inline_test_lines = 100
 excluded_paths = [
-    "libs/modkit",
-    "modules/mini-chat",
+    "libs/toolkit",
+    "gears/mini-chat",
     # ... modules not yet migrated
 ]
 ```
@@ -133,4 +133,4 @@ mod handler_tests;
 
 - [Rust Book ch11-03: Test Organization](https://doc.rust-lang.org/book/ch11-03-test-organization.html)
 - [DE1101 lint README](../../../tools/dylint_lints/de11_testing/de1101_tests_in_separate_files/README.md)
-- [Unit & Integration Testing Guide](../../modkit_unified_system/12_unit_testing.md)
+- [Unit & Integration Testing Guide](../../toolkit_unified_system/12_unit_testing.md)

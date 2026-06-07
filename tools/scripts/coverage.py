@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Code coverage collection script for Cyber Ware.
+Code coverage collection script for Gears.
 Supports unit tests, e2e tests, and combined coverage.
 """
 import argparse
@@ -222,7 +222,7 @@ def make_relative_path(filepath, project_root):
     if s.startswith("./"):
         s = s[2:]
     # If it's already a libs/ or modules/ or apps/ relative path, accept it
-    if s.startswith("libs/") or s.startswith("modules/") or s.startswith("apps/"):
+    if s.startswith("libs/") or s.startswith("gears/") or s.startswith("apps/"):
         return s
     # Otherwise try to relativize
     try:
@@ -236,13 +236,13 @@ def categorize_file(rel_path):
     # Normalize leading './'
     rel_path = rel_path[2:] if rel_path.startswith('./') else rel_path
     if rel_path.startswith('libs/'):
-        # Extract lib name: libs/modkit-db/... -> modkit-db
+        # Extract lib name: libs/toolkit-db/... -> toolkit-db
         parts = rel_path.split('/')
         if len(parts) >= 2:
             return 'lib', parts[1]
         return 'file', None
     elif rel_path.startswith('modules/'):
-        # modules/system/ contains nested submodules (oagw, api-gateway, …).
+        # gears/system/ contains nested submodules (oagw, api-gateway, …).
         # Use the submodule name so each one gets its own report row.
         parts = rel_path.split('/')
         if len(parts) >= 3 and parts[1] == 'system':
@@ -539,7 +539,7 @@ def collect_unit_coverage(
     Args:
         output_dir: Directory to store coverage reports
         config_file: Optional config file path
-        test_filter: Optional package filter (e.g., 'modkit-db')
+        test_filter: Optional package filter (e.g., 'toolkit-db')
         skip_build: If True, skip clean and test execution
 
     Returns:
@@ -559,7 +559,7 @@ def collect_unit_coverage(
 
     # Set config file if provided
     if config_file:
-        env["CYBERFABRIC_CONFIG"] = str(config_file)
+        env["CF_CONFIG"] = str(config_file)
         print(f"Using config: {config_file}")
 
     # Build command
@@ -673,7 +673,7 @@ def get_llvm_cov_env():
 
 def build_instrumented_server(env, target_dir: Path):
     step(
-        "Building cyberware-server with coverage instrumentation "
+        "Building cf-gears-server with coverage instrumentation "
         f"(features: {E2E_SERVER_FEATURES})"
     )
     run_cmd(
@@ -681,7 +681,7 @@ def build_instrumented_server(env, target_dir: Path):
             "cargo",
             "build",
             "--bin",
-            "cyberware-server",
+            "cf-gears-server",
             "--features",
             E2E_SERVER_FEATURES,
         ],
@@ -691,7 +691,7 @@ def build_instrumented_server(env, target_dir: Path):
 
 
 def start_instrumented_server(config_file, output_dir, port=None):
-    """Start the cyberware-server with coverage instrumentation.
+    """Start the cf-gears-server with coverage instrumentation.
 
     Args:
         config_file: Path to config file
@@ -709,7 +709,7 @@ def start_instrumented_server(config_file, output_dir, port=None):
 
     # Create output directory and log file
     output_dir.mkdir(parents=True, exist_ok=True)
-    log_file = output_dir / "cyberware-server.log"
+    log_file = output_dir / "cf-gears-server.log"
 
     step(
         f"Starting server with coverage instrumentation "
@@ -723,11 +723,11 @@ def start_instrumented_server(config_file, output_dir, port=None):
     # We must build the server there AND write profiles there so report finds them.
     target_dir = PROJECT_ROOT / "target" / "llvm-cov-target"
     env2["CARGO_TARGET_DIR"] = str(target_dir)
-    env2["LLVM_PROFILE_FILE"] = str(target_dir / "cyberware-%p-%m.profraw")
+    env2["LLVM_PROFILE_FILE"] = str(target_dir / "cf-gears-%p-%m.profraw")
 
     build_instrumented_server(env2, target_dir)
 
-    server_bin = find_binary(target_dir, "debug", "cyberware-server")
+    server_bin = find_binary(target_dir, "debug", "cf-gears-server")
     if not server_bin.exists():
         print(f"ERROR: Instrumented server binary not found at: {server_bin}")
         sys.exit(1)
@@ -1092,7 +1092,7 @@ def cmd_coverage_combined(args):
     env = os.environ.copy()
 
     # Set config file for unit tests
-    env["CYBERFABRIC_CONFIG"] = config_file
+    env["CF_CONFIG"] = config_file
     print(f"Using config: {config_file}")
 
     unit_cmd = [
@@ -1192,7 +1192,7 @@ def main():
     ensure_tool("cargo-llvm-cov", "cargo install cargo-llvm-cov")
 
     parser = argparse.ArgumentParser(
-        description="Generate code coverage reports for Cyber Ware",
+        description="Generate code coverage reports for Gears",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -1200,7 +1200,7 @@ Examples:
   python scripts/coverage.py unit
 
   # Generate unit test coverage for specific package
-  python scripts/coverage.py unit --filter modkit-db
+  python scripts/coverage.py unit --filter toolkit-db
 
   # Generate local e2e test coverage only
   python scripts/coverage.py e2e-local
@@ -1230,7 +1230,7 @@ Examples:
     )
     p_unit.add_argument(
         "--filter",
-        help="Filter tests by package name (e.g., modkit-db, api-gateway)",
+        help="Filter tests by package name (e.g., toolkit-db, api-gateway)",
         default=None
     )
     p_unit.add_argument(

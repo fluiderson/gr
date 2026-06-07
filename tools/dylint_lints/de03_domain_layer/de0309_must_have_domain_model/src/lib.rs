@@ -34,7 +34,7 @@ dylint_linting::declare_pre_expansion_lint! {
     ///
     /// ```rust,ignore
     /// // src/domain/user.rs
-    /// use modkit_macros::domain_model;
+    /// use toolkit_macros::domain_model;
     ///
     /// #[domain_model]
     /// pub struct User {
@@ -82,12 +82,12 @@ fn check_domain_model_attribute(cx: &EarlyContext<'_>, item: &Item) {
         ));
         diag.help(format!(
             "add #[domain_model] attribute to enforce DDD boundaries at compile time: \
-             use modkit_macros::domain_model; #[domain_model] pub {item_keyword} ..."
+             use toolkit_macros::domain_model; #[domain_model] pub {item_keyword} ..."
         ));
     });
 }
 
-/// Check if an item has the `#[domain_model]` or `#[modkit::domain_model]` attribute.
+/// Check if an item has the `#[domain_model]` or `#[toolkit::domain_model]` attribute.
 fn has_domain_model_attribute(item: &Item) -> bool {
     for attr in &item.attrs {
         if let rustc_ast::AttrKind::Normal(attr_item) = &attr.kind {
@@ -98,7 +98,7 @@ fn has_domain_model_attribute(item: &Item) -> bool {
                 .map(|s| s.ident.name.as_str())
                 .collect();
 
-            // Match: domain_model, modkit::domain_model, modkit_macros::domain_model
+            // Match: domain_model, toolkit::domain_model, toolkit_macros::domain_model
             if segments.last() == Some(&"domain_model") {
                 return true;
             }

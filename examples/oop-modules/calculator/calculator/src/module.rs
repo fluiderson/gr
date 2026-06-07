@@ -9,8 +9,8 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 
-use modkit::context::ModuleCtx;
-use modkit::contracts::{GrpcServiceCapability, RegisterGrpcServiceFn};
+use toolkit::context::ModuleCtx;
+use toolkit::contracts::{GrpcServiceCapability, RegisterGrpcServiceFn};
 
 use calculator_sdk::{CalculatorServiceServer, SERVICE_NAME};
 
@@ -20,7 +20,7 @@ use crate::domain::Service;
 /// Calculator module.
 ///
 /// Exposes the accumulator service via gRPC through the grpc_hub.
-#[modkit::module(
+#[toolkit::module(
     name = "calculator",
     capabilities = [grpc]
 )]
@@ -33,7 +33,7 @@ impl Default for CalculatorModule {
 }
 
 #[async_trait]
-impl modkit::Module for CalculatorModule {
+impl toolkit::Module for CalculatorModule {
     async fn init(&self, ctx: &ModuleCtx) -> Result<()> {
         // Create domain service
         let service = Arc::new(Service::new());

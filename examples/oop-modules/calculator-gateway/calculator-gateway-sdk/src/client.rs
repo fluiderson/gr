@@ -5,7 +5,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use modkit_security::SecurityContext;
+use toolkit_security::SecurityContext;
 
 use calculator_gateway::{Service, ServiceError};
 

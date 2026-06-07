@@ -11,7 +11,7 @@
   - [1. When to Introduce GTS Types](#1-when-to-introduce-gts-types)
   - [2. GTS Identifier Format](#2-gts-identifier-format)
     - [2.1 Base Type Identifier](#21-base-type-identifier)
-      - [Cyber Ware examples](#cyber-ware-examples)
+      - [Gears examples](#gears-examples)
     - [2.2 Derived Type Identifier](#22-derived-type-identifier)
     - [2.3 Well-Known Instance Identifier](#23-well-known-instance-identifier)
     - [2.4 Anonymous Instance](#24-anonymous-instance)
@@ -51,7 +51,7 @@
   - [11. Abstract and Final Types](#11-abstract-and-final-types)
     - [Abstract Types (`x-gts-abstract: true`)](#abstract-types-x-gts-abstract-true)
     - [Final Types (`x-gts-final: true`)](#final-types-x-gts-final-true)
-  - [12. Cyber Ware GTS Conventions](#12-cyber-ware-gts-conventions)
+  - [12. Gears GTS Conventions](#12-gears-gts-conventions)
   - [13. Reviewing GTS in PRD](#13-reviewing-gts-in-prd)
   - [14. Reviewing GTS in DESIGN](#14-reviewing-gts-in-design)
   - [15. Reviewing GTS in Rust Code PRs](#15-reviewing-gts-in-rust-code-prs)
@@ -71,7 +71,7 @@ Use this guide differently depending on what you are reviewing:
 - **Doing a fast final pass**: use the [Quick Review Checklist](#quick-review-checklist) at the bottom.
 
 
-GTS brings the following capabilities to Cyber Ware:
+GTS brings the following capabilities to Gears:
 
 1. **Versioned schemas** — built-in major/minor versioning with automated compatibility checking, safe schema evolution, and version casting between compatible editions
 2. **Human-readable origin and category** — vendor, package, namespace, and type encoded directly in the identifier; instantly comprehensible in logs, traces, and debugging
@@ -84,7 +84,7 @@ GTS brings the following capabilities to Cyber Ware:
 9. **GTS Registry** — GTS Type Schemas and well-known Instances indexed by GTS Identifier for discovery, validation, compatibility checking, and plugin resolution
 10. **Types and well-known instances** — GTS distinguishes between type definitions (schemas that describe structure) and well-known instances (canonical, named objects of a given type); types end with `~`, instances do not — enabling a single naming system for both contracts and their predefined values. This is especially valuable for discriminator fields and former "const enum" style values: use well-known instances instead of raw strings when values need discoverability, descriptions, authorization semantics, or vendor extensibility.
 
-Cyber Ware modules that offer extension points define **base GTS types** with a stable core schema. Derived types specialize the base by adding context-specific fields — typically metadata, payload, params, or properties. At the database level, the module stores base-type fields in dedicated columns (indexed, queryable) and the extension field as a `JSONB` column. This pattern allows new data-type variants to appear at runtime or compile time **without changing the database schema or existing APIs**.
+Gears that offer extension points define **base GTS types** with a stable core schema. Derived types specialize the base by adding context-specific fields — typically metadata, payload, params, or properties. At the database level, the module stores base-type fields in dedicated columns (indexed, queryable) and the extension field as a `JSONB` column. This pattern allows new data-type variants to appear at runtime or compile time **without changing the database schema or existing APIs**.
 
 Examples of extendable types: event schemas, resource types, plugin specifications, user settings categories, permission definitions, licenseable features, model lifecycle statuses, function/workflow contracts, and AI model provider types. All of these can be extended to carry meaningful additional metadata or payload.
 
@@ -100,7 +100,7 @@ Use GTS when you identify:
 - Objects that share a common base but carry **different metadata per plugin, vendor, or integration**
 - Structures where fields are **dynamic, plugin-driven, or vendor-specific** (e.g., provider settings, adapter configs)
 - "Future unknowns" — metadata, settings, attributes, or payloads that will grow as the platform evolves
-- Extension points where **third-party vendors** need to add data without modifying Cyber Ware modules
+- Extension points where **third-party vendors** need to add data without modifying Gears
 - Entities that need **type-based access control** — wildcard policies over families of identifiers (see [section 8](#8-gts-based-security-and-wildcard-access-control))
 
 **Use GTS for:**
@@ -122,7 +122,7 @@ Use GTS when you identify:
 
 ## 2. GTS Identifier Format
 
-A GTS identifier is a dot-separated string that uniquely names a type or instance. The full specification is at [gts-spec](https://github.com/GlobalTypeSystem/gts-spec); this section covers the practical formats used in Cyber Ware.
+A GTS identifier is a dot-separated string that uniquely names a type or instance. The full specification is at [gts-spec](https://github.com/GlobalTypeSystem/gts-spec); this section covers the practical formats used in Gears.
 
 ### 2.1 Base Type Identifier
 
@@ -132,14 +132,14 @@ A base type defines a core schema. Base type identifiers always **start with `gt
 gts.<vendor>.<package>.<namespace>.<type>.v<MAJOR>[.<MINOR>]~
 ```
 
-#### Cyber Ware examples
+#### Gears examples
 
-Cyber Ware uses `cf` as the vendor name, as it's a part of the Cyber Fabric Foundation.
+Gears use `cf` as the vendor name, as it's a part of the Constructor Fabric Foundation.
 
-Cyber Ware has several predifined packages - 'core', 'genai', 'example', etc
+Gears have several predifined packages - 'core', 'genai', 'example', etc
 
 ```text
-gts.cf.core.modkit.plugin.v1~    -- base plugin schema
+gts.cf.core.toolkit.plugin.v1~    -- base plugin schema
 gts.cf.core.oagw.upstream.v1~    -- OAGW upstream resource type
 gts.cf.core.oagw.auth_plugin.v1~ -- OAGW auth plugin type
 gts.cf.genai.model.provider.v1~  -- AI model provider base type
@@ -157,16 +157,16 @@ A derived type extends a base type. The chain is separated by `~` and follows **
 gts.<base_vendor>.<base_package>.<base_ns>.<base_type>.v<MAJOR>[.<MINOR>]~<derived_vendor>.<derived_package>.<derived_ns>.<derived_type>.v<MAJOR>[.<MINOR>]~
 ```
 
-Cyber Ware examples:
+Gears examples:
 
 ```text
 -- Tenant resolver plugin (derives from base plugin)
-gts.cf.core.modkit.plugin.v1~cf.core.tenant_resolver.plugin.v1~
+gts.cf.core.toolkit.plugin.v1~cf.core.tenant_resolver.plugin.v1~
 
 -- CredStore plugin
-gts.cf.core.modkit.plugin.v1~cf.core.credstore.plugin.v1~
+gts.cf.core.toolkit.plugin.v1~cf.core.credstore.plugin.v1~
 
--- Azure AI Studio provider (third-party vendor extending Cyber Ware base)
+-- Azure AI Studio provider (third-party vendor extending Gears base)
 gts.cf.genai.model.provider.v1~msft.azure._.ai_studio.v1~
 
 -- Vendor audit event extending platform base event and audit event
@@ -189,7 +189,7 @@ A well-known instance is a canonical, named object of a given type. Instance ide
 gts.<type_chain>~<instance_vendor>.<instance_package>.<instance_ns>.<instance_name>.v<V>
 ```
 
-Cyber Ware well-known instances examples:
+Gears well-known instances examples:
 
 ```text
 -- HTTP protocol instance (well-known OAGW protocol)
@@ -242,7 +242,7 @@ gts.cf.core.oagw.upstream.v1~7a1d2f34-5678-49ab-9012-abcdef123456
 
 The **owner or authority** of the type definition.
 
-- **`cf`** — reserved for CyberFabric vendor, used for all defined base and derived types and well-known instances
+- **`cf`** — reserved for Constructor Fabric vendor, used for all defined base and derived types and well-known instances
 - Third-party vendors use their own prefix: `msft`, `google`, `stripe`, `abc`
 - Must be globally unique, lowercase, stable
 
@@ -255,7 +255,7 @@ A **domain-level grouping** — a bounded context, service, or application area.
 
 | Package | Meaning |
 |---------|---------|
-| `core` | Core platform services (modkit, OAGW, events, resource groups) |
+| `core` | Core platform services (toolkit, OAGW, events, resource groups) |
 | `genai` | Generative AI subsystem (model registry, LLM gateway) |
 | `bss` | Business support (billing, licensing, usage) |
 
@@ -287,7 +287,7 @@ gts.cf.bss.billing.invoice.v1~        -- namespace: billing
 When namespace is irrelevant, use `_`:
 
 ```text
-gts.cf.core.modkit.plugin.v1~cf.core._.admin.v1
+gts.cf.core.toolkit.plugin.v1~cf.core._.admin.v1
 gts.cf.em.event.type.v1~cf.idp._.tenant_created.v1~
 ```
 
@@ -324,7 +324,7 @@ Prefer **major-only versioning** for simplicity. Use **minor versions** when you
 | Concept | Ends with `~` | Purpose | Example |
 |---------|:---:|---------|---------|
 | **Type (Schema)** | Yes | Defines structure, validation rules, reusable contracts | `gts.cf.core.oagw.auth_plugin.v1~` |
-| **Derived Type** | Yes | Specializes a base type for a vendor or context | `gts.cf.core.modkit.plugin.v1~cf.core.credstore.plugin.v1~` |
+| **Derived Type** | Yes | Specializes a base type for a vendor or context | `gts.cf.core.toolkit.plugin.v1~cf.core.credstore.plugin.v1~` |
 | **Well-Known Instance** | No | Canonical named value shared across systems | `gts.cf.core.oagw.auth_plugin.v1~cf.core.oagw.apikey.v1` |
 | **Anonymous Instance** | N/A | Runtime object with UUID `id` and separate `type` | `id: UUID`, `type: "gts.cf.core.events.type.v1~..."` |
 
@@ -501,12 +501,12 @@ The `$id` uses the `gts://` URI prefix. The `$ref` references the base type. The
 
 In gts-rust result types, note the distinction between two predicates: `is_type_schema` (entity results — is this entity a GTS Type Schema, not an instance?) vs `is_type` (parse/validate ID results — does this GTS Identifier end with `~`, making it a type rather than an instance ID?).
 
-Cyber Ware generates GTS type schemas from Rust structs using the `#[struct_to_gts_schema]` macro. This keeps type definitions in code, not in hand-maintained JSON files.
+Gears generate GTS type schemas from Rust structs using the `#[struct_to_gts_schema]` macro. This keeps type definitions in code, not in hand-maintained JSON files.
 
 ### 6.1 Defining a Base Type
 
 ```rust
-// libs/modkit/src/gts/plugin.rs
+// libs/toolkit/src/gts/plugin.rs
 use gts::GtsInstanceId;
 use gts_macros::struct_to_gts_schema;
 
@@ -514,11 +514,11 @@ use gts_macros::struct_to_gts_schema;
 #[struct_to_gts_schema(
     dir_path = "schemas",
     base = true,
-    type_id = "gts.cf.core.modkit.plugin.v1~",
-    description = "Base modkit plugin schema",
+    type_id = "gts.cf.core.toolkit.plugin.v1~",
+    description = "Base toolkit plugin schema",
     properties = "id,vendor,priority,properties"
 )]
-pub struct BaseModkitPluginV1<P: gts::GtsSchema> {
+pub struct BaseToolkitPluginV1<P: gts::GtsSchema> {
     pub id: GtsInstanceId,
     pub vendor: String,
     pub priority: i16,
@@ -539,19 +539,19 @@ Using `String` bypasses structural validation and makes the origin of the value 
 ```rust
 // modules/credstore/credstore-sdk/src/gts.rs
 use gts_macros::struct_to_gts_schema;
-use modkit::gts::BaseModkitPluginV1;
+use toolkit::gts::BaseToolkitPluginV1;
 
 #[struct_to_gts_schema(
     dir_path = "schemas",
-    base = BaseModkitPluginV1,
-    type_id = "gts.cf.core.modkit.plugin.v1~cf.core.credstore.plugin.v1~",
+    base = BaseToolkitPluginV1,
+    type_id = "gts.cf.core.toolkit.plugin.v1~cf.core.credstore.plugin.v1~",
     description = "CredStore plugin specification",
     properties = ""
 )]
 pub struct CredStorePluginSpecV1;
 ```
 
-The `base = BaseModkitPluginV1` links this derived type to its base. The `type_id` is a chained GTS identifier showing the inheritance: `base~derived~`.
+The `base = BaseToolkitPluginV1` links this derived type to its base. The `type_id` is a chained GTS identifier showing the inheritance: `base~derived~`.
 
 **Review note — generated schema shape matters:** when PRs add or modify generic or nested derived GTS structs, review the generated schema artifact or tests, not just the Rust type. Derived overlays must be wrapped at the full nesting path under the intended extension field; otherwise fields can leak to the top level and accidentally violate `additionalProperties: false` contracts. The `description` attribute is now emitted into the generated JSON schema root — a PR that adds or changes `description` on a `#[struct_to_gts_schema]` struct must also update the checked-in schema artifact.
 
@@ -573,7 +573,7 @@ async fn init(&self, ctx: &ModuleCtx) -> anyhow::Result<()> {
     );
 
     // Create the plugin instance payload
-    let instance = BaseModkitPluginV1::<CredStorePluginSpecV1> {
+    let instance = BaseToolkitPluginV1::<CredStorePluginSpecV1> {
         id: instance_id.clone(),
         vendor: "builtin".into(),
         priority: 100,
@@ -606,7 +606,7 @@ async fn init(&self, ctx: &ModuleCtx) -> anyhow::Result<()> {
 For well-known types and instances, define constants in a dedicated `gts_helpers` module:
 
 ```rust
-// modules/system/oagw/oagw/src/domain/gts_helpers.rs
+// gears/system/oagw/oagw/src/domain/gts_helpers.rs
 
 // Schema GTS identifiers (types)
 pub const UPSTREAM_SCHEMA: &str  = "gts.cf.core.oagw.upstream.v1~";
@@ -722,7 +722,7 @@ The engine resolves the URI and delegates to the plugin that declared it. The pl
 
 **7. Schema properties drive engine behavior — no match arms.**
 
-In Cyber Ware, behavior-driving semantics are typically attached to the resolved GTS schema as JSON Schema metadata — most often via `x-gts-traits` and `x-gts-traits-schema` — instead of being hardcoded in `match` arms:
+In Gears, behavior-driving semantics are typically attached to the resolved GTS schema as JSON Schema metadata — most often via `x-gts-traits` and `x-gts-traits-schema` — instead of being hardcoded in `match` arms:
 
 ```json
 {
@@ -845,11 +845,11 @@ Base types define **foundational, stable concepts** that derived types specializ
 - Mark the type as `"x-gts-abstract": true` if direct instantiation makes no sense
 - Focus on **core invariants** — fields that define the concept, not optional features
 
-**Cyber Ware base type examples:**
+**Gears base type examples:**
 
 | Base Type | Purpose |
 |-----------|---------|
-| `gts.cf.core.modkit.plugin.v1~` | Base plugin schema — all Cyber Ware plugins derive from this |
+| `gts.cf.core.toolkit.plugin.v1~` | Base plugin schema — all Gears plugins derive from this |
 | `gts.cf.core.events.type.v1~` | Base event schema — id, type_id, occurred_at, payload |
 | `gts.cf.core.oagw.auth_plugin.v1~` | OAGW auth plugin type |
 | `gts.cf.genai.model.provider.v1~` | AI model provider type |
@@ -869,7 +869,7 @@ Base types define **foundational, stable concepts** that derived types specializ
 
 ### 8.1 Why Naming Structure Matters for Security
 
-Cyber Ware's authorization pipeline uses GTS identifiers as resource types in access-control decisions. The `AccessScope` returned by the PDP can include type-based constraints using GTS wildcard patterns. This means:
+Gears' authorization pipeline uses GTS identifiers as resource types in access-control decisions. The `AccessScope` returned by the PDP can include type-based constraints using GTS wildcard patterns. This means:
 
 ```text
 Policy: role "ai_admin" → allow read on gts.cf.genai.model.provider.v1~msft.*
@@ -894,7 +894,7 @@ If you name types poorly (e.g., flatten the hierarchy, use inconsistent packages
 |---------|---------|
 | `gts.cf.core.oagw.*` | All OAGW types (upstreams, routes, auth plugins, etc.) |
 | `gts.cf.genai.model.provider.v1~msft.*` | All Microsoft-derived provider types |
-| `gts.cf.core.modkit.plugin.v1~*` | All derived plugin types and instances |
+| `gts.cf.core.toolkit.plugin.v1~*` | All derived plugin types and instances |
 | `gts.cf.core.events.type.v1~cf.core.audit.event.v1~abc.*` | All of vendor ABC's audit events |
 
 ### 8.3 Naming Rules That Enable Security
@@ -920,7 +920,7 @@ These are "cheap generic rules" — no custom development needed. The platform's
 
 ## 9. Derived Types — Design Guidelines
 
-Derived types extend base types for specialization. In Cyber Ware, plugins, vendor-specific integrations, and runtime extensions are all expressed as derived types.
+Derived types extend base types for specialization. In Gears, plugins, vendor-specific integrations, and runtime extensions are all expressed as derived types.
 
 **Good practices:**
 - Add only **context-specific fields** — do not duplicate base fields
@@ -929,13 +929,13 @@ Derived types extend base types for specialization. In Cyber Ware, plugins, vend
 - Keep the derivation chain **shallow** — ideally one level deep (base → derived), two at most (base → intermediate → vendor)
 - Use `allOf` with `$ref` in JSON Schema to express inheritance
 
-**Cyber Ware derived type examples:**
+**Gears derived type examples:**
 
 ```text
-Base:    gts.cf.core.modkit.plugin.v1~
-Derived: gts.cf.core.modkit.plugin.v1~cf.core.tenant_resolver.plugin.v1~
-         gts.cf.core.modkit.plugin.v1~cf.core.credstore.plugin.v1~
-         gts.cf.core.modkit.plugin.v1~cf.core.mini_chat_model_policy.plugin.v1~
+Base:    gts.cf.core.toolkit.plugin.v1~
+Derived: gts.cf.core.toolkit.plugin.v1~cf.core.tenant_resolver.plugin.v1~
+         gts.cf.core.toolkit.plugin.v1~cf.core.credstore.plugin.v1~
+         gts.cf.core.toolkit.plugin.v1~cf.core.mini_chat_model_policy.plugin.v1~
 
 Base:    gts.cf.core.events.type.v1~
 Derived: gts.cf.core.events.type.v1~cf.core.audit.event.v1~
@@ -952,7 +952,7 @@ Derived: gts.cf.core.events.type.v1~cf.core.audit.event.v1~
 
 ## 10. GTS Traits
 
-GTS traits are **structured cross-cutting semantic properties** attached to a type-schema. They are used to define meaning and system behavior that cuts across many otherwise unrelated types — not just to describe data shape. In Cyber Ware:
+GTS traits are **structured cross-cutting semantic properties** attached to a type-schema. They are used to define meaning and system behavior that cuts across many otherwise unrelated types — not just to describe data shape. In Gears:
 
 - `x-gts-traits-schema` defines the JSON Schema for allowed trait keys, value types, and defaults
 - `x-gts-traits` carries the actual trait values for that type-schema
@@ -1055,9 +1055,9 @@ Types that **must not be extended**. No derived types are allowed.
 
 ---
 
-## 12. Cyber Ware GTS Conventions
+## 12. Gears GTS Conventions
 
-1. **Vendor prefix**: all CyberFabric-defined base types use `cf` as vendor (include the Cyber Ware types)
+1. **Vendor prefix**: all Constructor Fabric- defined base types use `cf` as vendor (include the Gears types)
 2. **SDK placement**: GTS type definitions live in `<module>-sdk/src/gts.rs`
 3. **Schema generation**: use `#[struct_to_gts_schema]` macro — do not maintain schemas by hand
 4. **Constants**: well-known GTS identifiers are defined as `const` strings in `domain/gts_helpers.rs` or `gts.rs`
@@ -1186,7 +1186,7 @@ When reviewing Rust code, verify not just naming correctness but also that the c
 
 - [ ] Is this an extension point that should use GTS? (dynamic metadata, plugin, vendor-specific data)
 - [ ] Is the identifier globally unique and well-structured? (`gts.<vendor>.<package>.<namespace>.<type>.v<N>~`)
-- [ ] Does the vendor segment use `cf` for Cyber Ware types or the correct third-party vendor prefix?
+- [ ] Does the vendor segment use `cf` for CF/Gears types or the correct third-party vendor prefix?
 - [ ] Is the package stable and domain-oriented (not `utils` or `misc`)?
 - [ ] Is namespace used appropriately? (`_` when unnecessary, meaningful sub-grouping when the domain is complex)
 - [ ] Is the type name a singular noun?

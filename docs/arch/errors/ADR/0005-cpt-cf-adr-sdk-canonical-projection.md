@@ -9,7 +9,7 @@ date: 2026-05-20
 
 ## Context and Problem Statement
 
-Cyber Ware ships per-module SDK crates (`oagw-sdk`, `credstore-sdk`, `tenant-resolver-sdk`, …) that ClientHub consumers use to call other modules in-process. Each SDK historically exposed a hand-rolled error enum (`ServiceGatewayError`, `CredStoreError`, …) that the impl crate populated through a parallel `From<DomainError> for SdkError` ladder, distinct from the `From<DomainError> for CanonicalError` ladder used on the REST boundary.
+Gears ship per-module SDK crates (`oagw-sdk`, `credstore-sdk`, `tenant-resolver-sdk`, …) that ClientHub consumers use to call other modules in-process. Each SDK historically exposed a hand-rolled error enum (`ServiceGatewayError`, `CredStoreError`, …) that the impl crate populated through a parallel `From<DomainError> for SdkError` ladder, distinct from the `From<DomainError> for CanonicalError` ladder used on the REST boundary.
 
 This caused three concrete problems:
 
@@ -75,9 +75,9 @@ The OAGW SDK demonstrates the pattern end-to-end:
 
 (f) Mini-chat (OAGW's only current consumer) defines `From<CanonicalError> for LlmProviderError` that chains through `ServiceGatewayError::from(err).into()` internally, so every call site stays as plain `?` propagation without `.map_err` boilerplate.
 
-(g) Out-of-process consumers can use `TryFrom<Problem> for CanonicalError` (in `modkit-canonical-errors`) to reconstruct typed errors from wire bytes. The full chain is `Problem JSON → Problem → CanonicalError → (optional) SdkError`.
+(g) Out-of-process consumers can use `TryFrom<Problem> for CanonicalError` (in `toolkit-canonical-errors`) to reconstruct typed errors from wire bytes. The full chain is `Problem JSON → Problem → CanonicalError → (optional) SdkError`.
 
-(h) Workspace `cargo test` passes (~1,800 tests across `oagw-sdk`, `oagw`, `mini-chat`, `modkit-canonical-errors`).
+(h) Workspace `cargo test` passes (~1,800 tests across `oagw-sdk`, `oagw`, `mini-chat`, `toolkit-canonical-errors`).
 
 (i) **`simple-user-settings-sdk` is the Pattern 1 (no-projection) reference**: trait returns `Result<_, CanonicalError>`, no `SettingsError` enum, no `From<DomainError> for SettingsError` ladder. Consumers either propagate via `?` or match on `CanonicalError` categories directly. Demonstrates the lower bound of the pattern — when the projection layer would add cost without dispatch value.
 
@@ -128,7 +128,7 @@ When an SDK's consumers benefit from flat typed dispatch, the SDK ships a `From<
 ```rust
 // {sdk}/src/error.rs
 
-use modkit_canonical_errors::CanonicalError;
+use toolkit_canonical_errors::CanonicalError;
 use crate::field::TargetHostCode;
 use crate::gts::Resource;
 use crate::reason::auth::FailureReason as AuthFailureReason;
@@ -277,7 +277,7 @@ No reverse `From<SdkError> for CanonicalError` impl is needed — canonical is a
 
 ### Cross-process round-trip
 
-`TryFrom<Problem> for CanonicalError` (in `modkit-canonical-errors`) closes the out-of-process loop. An HTTP/REST consumer's full chain:
+`TryFrom<Problem> for CanonicalError` (in `toolkit-canonical-errors`) closes the out-of-process loop. An HTTP/REST consumer's full chain:
 
 ```
 network bytes
@@ -357,7 +357,7 @@ For the four resolver SDKs at the bottom, the canonical boundary mapping is the 
 | [`ADR 0001`](./0001-cpt-cf-adr-canonical-error-categories.md) §Consequences | *"Every module must migrate its existing ad-hoc error types to one of the 16 canonical categories — no module-specific error categories are allowed."* | **Verbatim.** Trait boundary is `CanonicalError`; the opt-in projection is consumer-side, not a wire or trait contract. |
 | [`PRD §6`](../PRD.md) Acceptance Criteria | *"No error reaches API consumers outside the canonical vocabulary."* | **Verbatim.** Consumers receive `CanonicalError` at the trait boundary. |
 | [`DESIGN §3.2`](../DESIGN.md) `principle-single-error-gateway` | *"Every REST error response is produced from a `CanonicalError` via `From<CanonicalError> for Problem`."* | **Verbatim.** REST path is unchanged. |
-| [`DESIGN §3.3`](../DESIGN.md) `cpt-cf-errors-interface-problem-roundtrip` | *"SDK clients deserialize Problem responses back into `CanonicalError`."* | **Implemented.** `TryFrom<Problem> for CanonicalError` landed in `modkit-canonical-errors`. |
+| [`DESIGN §3.3`](../DESIGN.md) `cpt-cf-errors-interface-problem-roundtrip` | *"SDK clients deserialize Problem responses back into `CanonicalError`."* | **Implemented.** `TryFrom<Problem> for CanonicalError` landed in `toolkit-canonical-errors`. |
 
 No amendment to ADR 0001 is required — the chosen design preserves the literal text of every constraint above.
 

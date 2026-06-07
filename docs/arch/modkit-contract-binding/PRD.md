@@ -1,14 +1,14 @@
-# PRD -- ModKit Contract Binding System
+# PRD -- ToolKit Contract Binding System
 
 ## 1. Overview
 
 ### 1.1 Purpose
 
-A two-layer contract-binding system for CyberFabric ModKit that separates module contracts (plain Rust traits) from their transport projections (transport-annotated traits), enabling modules to expose and consume interfaces across process boundaries without coupling domain logic to transport details.
+A two-layer contract-binding system for Gears Toolkit that separates module contracts (plain Rust traits) from their transport projections (transport-annotated traits), enabling modules to expose and consume interfaces across process boundaries without coupling domain logic to transport details.
 
 ### 1.2 Background / Problem Statement
 
-ModKit modules define Rust traits as their extension points. Today, binding an implementation to a trait requires compiling it into the same binary -- a Cargo dependency on the SDK crate, a direct `impl Trait`, and registration into ClientHub via `inventory`. This works for in-process plugins but breaks when:
+ToolKit modules define Rust traits as their extension points. Today, binding an implementation to a trait requires compiling it into the same binary -- a Cargo dependency on the SDK crate, a direct `impl Trait`, and registration into ClientHub via `inventory`. This works for in-process plugins but breaks when:
 
 - The implementation lives in a separate process (out-of-process plugin, sidecar, external service).
 - The implementation is written in another language.
@@ -91,7 +91,7 @@ There is no mechanism to generate REST clients from a trait definition, no way t
 
 ## 3. Operational Concept & Environment
 
-The contract-binding system operates within the standard CyberFabric ModKit runtime. Contracts are defined at compile time as Rust traits. Transport projections generate REST clients and OpenAPI specs via proc macros during compilation. At runtime, the module host executes a lifecycle with a dedicated proxy wiring phase that instantiates REST proxies for unsatisfied Backend traits using the service directory.
+The contract-binding system operates within the standard Gears Toolkit runtime. Contracts are defined at compile time as Rust traits. Transport projections generate REST clients and OpenAPI specs via proc macros during compilation. At runtime, the module host executes a lifecycle with a dedicated proxy wiring phase that instantiates REST proxies for unsatisfied Backend traits using the service directory.
 
 The four contract types encode fundamentally different operational semantics that affect how callers write code:
 
@@ -118,7 +118,7 @@ Collapsing to fewer contract types would force callers into unnecessary defensiv
 
 - Four contract types (Api, Embedded, Backend, Extension) with naming convention enforcement
 - Base trait definition as plain Rust traits with zero transport annotations
-- REST transport projection via `#[modkit_rest_contract]` proc macro
+- REST transport projection via `#[toolkit_rest_contract]` proc macro
 - REST client code generation implementing both base and transport traits
 - OpenAPI 3.1 spec generation from transport projection traits
 - SSE streaming support via `#[streaming]` annotation
@@ -135,7 +135,7 @@ Collapsing to fewer contract types would force callers into unnecessary defensiv
 
 ### 4.2 Out of Scope
 
-- gRPC transport projection (`#[modkit_grpc_contract]`) -- future work, same pattern
+- gRPC transport projection (`#[toolkit_grpc_contract]`) -- future work, same pattern
 - Service directory implementation -- delivered by cluster service discovery workstream
 - Transaction guard (TxGuard) compile-time mechanism -- open design question, separate ADR
 - Transaction context propagation for Embedded/Extension contracts -- separate ADR
@@ -228,7 +228,7 @@ All base contract traits MUST have `Send + Sync` supertraits to support sharing 
 
 - [ ] `p1` - **ID**: `cpt-cf-binding-fr-rest-macro`
 
-The `#[modkit_rest_contract]` proc macro SHALL generate a REST client struct and OpenAPI spec function from a trait that extends a base contract trait. When a trait annotated with `#[modkit_rest_contract]` extends a base trait (e.g., `trait FooApiRest: FooApi`), the macro SHALL generate a `FooApiRestClient` struct that implements both the base trait (with HTTP dispatch logic) and the transport trait.
+The `#[toolkit_rest_contract]` proc macro SHALL generate a REST client struct and OpenAPI spec function from a trait that extends a base contract trait. When a trait annotated with `#[toolkit_rest_contract]` extends a base trait (e.g., `trait FooApiRest: FooApi`), the macro SHALL generate a `FooApiRestClient` struct that implements both the base trait (with HTTP dispatch logic) and the transport trait.
 
 - **Rationale**: Eliminates hand-written HTTP client code, ensures generated clients conform to the contract.
 - **Actors**: `cpt-cf-binding-actor-module-developer`
@@ -293,7 +293,7 @@ The transport projection trait MAY add methods with default implementations that
 
 - [ ] `p1` - **ID**: `cpt-cf-binding-fr-openapi-generation`
 
-The `#[modkit_rest_contract]` macro SHALL generate a function (e.g., `foo_api_rest_openapi_spec()`) returning a `serde_json::Value` with a valid OpenAPI 3.1 spec. The spec SHALL include endpoint paths, HTTP methods, request/response schemas (via `schemars`), and error schemas.
+The `#[toolkit_rest_contract]` macro SHALL generate a function (e.g., `foo_api_rest_openapi_spec()`) returning a `serde_json::Value` with a valid OpenAPI 3.1 spec. The spec SHALL include endpoint paths, HTTP methods, request/response schemas (via `schemars`), and error schemas.
 
 - **Rationale**: OpenAPI spec is the conformance target for remote implementations and enables spec validation at registration.
 - **Actors**: `cpt-cf-binding-actor-module-developer`, `cpt-cf-binding-actor-service-directory`
@@ -518,7 +518,7 @@ New methods added to transport projection traits MUST have default implementatio
 
 - [ ] `p2` - **ID**: `cpt-cf-binding-nfr-macro-transparency`
 
-The generated code from `#[modkit_rest_contract]` MUST be inspectable via `cargo expand`. Generated struct names, method names, and trait implementations MUST follow predictable naming conventions (e.g., `{Trait}Client` for the client struct).
+The generated code from `#[toolkit_rest_contract]` MUST be inspectable via `cargo expand`. Generated struct names, method names, and trait implementations MUST follow predictable naming conventions (e.g., `{Trait}Client` for the client struct).
 
 - **Rationale**: Developers and LLM agents must be able to understand and debug generated code.
 
@@ -534,7 +534,7 @@ SDK crates with the `rest-client` feature disabled MUST NOT incur additional com
 
 ### 7.1 Constraints
 
-- The system is built on CyberFabric's ModKit framework and uses its ClientHub, inventory-based plugin discovery, and module lifecycle.
+- The system is built on Gears Toolkit framework and uses its ClientHub, inventory-based plugin discovery, and module lifecycle.
 - REST is the first transport. gRPC is a future transport following the same two-layer pattern.
 - The service directory implementation is delivered by a separate workstream. This change defines only the interface trait.
 - Alignment with ADR-0004 (PR #1380) module/plugin declaration macros is required.
@@ -550,15 +550,15 @@ SDK crates with the `rest-client` feature disabled MUST NOT incur additional com
 
 - **Transaction guard (TxGuard)**: A compile-time mechanism that restricts which contracts can be called inside a transaction scope. Within a `TxGuard<'tx>`, only Embedded/Extension contracts would be callable -- the compiler would reject calls to Api/Backend traits. This would enforce the operational semantics table at the type level, not just by naming convention. Needs its own ADR to design the type-state mechanism and interaction with database transactions (SeaORM/SQLx). Not a requirement for this change.
 - **Remote backend unavailability**: Circuit breakers, fallback methods, degraded-mode behavior when remote plugins are temporarily down.
-- **gRPC transport projection**: `#[modkit_grpc_contract]` macro design, proto generation approach, interaction with tonic.
+- **gRPC transport projection**: `#[toolkit_grpc_contract]` macro design, proto generation approach, interaction with tonic.
 - **Transaction context propagation**: How Embedded/Extension contracts receive and participate in the caller's transaction scope.
 
 ## 8. Prior Art
 
 | Reference | Relevance |
 |-----------|-----------|
-| Working PoC: [striped-zebra-dev/modkit-binding-poc](https://github.com/striped-zebra-dev/modkit-binding-poc) | Validated the two-layer approach, transport projection generation, and ClientHub fallback resolution |
-| Module/plugin declaration and resolution: [PR #1380](https://github.com/cyberfabric/cyberfabric-core/pull/1380) | Typed module/plugin resolution -- the binding system complements this |
+| Working PoC: [striped-zebra-dev/toolkit-binding-poc](https://github.com/striped-zebra-dev/toolkit-binding-poc) | Validated the two-layer approach, transport projection generation, and ClientHub fallback resolution |
+| Module/plugin declaration and resolution: [PR #1380](https://github.com/constructorfabric/gears-rust/pull/1380) | Typed module/plugin resolution -- the binding system complements this |
 | WCF (Windows Communication Foundation) | Two-layer contract/binding model: service contract (interface) + binding (transport). Similar separation of domain interface from transport projection |
 | OSGi Remote Services | Service interfaces published locally, discovered and proxied remotely via generated stubs. Similar compile-time-first with remote fallback pattern |
 | Hexagonal Architecture (Ports and Adapters) | Contracts as ports, transport projections as adapters. The base trait is the port; the REST projection is an adapter |
@@ -569,4 +569,4 @@ SDK crates with the `rest-client` feature disabled MUST NOT incur additional com
 - **Design**: [`./DESIGN.md`](./DESIGN.md)
 - **ADR-0001** — contract source of truth: [`./ADR/0001-cpt-cf-binding-adr-contract-source-of-truth.md`](./ADR/0001-cpt-cf-binding-adr-contract-source-of-truth.md)
 - **ADR-0002** — OpenAPI spec limits: [`./ADR/0002-cpt-cf-binding-adr-openapi-spec-limits.md`](./ADR/0002-cpt-cf-binding-adr-openapi-spec-limits.md)
-- **PoC**: [striped-zebra-dev/modkit-binding-poc](https://github.com/striped-zebra-dev/modkit-binding-poc)
+- **PoC**: [striped-zebra-dev/toolkit-binding-poc](https://github.com/striped-zebra-dev/toolkit-binding-poc)

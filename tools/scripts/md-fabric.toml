@@ -56,11 +56,11 @@ pattern = ".cypilot/config/**/*.md"
 id      = "windsurf"
 pattern = ".windsurf/**/*.md"
 
-# ── ModKit ────────────────────────────────────────────────────────────────────
+# ── ToolKit ────────────────────────────────────────────────────────────────────
 
 [[categories]]
-id    = "modkit"
-label = "ModKit"
+id    = "toolkit"
+label = "ToolKit"
 
 [[categories.buckets]]
 id      = "docs-adrs"
@@ -83,8 +83,8 @@ id      = "docs-checklists"
 pattern = "docs/checklists/**/*.md"
 
 [[categories.buckets]]
-id      = "docs-modkit-unified-system"
-pattern = "docs/modkit_unified_system/**/*.md"
+id      = "docs-toolkit-unified-system"
+pattern = "docs/toolkit_unified_system/**/*.md"
 
 [[categories.buckets]]
 id      = "docs-pr-review"
@@ -130,11 +130,11 @@ label = "Modules"
 
 [[categories.buckets]]
 id      = "modules-system"
-pattern = "modules/system/*/**/*.md"
+pattern = "gears/system/*/**/*.md"
 
 [[categories.buckets]]
 id      = "modules-other"
-pattern = "modules/*/**/*.md"
+pattern = "gears/*/**/*.md"
 
 # ── Control Plane Views ─────────────────────────────────────────────────────
 

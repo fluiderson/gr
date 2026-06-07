@@ -1,6 +1,6 @@
 # Spec Templates
 
-Industry-standard specification templates incorporating best practices from IEEE, ISO, and modern software development methodologies. Compatible with [Cypilot-Driven Development](https://github.com/cyberfabric/Cypilot) for validation and traceability.
+Industry-standard specification templates incorporating best practices from IEEE, ISO, and modern software development methodologies. Compatible with [Cypilot-Driven Development](https://github.com/constructorfabric/Cypilot) for validation and traceability.
 
 ## Purpose
 
@@ -305,4 +305,4 @@ When full Cypilot framework is connected:
 2. **Traceability** — IDs will be linked across PRD → DESIGN → ADR → FEATURE → code
 3. **Deterministic gates** — CI/CD can enforce document quality before code changes
 
-For more details on Cypilot taxonomy and artifact relationships, see [`TAXONOMY.md`](https://github.com/cyberfabric/Cypilot/blob/main/guides/TAXONOMY.md).
+For more details on Cypilot taxonomy and artifact relationships, see [`TAXONOMY.md`](https://github.com/constructorfabric/Cypilot/blob/main/guides/TAXONOMY.md).

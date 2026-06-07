@@ -1,7 +1,7 @@
-# /modkit-pr-review
+# /toolkit-pr-review
 
-Review a GitHub PR for Rust + ModKit compliance and post inline comments.
+Review a GitHub PR for Rust + ToolKit compliance and post inline comments.
 
-ALWAYS open and follow `.claude/skills/modkit-pr-review/SKILL.md`.
+ALWAYS open and follow `.claude/skills/toolkit-pr-review/SKILL.md`.
 
-Usage: `/modkit-pr-review <PR_NUMBER> [--repo <owner/repo>]`
+Usage: `/toolkit-pr-review <PR_NUMBER> [--repo <owner/repo>]`

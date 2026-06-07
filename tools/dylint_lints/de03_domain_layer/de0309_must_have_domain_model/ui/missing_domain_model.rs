@@ -1,4 +1,4 @@
-// simulated_dir=/cyberfabric/modules/example/src/domain/
+// simulated_dir=/cf-gears/gears/example/src/domain/
 
 // Test: Domain structs without #[domain_model] should trigger lint
 

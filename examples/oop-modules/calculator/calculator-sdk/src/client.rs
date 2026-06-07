@@ -6,9 +6,9 @@ use anyhow::Result;
 use async_trait::async_trait;
 use tonic::transport::Channel;
 
-use modkit_security::SecurityContext;
-use modkit_transport_grpc::attach_secctx;
-use modkit_transport_grpc::client::{GrpcClientConfig, connect_with_retry};
+use toolkit_security::SecurityContext;
+use toolkit_transport_grpc::attach_secctx;
+use toolkit_transport_grpc::client::{GrpcClientConfig, connect_with_retry};
 
 use crate::api::{CalculatorClientV1, CalculatorError};
 use crate::proto::AddRequest;

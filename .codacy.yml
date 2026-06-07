@@ -14,4 +14,4 @@ exclude_paths:
   - "**/*.min.js"
   - "**/*.min.css"
   - "testing/e2e/**"
-  - "modules/**/tests/**"
+  - "gears/**/tests/**"

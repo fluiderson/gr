@@ -107,13 +107,13 @@ Exclusions are configured in `dylint.toml` at the workspace root:
 ```toml
 [de1101_tests_in_separate_files]
 excluded_paths = [
-    "libs/modkit",
-    "modules/mini-chat",
+    "libs/toolkit",
+    "gears/mini-chat",
     # ...
 ]
 ```
 
-Each entry is a module path prefix (e.g. `libs/modkit`, `modules/system/oagw`). Remove entries one by one as modules are migrated.
+Each entry is a module path prefix (e.g. `libs/toolkit`, `gears/system/oagw`). Remove entries one by one as modules are migrated.
 
 ## Relation to Rust Book Guidance
 

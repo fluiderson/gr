@@ -154,7 +154,7 @@ fn contains_operation_builder_constructor(expr: &rustc_hir::Expr<'_>) -> bool {
                 let type_str = format!("{:?}", path);
                 let method_name = segment.ident.name.as_str();
                 return type_str.contains("OperationBuilder")
-                    && type_str.contains("modkit")
+                    && type_str.contains("toolkit")
                     && matches!(
                         method_name,
                         "get" | "post" | "put" | "delete" | "patch" | "head" | "options"
@@ -194,7 +194,7 @@ fn check_builder_chain(expr: &rustc_hir::Expr<'_>, has_tag: &mut bool, has_summa
 fn is_operation_builder_type(cx: &LateContext<'_>, expr: &rustc_hir::Expr<'_>) -> bool {
     let ty = cx.typeck_results().expr_ty(expr);
     let type_str = format!("{:?}", ty);
-    type_str.contains("OperationBuilder") && type_str.contains("modkit")
+    type_str.contains("OperationBuilder") && type_str.contains("toolkit")
 }
 
 fn extract_tag_value(cx: &LateContext<'_>, expr: &rustc_hir::Expr<'_>) -> Option<String> {

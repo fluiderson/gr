@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use modkit::client_hub::ClientHub;
+use toolkit::client_hub::ClientHub;
 
 use calculator_gateway::Service;
 

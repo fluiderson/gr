@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 
 use lint_utils::{
-    is_in_contract_module_ast, is_in_cyberware_server_path, is_in_modkit_db_path,
+    is_in_cf_gears_server_path, is_in_contract_module_ast, is_in_toolkit_db_path,
     use_tree_to_strings,
 };
 use rustc_ast::{Item, ItemKind, Ty, TyKind};
@@ -26,7 +26,7 @@ dylint_linting::declare_early_lint! {
     ///
     /// ### Known Exclusions
     ///
-    /// This lint does NOT apply to `libs/modkit-db/` which is the internal
+    /// This lint does NOT apply to `libs/toolkit-db/` which is the internal
     /// wrapper library that provides the Sea-ORM/SecORM abstraction layer.
     ///
     /// ### Example
@@ -168,14 +168,14 @@ fn check_use_for_sqlx(cx: &rustc_lint::EarlyContext<'_>, item: &Item) {
 
 impl EarlyLintPass for De0706NoDirectSqlx {
     fn check_item(&mut self, cx: &rustc_lint::EarlyContext<'_>, item: &Item) {
-        // Skip libs/modkit-db/ - this is the internal wrapper library
+        // Skip libs/toolkit-db/ - this is the internal wrapper library
         // that legitimately uses sqlx to provide the abstraction layer
-        if is_in_modkit_db_path(cx.sess().source_map(), item.span) {
+        if is_in_toolkit_db_path(cx.sess().source_map(), item.span) {
             return;
         }
 
-        // Skip apps/cyberware-example-server/ - it needs sqlx driver linkage workaround
-        if is_in_cyberware_server_path(cx.sess().source_map(), item.span) {
+        // Skip apps/cf-gears-example-server/ - it needs sqlx driver linkage workaround
+        if is_in_cf_gears_server_path(cx.sess().source_map(), item.span) {
             return;
         }
 

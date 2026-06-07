@@ -1,7 +1,7 @@
 #![no_main]
 
 use libfuzzer_sys::fuzz_target;
-use modkit_odata::CursorV1;
+use toolkit_odata::CursorV1;
 
 fuzz_target!(|data: &[u8]| {
     // Limit input size to avoid OOM on pathological inputs

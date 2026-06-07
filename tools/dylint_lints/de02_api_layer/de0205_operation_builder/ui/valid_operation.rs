@@ -1,6 +1,6 @@
 // simulated_dir=modules/simple-resource-registry/simple-resource-registry/src/api/rest
 
-use modkit::api::OperationBuilder;
+use toolkit::api::OperationBuilder;
 
 const VALID_TAG: &str = "Simple Resource Registry";
 const ANOTHER_VALID_TAG: &str = "User Management";

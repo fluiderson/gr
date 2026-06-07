@@ -43,9 +43,9 @@ let api_key = std::env::var("API_KEY")
 
 ## Secure ORM
 
-Cyber Ware provides a secure-by-default ORM layer that enforces access control at compile time using the typestate pattern. This prevents unscoped database queries from executing and ensures tenant isolation.
+Gears provide a secure-by-default ORM layer that enforces access control at compile time using the typestate pattern. This prevents unscoped database queries from executing and ensures tenant isolation.
 
-For secure ORM usage, see `docs/modkit_unified_system/06_authn_authz_secure_orm.md`.
+For secure ORM usage, see `docs/toolkit_unified_system/06_authn_authz_secure_orm.md`.
 
 ### Key Features
 
@@ -59,8 +59,8 @@ For secure ORM usage, see `docs/modkit_unified_system/06_authn_authz_secure_orm.
 ### Quick Example
 
 ```rust
-use modkit_db::secure::{SecurityContext, SecureConn};
-use modkit_db_macros::Scopable;
+use toolkit_db::secure::{SecurityContext, SecureConn};
+use toolkit_db_macros::Scopable;
 
 // Define a scopable entity
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Scopable)]
@@ -85,7 +85,7 @@ pub async fn list_users_handler(
     let secure_conn = db.sea_secure();
 
     // Query with automatic tenant isolation
-    let scope = modkit_db::secure::AccessScope::tenant(ctx.tenant_id());
+    let scope = toolkit_db::secure::AccessScope::tenant(ctx.tenant_id());
     let users = secure_conn
         .find::<user::Entity>(&scope)
         .all(&secure_conn)

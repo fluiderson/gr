@@ -1,4 +1,4 @@
-// simulated_dir=/cyberfabric/modules/some_module/contract/
+// simulated_dir=/cf-gears/gears/some_module/contract/
 use utoipa::ToSchema;
 
 #[allow(dead_code)]

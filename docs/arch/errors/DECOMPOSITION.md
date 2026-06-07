@@ -14,14 +14,14 @@ This decomposition organizes the canonical error migration into sequential imple
 
 - [ ] `p1` - **ID**: `cpt-cf-errors-feature-foundation`
 
-Build the `CanonicalError` enum, context types, `Problem` mapping, and `#[resource_error]` macro in `libs/modkit-canonical-errors`.
+Build the `CanonicalError` enum, context types, `Problem` mapping, and `#[resource_error]` macro in `libs/toolkit-canonical-errors`.
 
 > Traces to: `cpt-cf-errors-component-canonical-error`, `cpt-cf-errors-component-context-types`, `cpt-cf-errors-component-rest-mapping`, `cpt-cf-errors-component-resource-error-macro`
 
 #### 1.1 Core types
 
-- [ ] 1.1.1 Define `CanonicalError` enum with 16 variants in `libs/modkit-errors/src/canonical.rs`
-- [ ] 1.1.2 Define 16 per-category context types in `libs/modkit-errors/src/`: `Cancelled`, `Unknown`, `InvalidArgument`, `DeadlineExceeded`, `NotFound`, `AlreadyExists`, `PermissionDenied`, `ResourceExhausted`, `FailedPrecondition`, `Aborted`, `OutOfRange`, `Unimplemented`, `Internal`, `ServiceUnavailable`, `DataLoss`, `Unauthenticated`; plus sub-types `FieldViolation`, `QuotaViolation`, `PreconditionViolation`. Use versioned naming (`XxxV1`) with unversioned type aliases (e.g., `pub type NotFound = NotFoundV1;`). Each type carries an internal `gts_type: GtsSchemaId` field (skipped during serialization) and a reserved `extra: Option<serde_json::Value>` field (always absent in p1, see DESIGN §3.8)
+- [ ] 1.1.1 Define `CanonicalError` enum with 16 variants in `libs/toolkit-errors/src/canonical.rs`
+- [ ] 1.1.2 Define 16 per-category context types in `libs/toolkit-errors/src/`: `Cancelled`, `Unknown`, `InvalidArgument`, `DeadlineExceeded`, `NotFound`, `AlreadyExists`, `PermissionDenied`, `ResourceExhausted`, `FailedPrecondition`, `Aborted`, `OutOfRange`, `Unimplemented`, `Internal`, `ServiceUnavailable`, `DataLoss`, `Unauthenticated`; plus sub-types `FieldViolation`, `QuotaViolation`, `PreconditionViolation`. Use versioned naming (`XxxV1`) with unversioned type aliases (e.g., `pub type NotFound = NotFoundV1;`). Each type carries an internal `gts_type: GtsSchemaId` field (skipped during serialization) and a reserved `extra: Option<serde_json::Value>` field (always absent in p1, see DESIGN §3.8)
 - [ ] 1.1.3 Implement `GtsSchema` for each of the 16 per-category context types and 3 sub-types via `#[struct_to_gts_schema]` macro
 - [ ] 1.1.4 Implement `GtsSchema` for `CanonicalError` (oneOf schema with all 16 variants)
 - [ ] 1.1.5 Implement ergonomic constructors (one per category: `CanonicalError::category(ctx)`) and builder methods (`with_message()`, `with_resource_type()`)
@@ -41,7 +41,7 @@ Build the `CanonicalError` enum, context types, `Problem` mapping, and `#[resour
 
 > Traces to: `cpt-cf-errors-component-resource-error-macro`, `cpt-cf-errors-constraint-macro-gts-construction`
 
-- [ ] 1.3.1 Implement `#[resource_error]` attribute macro in `libs/modkit-canonical-errors-macro/`
+- [ ] 1.3.1 Implement `#[resource_error]` attribute macro in `libs/toolkit-canonical-errors-macro/`
 - [ ] 1.3.2 Generate 15 associated functions per annotated struct (all categories except `service_unavailable`). For `not_found`, `already_exists`, and `data_loss`: take a single `impl Into<String>` (resource name) and construct the context type internally; other categories take the category-specific context type
 - [ ] 1.3.3 Validate GTS identifier at compile time — must be a valid GTS type ID registered in the Types Registry and must end with `~`
 
@@ -107,16 +107,16 @@ For each module:
 
 #### 3.2 Module list
 
-- [ ] 3.2.1 OAGW (`modules/system/oagw/`)
+- [ ] 3.2.1 OAGW (`gears/system/oagw/`)
 - [ ] 3.2.2 Credstore (`modules/core/credstore/`)
 - [ ] 3.2.3 Tenant Resolver (`modules/core/tenant-resolver/`)
 - [ ] 3.2.4 AuthZ Resolver (`modules/core/authz-resolver/`)
 - [ ] 3.2.5 AuthN Resolver (`modules/core/authn-resolver/`)
 - [ ] 3.2.6 Simple Resource Registry (`modules/simple-resource-registry/`)
 - [ ] 3.2.7 Simple User Settings (`modules/simple-user-settings/`)
-- [ ] 3.2.8 API Gateway (`modules/system/api-gateway/`)
-- [ ] 3.2.9 Nodes Registry (`modules/system/nodes-registry/`)
-- [ ] 3.2.10 Types Registry (`modules/system/types-registry/`)
+- [ ] 3.2.8 API Gateway (`gears/system/api-gateway/`)
+- [ ] 3.2.9 Nodes Registry (`gears/system/nodes-registry/`)
+- [ ] 3.2.10 Types Registry (`gears/system/types-registry/`)
 - [ ] 3.2.11 File Parser (`modules/file-parser/`)
 - [ ] 3.2.12 Mini-Chat (`modules/mini-chat/`)
 
@@ -142,11 +142,11 @@ All modules are now on `CanonicalError`. Remove legacy infrastructure and finali
 
 #### 4.2 Remove legacy error infrastructure
 
-- [ ] 4.2.1 Remove `ErrDef` struct from `libs/modkit-errors/src/catalog.rs`
-- [ ] 4.2.2 Remove `declare_errors!` macro from `libs/modkit-errors-macro/`
+- [ ] 4.2.1 Remove `ErrDef` struct from `libs/toolkit-errors/src/catalog.rs`
+- [ ] 4.2.2 Remove `declare_errors!` macro from `libs/toolkit-errors-macro/`
 - [ ] 4.2.3 Remove `ValidationViolation` struct (replaced by `FieldViolation` in `InvalidArgument` and `OutOfRange` context types)
 - [ ] 4.2.4 Remove `ValidationError` and `ValidationErrorResponse` structs
-- [ ] 4.2.5 Remove convenience constructors from `libs/modkit/src/api/problem.rs` (`bad_request`, `not_found`, `conflict`, `internal_error`)
+- [ ] 4.2.5 Remove convenience constructors from `libs/toolkit/src/api/problem.rs` (`bad_request`, `not_found`, `conflict`, `internal_error`)
 - [ ] 4.2.6 Remove all `gts/errors.json` files from modules and examples
 - [ ] 4.2.7 Remove any remaining `ErrorCode` enum references
 
@@ -165,7 +165,7 @@ All modules are now on `CanonicalError`. Remove legacy infrastructure and finali
 
 > Traces to: `cpt-cf-errors-fr-schema-drift-prevention`
 
-- [ ] 5.1 Add `cargo-semver-checks` to CI for `cyberware-modkit-errors` crate
+- [ ] 5.1 Add `cargo-semver-checks` to CI for `cf-gears-toolkit-errors` crate
 - [ ] 5.2 Export GTS schemas to `schemas/*.json` and add CI step to diff against committed baselines
 - [ ] 5.3 Add `cargo insta test --check` to CI to reject unapproved snapshot changes
 
@@ -177,21 +177,21 @@ All modules are now on `CanonicalError`. Remove legacy infrastructure and finali
 
 Update all documentation to reflect the canonical error architecture. Can run in parallel with Phases 2-4 once Phase 1 is merged.
 
-#### 6.1 ModKit Unified System docs
+#### 6.1 ToolKit Unified System docs
 
-- [ ] 6.1.1 Rewrite `docs/modkit_unified_system/05_errors_rfc9457.md` — replace legacy patterns with `CanonicalError` categories, `#[resource_error]` macro, typed context structs, and `Result<T, CanonicalError>` handler return types
-- [ ] 6.1.2 Update `docs/modkit_unified_system/01_overview.md` — update error handling summary
-- [ ] 6.1.3 Update `docs/modkit_unified_system/03_clienthub_and_plugins.md` — update error handling in SDK error boundaries
-- [ ] 6.1.4 Update `docs/modkit_unified_system/04_rest_operation_builder.md` — update error registration examples
-- [ ] 6.1.5 Update `docs/modkit_unified_system/06_authn_authz_secure_orm.md` — update error handling for auth flows
-- [ ] 6.1.6 Update `docs/modkit_unified_system/07_odata_pagination_select_filter.md` — update OData validation to use `CanonicalError::invalid_argument` with `InvalidArgument` context
-- [ ] 6.1.7 Update `docs/modkit_unified_system/10_checklists_and_templates.md` — update error handling checklist and templates
+- [ ] 6.1.1 Rewrite `docs/toolkit_unified_system/05_errors_rfc9457.md` — replace legacy patterns with `CanonicalError` categories, `#[resource_error]` macro, typed context structs, and `Result<T, CanonicalError>` handler return types
+- [ ] 6.1.2 Update `docs/toolkit_unified_system/01_overview.md` — update error handling summary
+- [ ] 6.1.3 Update `docs/toolkit_unified_system/03_clienthub_and_plugins.md` — update error handling in SDK error boundaries
+- [ ] 6.1.4 Update `docs/toolkit_unified_system/04_rest_operation_builder.md` — update error registration examples
+- [ ] 6.1.5 Update `docs/toolkit_unified_system/06_authn_authz_secure_orm.md` — update error handling for auth flows
+- [ ] 6.1.6 Update `docs/toolkit_unified_system/07_odata_pagination_select_filter.md` — update OData validation to use `CanonicalError::invalid_argument` with `InvalidArgument` context
+- [ ] 6.1.7 Update `docs/toolkit_unified_system/10_checklists_and_templates.md` — update error handling checklist and templates
 
 #### 6.2 Architecture-level docs
 
 - [ ] 6.2.1 Update `docs/ARCHITECTURE_MANIFEST.md` — update error handling section
 - [ ] 6.2.2 Update `docs/REPO_PLAYBOOK.md` — update error handling standards references
-- [ ] 6.2.3 Update `docs/MODULES.md` — update error mapping component descriptions
+- [ ] 6.2.3 Update `docs/GEARS.md ` — update error mapping component descriptions
 
 #### 6.3 Checklists
 

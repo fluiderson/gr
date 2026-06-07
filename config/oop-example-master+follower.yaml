@@ -1,5 +1,5 @@
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 modules:
   api-gateway:

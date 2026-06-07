@@ -1,5 +1,5 @@
 [package]
-name = "cyberware-system-sdks"
+name = "cf-gears-system-sdks"
 version = "0.1.35"
 edition.workspace = true
 license.workspace = true
@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Collection of system modules SDKs"
 readme = "README.md"
 rust-version.workspace = true
-keywords = ["cyberfabric", "cyberware", "cyberware-system"]
+keywords = ["constructorfabric", "cf-gears", "cf-gears-system"]
 categories = ["development-tools"]
 metadata.docs.rs.all-features = true
 
@@ -19,10 +19,10 @@ name = "cf_system_sdks"
 workspace = true
 
 [features]
-directory = ["dep:cyberware-system-sdk-directory"]
-directory_grpc = ["directory", "cyberware-system-sdk-directory?/grpc"]
+directory = ["dep:cf-gears-system-sdk-directory"]
+directory_grpc = ["directory", "cf-gears-system-sdk-directory?/grpc"]
 
 
 [dependencies]
-cyberware-system-sdk-directory = { workspace = true, optional = true }
+cf-gears-system-sdk-directory = { workspace = true, optional = true }
 

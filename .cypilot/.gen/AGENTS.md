@@ -1,4 +1,4 @@
-# Cypilot: cyberware
+# Cypilot: g
 
 ## Navigation Rules
 

@@ -8,7 +8,7 @@ use std::sync::Arc;
 use tonic::{Request, Response, Status};
 
 use calculator_sdk::{AddRequest, AddResponse, CalculatorService};
-use modkit_transport_grpc::extract_secctx;
+use toolkit_transport_grpc::extract_secctx;
 
 use crate::domain::Service;
 

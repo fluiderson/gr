@@ -3,106 +3,106 @@
 
 [[ignore]]
 reason = "Ignore rust-traits.md — reference document for planned Rust SDK contracts, not a Cypilot SDLC artifact."
-patterns = ["modules/system/resource-group/docs/rust-traits.md"]
+patterns = ["gears/system/resource-group/docs/rust-traits.md"]
 
 [[ignore]]
-reason = "Ignore 'modules/system' parent directory — not a module, only a grouping for system submodules."
-patterns = ["modules/system"]
+reason = "Ignore 'gears/system' parent directory — not a module, only a grouping for system submodules."
+patterns = ["gears/system"]
 
 [[ignore]]
 reason = "Ignore authn-resolver root module node while allowing nested plugin docs scopes."
-patterns = ["modules/system/authn-resolver"]
+patterns = ["gears/system/authn-resolver"]
 
 [[ignore]]
-reason = "Ignore 'modules/system/authz-resolver' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/authz-resolver/*"]
+reason = "Ignore 'gears/system/authz-resolver' (not SDLC-documented yet: missing required PRD/DESIGN)."
+patterns = ["gears/system/authz-resolver/*"]
 
 [[ignore]]
 reason = "Ignore module 'api-gateway' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/api-gateway/*"]
+patterns = ["gears/system/api-gateway/*"]
 
 [[ignore]]
 reason = "Ignore module 'grpc-hub' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/grpc-hub/*"]
+patterns = ["gears/system/grpc-hub/*"]
 
 [[ignore]]
 reason = "Ignore module 'module-orchestrator' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/module-orchestrator/*"]
+patterns = ["gears/system/module-orchestrator/*"]
 
 [[ignore]]
 reason = "Ignore module 'nodes-registry' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/nodes-registry/*"]
+patterns = ["gears/system/nodes-registry/*"]
 
 [[ignore]]
 reason = "Ignore oagw codebase and features — code traceability markers reverted, pending re-add. PRD/DESIGN/ADR/DECOMPOSITION still validated via autodetect."
 patterns = [
-  "modules/system/oagw/oagw/src/*",
-  "modules/system/oagw/oagw/tests/*",
-  "modules/system/oagw/oagw-sdk/src/*",
-  "modules/system/oagw/docs/features/*",
+  "gears/system/oagw/oagw/src/*",
+  "gears/system/oagw/oagw/tests/*",
+  "gears/system/oagw/oagw-sdk/src/*",
+  "gears/system/oagw/docs/features/*",
 ]
 
 [[ignore]]
 reason = "Ignore legacy (pre-Cypilot) ADR files in oagw/docs root — converted copies live under docs/ADR/."
-patterns = ["modules/system/oagw/docs/adr-*.md"]
+patterns = ["gears/system/oagw/docs/adr-*.md"]
 
 
 [[ignore]]
 reason = "Ignore module 'tenant-resolver' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/tenant-resolver/*"]
+patterns = ["gears/system/tenant-resolver/*"]
 
 [[ignore]]
 reason = "Ignore module 'types' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/types/*"]
+patterns = ["gears/system/types/*"]
 
 [[ignore]]
 reason = "Ignore module 'types-registry' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/types-registry/*"]
+patterns = ["gears/system/types-registry/*"]
 
 [[ignore]]
 reason = "Ignore module 'types-sdk' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/system/types-sdk/*"]
+patterns = ["gears/system/types-sdk/*"]
 
 [[ignore]]
 reason = "Ignore module 'simple-user-settings' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/simple-user-settings/*"]
+patterns = ["gears/simple-user-settings/*"]
 
 [[ignore]]
 reason = "Ignore module 'file-storage' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/file-storage/*"]
+patterns = ["gears/file-storage/*"]
 
 [[ignore]]
 reason = "Ignore module 'types-registry' (not SDLC-documented yet: missing required PRD/DESIGN)."
-patterns = ["modules/types-registry/*"]
+patterns = ["gears/types-registry/*"]
 
 [[ignore]]
 reason = "Ignore serverless-runtime companion docs — supplementary to DESIGN.md, not standalone SDLC artifacts."
 patterns = [
-  "modules/serverless-runtime/docs/DESIGN_GTS_SCHEMAS.md",
-  "modules/serverless-runtime/docs/DESIGN_RUST_TYPES.md",
-  "modules/serverless-runtime/docs/NEXT_ADR_SCOPE.md",
+  "gears/serverless-runtime/docs/DESIGN_GTS_SCHEMAS.md",
+  "gears/serverless-runtime/docs/DESIGN_RUST_TYPES.md",
+  "gears/serverless-runtime/docs/NEXT_ADR_SCOPE.md",
 ]
 
 [[ignore]]
 reason = "Ignore module 'mini-chat' docs (temporary: PRD/DESIGN constraints failing in CI)."
-patterns = ["modules/mini-chat/*"]
+patterns = ["gears/mini-chat/*"]
 
 [[ignore]]
 reason = "Ignore module 'approval-service' (PRD/DESIGN are placeholders). Remove this ignore after PRD/DESIGN conform to template."
-patterns = ["modules/approval-service/*"]
+patterns = ["gears/approval-service/*"]
 
 [[ignore]]
 reason = "Ignore module 'model-registry' (PRD/DESIGN headings need restructuring to match template). Remove after structural alignment."
-patterns = ["modules/model-registry/*"]
+patterns = ["gears/model-registry/*"]
 
 [[systems]]
-name = "cyberware"
+name = "cf-gears"
 slug = "cf"
 kit = "sdlc"
 
 [[systems.autodetect]]
 kit = "sdlc"
-system_root = "{project_root}/modules/$system"
+system_root = "{project_root}/gears/$system"
 artifacts_root = "{system_root}/docs"
 
 [systems.autodetect.artifacts]
@@ -153,7 +153,7 @@ extensions = [".rs"]
 
 [[systems.autodetect]]
 kit = "sdlc"
-system_root = "{project_root}/modules/system/$system"
+system_root = "{project_root}/gears/system/$system"
 artifacts_root = "{system_root}/docs"
 
 [systems.autodetect.artifacts]
@@ -195,10 +195,10 @@ require_md_extension = true
 # unmatched-markdown walk, so tightening this would flag legitimate sub-plugin artifacts
 # as unmatched.
 #
-# Known trade-off: because this autodetect block matches every modules/system/$system
+# Known trade-off: because this autodetect block matches every gears/system/$system
 # (oagw, resource-group, account-management, and any future sibling), setting this flag
 # to `false` here also disables unmatched-markdown detection across every other
-# modules/system/* subtree — not only account-management. Strictness is retained on each
+# gears/system/* subtree — not only account-management. Strictness is retained on each
 # child scope (see the tr-plugin child below, which keeps fail_on_unmatched_markdown = true).
 #
 # Do NOT tighten this flag without first introducing a per-path carve-out mechanism for
@@ -232,11 +232,11 @@ path = "{system_root}/{system}-sdk/src"
 extensions = [".rs"]
 
 # Nested sub-plugin scope: account-management/docs/tr-plugin/ carries its own PRD/DESIGN/ADR.
-# Declared as a child of the `modules/system/$system` autodetect rule so the sub-plugin
+# Declared as a child of the `gears/system/$system` autodetect rule so the sub-plugin
 # artifacts are detected as belonging to tr-plugin, not to account-management.
 [[systems.autodetect.children]]
 kit = "sdlc"
-system_root = "{project_root}/modules/system/account-management/docs/tr-plugin"
+system_root = "{project_root}/gears/system/account-management/docs/tr-plugin"
 artifacts_root = "{system_root}"
 
 [systems.autodetect.children.artifacts]
@@ -271,10 +271,10 @@ require_md_extension = true
 fail_on_unmatched_markdown = true
 
 # Nested sub-plugin scope: OIDC AuthN plugin carries its own PRD/DESIGN/DECOMPOSITION
-# under modules/system/authn-resolver/plugins/oidc-authn-plugin/docs.
+# under gears/system/authn-resolver/plugins/oidc-authn-plugin/docs.
 [[systems.autodetect.children]]
 kit = "sdlc"
-system_root = "{project_root}/modules/system/authn-resolver/plugins/oidc-authn-plugin/docs"
+system_root = "{project_root}/gears/system/authn-resolver/plugins/oidc-authn-plugin/docs"
 artifacts_root = "{system_root}"
 
 [systems.autodetect.children.artifacts]

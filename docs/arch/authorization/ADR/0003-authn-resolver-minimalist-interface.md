@@ -1,7 +1,7 @@
 ---
 status: accepted
 date: 2026-01-30
-decision-makers: Vasily
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # AuthN Resolver Minimalist Interface
@@ -21,7 +21,7 @@ Different IdPs use different protocols and token formats:
 
 ## Decision Drivers
 
-- **Vendor Neutrality** — Cyber Ware must integrate with any vendor's IdP without assuming specific protocols
+- **Vendor Neutrality** — Gears must integrate with any vendor's IdP without assuming specific protocols
 - **Plugin Flexibility** — Plugins should choose validation strategies based on their IdP's capabilities
 - **Separation of Concerns** — Module defines *what* authentication produces, plugins define *how* tokens are validated
 - **Caching Autonomy** — Different validation methods have different caching strategies (JWKS caching vs introspection result caching)
@@ -76,7 +76,7 @@ pub trait AuthNResolverPluginClient: Send + Sync {
 
 **Mitigations:**
 
-- The current OIDC AuthN plugin design ([DESIGN.md](../../../../modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md)) provides canonical patterns
+- The current OIDC AuthN plugin design ([DESIGN.md](../../../../gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md)) provides canonical patterns
 - Clear documentation of `SecurityContext` field semantics
 - Explicit error type definitions guide plugin error handling
 
@@ -122,7 +122,7 @@ trait AuthNResolverPluginClient {
 **Related Documentation:**
 
 - [DESIGN.md](../DESIGN.md) — Authentication and authorization design specification
-- [modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../../modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) — OIDC AuthN Resolver plugin design
+- [gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../../gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) — OIDC AuthN Resolver plugin design
 - [ADR 0002: Split AuthN and AuthZ Resolvers](./0002-split-authn-authz-resolvers.md) — Why AuthN and AuthZ are separate modules
 
 **Standards References:**

@@ -1,23 +1,23 @@
 ---
-name: modkit-pr-review
-description: "Review Rust PRs against idiomatic Rust guidelines and ModKit framework rules, post inline comments on GitHub"
+name: toolkit-pr-review
+description: "Review Rust PRs against idiomatic Rust guidelines and ToolKit framework rules, post inline comments on GitHub"
 user-invocable: true
 allowed-tools: Bash, Read, Glob, Grep, Write
 ---
 
 # Rust PR Review
 
-Review a GitHub pull request for Rust code quality and ModKit framework compliance.
+Review a GitHub pull request for Rust code quality and ToolKit framework compliance.
 Posts findings as inline review comments directly on the PR.
 
-**Usage**: `/modkit-pr-review <PR_NUMBER>`
+**Usage**: `/toolkit-pr-review <PR_NUMBER>`
 
 ---
 
 ## Inputs
 
 - `<PR_NUMBER>` — required, the GitHub PR number (e.g. `123`)
-- `--repo <owner/repo>` — optional, the GitHub repository (e.g. `cyberfabric/cyberware-rust`)
+- `--repo <owner/repo>` — optional, the GitHub repository (e.g. `constructorfabric/gears-rust`)
 
 ## Resolving the target repository
 
@@ -33,17 +33,17 @@ Store the result as `REPO` and pass `--repo $REPO` to all `gh pr` commands, and 
 
 The review has two tiers:
 
-**Tier 1 — Architecture (PR-level, Step 0)**: Apply the `# ARCHITECTURE REVIEW` section of `docs/pr-review/modkit-rust-review.md` once across the whole PR before reading individual files. This catches structural and design-level problems that are invisible inside a single diff hunk.
+**Tier 1 — Architecture (PR-level, Step 0)**: Apply the `# ARCHITECTURE REVIEW` section of `docs/pr-review/toolkit-rust-review.md` once across the whole PR before reading individual files. This catches structural and design-level problems that are invisible inside a single diff hunk.
 
-**Tier 2 — Code (per-file, Steps 2–4)**: Apply the remaining sections of `docs/pr-review/modkit-rust-review.md` to every `.rs` file in the diff.
+**Tier 2 — Code (per-file, Steps 2–4)**: Apply the remaining sections of `docs/pr-review/toolkit-rust-review.md` to every `.rs` file in the diff.
 
-Apply **ModKit framework compliance** (`docs/pr-review/modkit-framework-compliance-review.md`) **only** to `.rs` files that belong to ModKit-owned code. A file is ModKit-owned when **any** of these signals is present:
+Apply **ToolKit framework compliance** (`docs/pr-review/toolkit-framework-compliance-review.md`) **only** to `.rs` files that belong to ToolKit-owned code. A file is ToolKit-owned when **any** of these signals is present:
 
-1. **Cargo.toml signals** — the nearest `Cargo.toml` (same crate or workspace member) declares a `modkit` dependency/feature, or the crate name starts with `modkit`.
-2. **Path heuristics** — the file lives under a path that matches ModKit module conventions (e.g. `modules/*/src/`, `crates/modkit-*/`, or similar namespace).
-3. **Source-level symbols** — the file imports from ModKit crates (`use modkit_*`, `use crate::` inside a modkit crate) or references ModKit-specific types/traits such as `OperationBuilder`, `SecureConn`, `SecureORM`, `ClientHub`, or `ModuleLifecycle`.
+1. **Cargo.toml signals** — the nearest `Cargo.toml` (same crate or workspace member) declares a `toolkit` dependency/feature, or the crate name starts with `toolkit`.
+2. **Path heuristics** — the file lives under a path that matches ToolKit module conventions (e.g. `modules/*/src/`, `crates/toolkit-*/`, or similar namespace).
+3. **Source-level symbols** — the file imports from ToolKit crates (`use toolkit_*`, `use crate::` inside a toolkit crate) or references ToolKit-specific types/traits such as `OperationBuilder`, `SecureConn`, `SecureORM`, `ClientHub`, or `ModuleLifecycle`.
 
-Apply **Rust unit test quality review** (`docs/pr-review/modkit-tests-quality-review.md`) to every changed Rust test you can identify in the diff, including:
+Apply **Rust unit test quality review** (`docs/pr-review/toolkit-tests-quality-review.md`) to every changed Rust test you can identify in the diff, including:
 - `#[test]` functions
 - async tests such as `#[tokio::test]`
 - test modules such as `#[cfg(test)] mod tests`
@@ -51,7 +51,7 @@ Apply **Rust unit test quality review** (`docs/pr-review/modkit-tests-quality-re
 - integration tests under `tests/`
 - test-only helper code when it materially affects test validity
 
-If none of the ModKit signals are detected, skip the framework compliance checklist for that file and apply only the general Rust idioms checklist.
+If none of the ToolKit signals are detected, skip the framework compliance checklist for that file and apply only the general Rust idioms checklist.
 
 For non-Rust files in the diff (TOML, YAML, migrations, etc.) — apply only general correctness checks, do not force Rust-specific rules.
 
@@ -76,7 +76,7 @@ Save the diff output for analysis. Extract the HEAD commit SHA — you need it f
 
 ### Step 2: PR-level architecture analysis
 
-With the PR title, body, and diff in hand, assess the PR as a whole before doing a full per-file review. Apply every item in the `# ARCHITECTURE REVIEW` section of `docs/pr-review/modkit-rust-review.md`. Some items can be answered from the file list and PR description alone; others require reading relevant code sections — do that now rather than deferring to the per-file pass.
+With the PR title, body, and diff in hand, assess the PR as a whole before doing a full per-file review. Apply every item in the `# ARCHITECTURE REVIEW` section of `docs/pr-review/toolkit-rust-review.md`. Some items can be answered from the file list and PR description alone; others require reading relevant code sections — do that now rather than deferring to the per-file pass.
 
 Record architecture findings. Post each as a PR-level issue comment (not an inline review comment) using `gh api`:
 
@@ -95,23 +95,23 @@ For each file, note the changed line ranges (added lines only — you can only c
 
 ### Step 4: Read review guidelines and classify files
 
-Read `docs/pr-review/modkit-rust-review.md` (always needed).
+Read `docs/pr-review/toolkit-rust-review.md` (always needed).
 
-For each `.rs` file from Step 3, determine whether it is ModKit-owned code:
-- Check the nearest `Cargo.toml` for modkit dependencies/features or a `modkit-` crate name.
-- Check whether the file path matches ModKit module conventions (`modules/*/src/`, `crates/modkit-*/`).
-- Scan the file for ModKit imports (`use modkit_*`) or ModKit types (`OperationBuilder`, `SecureConn`, `SecureORM`, `ClientHub`, `ModuleLifecycle`).
+For each `.rs` file from Step 3, determine whether it is ToolKit-owned code:
+- Check the nearest `Cargo.toml` for toolkit dependencies/features or a `toolkit-` crate name.
+- Check whether the file path matches ToolKit module conventions (`modules/*/src/`, `crates/toolkit-*/`).
+- Scan the file for ToolKit imports (`use toolkit_*`) or ToolKit types (`OperationBuilder`, `SecureConn`, `SecureORM`, `ClientHub`, `ModuleLifecycle`).
 
-If **any** file is classified as ModKit-owned, also read `docs/pr-review/modkit-framework-compliance-review.md`.
+If **any** file is classified as ToolKit-owned, also read `docs/pr-review/toolkit-framework-compliance-review.md`.
 
 ### Step 5: Review each changed file
 
 For each `.rs` file in the diff:
 
 a. Read the full current file from the repo (not just the diff hunk) to understand context.
-b. Apply **modkit-rust-review.md** checklist items — idiomatic Rust, error handling, async safety, ownership, testing, etc.
-c. Apply **modkit-tests-quality-review.md** checklist items - to every changed Rust test you can identify in the diff
-d. **Only if the file was classified as ModKit-owned in Step 3**, also apply **modkit-framework-compliance-review.md** checklist items — SDK pattern, OperationBuilder, SecureConn, module layout, error types, etc.
+b. Apply **toolkit-rust-review.md** checklist items — idiomatic Rust, error handling, async safety, ownership, testing, etc.
+c. Apply **toolkit-tests-quality-review.md** checklist items - to every changed Rust test you can identify in the diff
+d. **Only if the file was classified as ToolKit-owned in Step 3**, also apply **toolkit-framework-compliance-review.md** checklist items — SDK pattern, OperationBuilder, SecureConn, module layout, error types, etc.
 e. Record each finding with: checklist ID, severity, file path, line number, issue description, fix.
 
 ### Step 6: Filter and deduplicate
@@ -140,7 +140,7 @@ cat > /tmp/review-payload.json << 'REVIEW_EOF'
   "body": "",
   "comments": [
     {
-      "path": "modules/foo/src/domain/service.rs",
+      "path": "gears/foo/src/domain/service.rs",
       "line": 42,
       "side": "RIGHT",
       "body": "**HIGH**\n\nError context discarded by `map_err(|_| ...)`.\n\nPreserve the source error — wrap with `.context()` or map to a domain error that keeps the cause."
@@ -171,7 +171,7 @@ After posting, print a compact summary table to the terminal. Architecture findi
 | # | ID | Sev | Location | Issue | Fix |
 |---|----|-----|----------|-------|-----|
 | 3 | RUST-ERR-001 | HIGH | service.rs:42 | Error context lost | Preserve source error |
-| 4 | MODKIT-SEC-001 | CRIT | handler.rs:18 | Raw DB connection | Use SecureConn |
+| 4 | TOOLKIT-SEC-001 | CRIT | handler.rs:18 | Raw DB connection | Use SecureConn |
 
 Posted <N> inline comments and <M> PR-level comments on PR #<PR_NUMBER>.
 ```
@@ -194,7 +194,7 @@ Each inline comment MUST follow this format:
 
 Where `<SEVERITY>` is one of: `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`.
 
-Do NOT include checklist IDs (e.g. RUST-ERR-001, MODKIT-SEC-001) in inline comments. IDs appear only in the terminal summary table (Step 7).
+Do NOT include checklist IDs (e.g. RUST-ERR-001, TOOLKIT-SEC-001) in inline comments. IDs appear only in the terminal summary table (Step 7).
 
 Rules:
 - Engineering English. No filler, no praise, no hedging.

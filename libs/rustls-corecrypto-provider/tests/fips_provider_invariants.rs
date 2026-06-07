@@ -6,7 +6,7 @@
 //! the FIPS path would be caught here at test time rather than at audit
 //! time. See FIPS PRD §9 "Verification & regression gates".
 //!
-//! Scope: only our own custom provider (`cyberware-rustls-corecrypto-provider`).
+//! Scope: only our own custom provider (`cf-gears-rustls-corecrypto-provider`).
 //! The Linux + Windows backends (`aws-lc-fips`, `rustls-cng-crypto`) are
 //! CMVP-validated upstream and shape-guaranteed by their respective
 //! maintainers — out of scope for this regression file.

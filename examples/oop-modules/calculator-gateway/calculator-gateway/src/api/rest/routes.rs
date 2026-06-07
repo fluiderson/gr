@@ -5,7 +5,7 @@ use std::sync::Arc;
 use axum::{Extension, Router};
 use http::StatusCode;
 
-use modkit::api::{OpenApiRegistry, OperationBuilder};
+use toolkit::api::{OpenApiRegistry, OperationBuilder};
 
 use crate::domain::Service;
 

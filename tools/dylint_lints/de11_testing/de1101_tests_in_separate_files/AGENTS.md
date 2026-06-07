@@ -13,7 +13,7 @@ Open `dylint.toml` in the workspace root and delete the module's line from `[de1
 [de1101_tests_in_separate_files]
 excluded_paths = [
     # ...
-    # "modules/my-module",   ← delete this line
+    # "gears/my-module",   ← delete this line
     # ...
 ]
 ```

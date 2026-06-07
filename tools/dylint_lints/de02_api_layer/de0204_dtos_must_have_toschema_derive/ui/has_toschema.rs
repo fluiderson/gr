@@ -1,4 +1,4 @@
-// simulated_dir=/cyberfabric/modules/some_module/api/rest/
+// simulated_dir=/cf-gears/gears/some_module/api/rest/
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

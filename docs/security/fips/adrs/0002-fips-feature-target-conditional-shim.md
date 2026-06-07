@@ -1,12 +1,12 @@
 ---
 status: accepted
 date: 2026-05-13
-decision-makers: cyberware core team
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Target-conditional `fips` feature activation via empty shim crate
 
-**ID**: `cpt-modkit-adr-fips-feature-target-conditional-shim`
+**ID**: `cpt-toolkit-adr-fips-feature-target-conditional-shim`
 
 ## Table of Contents
 
@@ -38,29 +38,29 @@ Cargo features defined in `[features]` are **global and target-agnostic**: there
 
 ## Decision Outcome
 
-Chosen option: **Option B — empty shim crate `cyberware-rustls-fips-shim`**.
+Chosen option: **Option B — empty shim crate `cf-gears-rustls-fips-shim`**.
 
-The shim's only purpose is to encode "pull `rustls` with the `fips` feature, but only on non-macOS targets" in a way Cargo accepts. Its `Cargo.toml` has a single target-conditional `[dependencies]` block; its `lib.rs` is empty. `modkit` and `modkit-http` activate `dep:rustls-fips-shim` from their `fips` feature; Cargo's feature unification then OR's `rustls/fips` into the resolved feature set on non-macOS only.
+The shim's only purpose is to encode "pull `rustls` with the `fips` feature, but only on non-macOS targets" in a way Cargo accepts. Its `Cargo.toml` has a single target-conditional `[dependencies]` block; its `lib.rs` is empty. `toolkit` and `toolkit-http` activate `dep:rustls-fips-shim` from their `fips` feature; Cargo's feature unification then OR's `rustls/fips` into the resolved feature set on non-macOS only.
 
 Justification:
 
 * Preserves a clean single-flag user-facing API (`--features fips`).
 * Minimal blast radius: ~30 lines of manifest + an empty `lib.rs`, runtime cost is zero.
 * No workspace refactor — `rustls = { workspace = true }` stays in every consumer crate unchanged.
-* Intent is local: anyone reading `cyberware-rustls-fips-shim/Cargo.toml` sees the trick and its rationale in one place.
+* Intent is local: anyone reading `cf-gears-rustls-fips-shim/Cargo.toml` sees the trick and its rationale in one place.
 * The shim is trivially deletable if Cargo ever adds native target-conditional feature activation.
 
 ### Consequences
 
 * One additional workspace member (`libs/rustls-fips-shim`) with zero runtime impact.
-* `modkit::fips` and `modkit-http::fips` features reference `dep:rustls-fips-shim` rather than `rustls/fips` directly. New consumers of the FIPS chain follow the same pattern.
-* `cargo tree -p cyberware-example-server --features fips,mini-chat` on macOS must show **no** `aws-lc-fips-sys` in the graph — this is now a regression check.
+* `toolkit::fips` and `toolkit-http::fips` features reference `dep:rustls-fips-shim` rather than `rustls/fips` directly. New consumers of the FIPS chain follow the same pattern.
+* `cargo tree -p cf-gears-example-server --features fips,mini-chat` on macOS must show **no** `aws-lc-fips-sys` in the graph — this is now a regression check.
 * When Cargo eventually supports target-conditional feature activation, the shim can be removed and replaced with a single feature expression like `"cfg(not(target_os = \"macos\")): rustls/fips"`.
 
 ### Confirmation
 
-* `cargo tree -p cyberware-example-server --features fips,mini-chat -e features 2>&1 | grep aws-lc-fips` returns empty on macOS, non-empty on Linux.
-* `otool -L target/debug/cyberware-example-server` on macOS+fips shows no `libaws_lc_fips_*.dylib`.
+* `cargo tree -p cf-gears-example-server --features fips,mini-chat -e features 2>&1 | grep aws-lc-fips` returns empty on macOS, non-empty on Linux.
+* `otool -L target/debug/cf-gears-example-server` on macOS+fips shows no `libaws_lc_fips_*.dylib`.
 * `cargo build` matrix passes on all four combinations: default, `--features mini-chat`, `--features fips`, `--features fips,mini-chat`.
 
 ## Pros and Cons of the Options
@@ -111,10 +111,10 @@ Justification:
 
 ## Traceability
 
-- **DESIGN**: [`libs/modkit/Cargo.toml`](../../../../libs/modkit/Cargo.toml), [`libs/modkit-http/Cargo.toml`](../../../../libs/modkit-http/Cargo.toml), [`libs/rustls-fips-shim/Cargo.toml`](../../../../libs/rustls-fips-shim/Cargo.toml).
+- **DESIGN**: [`libs/toolkit/Cargo.toml`](../../../../libs/toolkit/Cargo.toml), [`libs/toolkit-http/Cargo.toml`](../../../../libs/toolkit-http/Cargo.toml), [`libs/rustls-fips-shim/Cargo.toml`](../../../../libs/rustls-fips-shim/Cargo.toml).
 - **Related ADR**: [`0001-macos-fips-via-corecrypto-provider`](0001-macos-fips-via-corecrypto-provider.md).
 
 This decision directly addresses:
 
-* `cpt-modkit-nfr-fips-cross-os` — Single FIPS feature flag works correctly on every supported OS.
-* `cpt-modkit-design-binary-hygiene` — macOS+fips binaries link only Apple frameworks (no dead FIPS dylib).
+* `cpt-toolkit-nfr-fips-cross-os` — Single FIPS feature flag works correctly on every supported OS.
+* `cpt-toolkit-design-binary-hygiene` — macOS+fips binaries link only Apple frameworks (no dead FIPS dylib).

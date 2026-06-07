@@ -1,12 +1,12 @@
 ---
 status: accepted
 date: 2026-05-13
-decision-makers: cyberware core team
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Server-side TLS on macOS via the corecrypto rustls CryptoProvider
 
-**ID**: `cpt-modkit-adr-macos-server-side-corecrypto`
+**ID**: `cpt-toolkit-adr-macos-server-side-corecrypto`
 
 ## Table of Contents
 
@@ -18,13 +18,13 @@ This ADR **extends** the macOS provider scope decided in [ADR 0001](0001-macos-f
 
 ## Context and Problem Statement
 
-ADR 0001 introduced `cyberware-rustls-corecrypto-provider` with explicit scope **client-side TLS only**. The signer module was a rejecting stub (`Err("server-side TLS … is not supported")`), justified at the time by "cyberware terminates HTTPS at the reverse proxy in production".
+ADR 0001 introduced `cf-gears-rustls-corecrypto-provider` with explicit scope **client-side TLS only**. The signer module was a rejecting stub (`Err("server-side TLS … is not supported")`), justified at the time by "cf-gears terminates HTTPS at the reverse proxy in production".
 
 That assumption is now too narrow:
 
-1. **Deployments without a reverse proxy** — single-process edge / on-prem installs run cyberware-example-server directly on the public TLS port and need to hold a private key.
+1. **Deployments without a reverse proxy** — single-process edge / on-prem installs run cf-gears-example-server directly on the public TLS port and need to hold a private key.
 2. **mTLS / client-cert auth** — outbound mTLS (we are the TLS client presenting a cert to an upstream service) uses the same `KeyProvider::load_private_key` code path as server-side TLS.
-3. **API parity with the Windows provider** — `rustls-cng-crypto` on Windows already exposes full server-side signing (RSA + ECDSA P-256/P-384/P-521); an asymmetric macOS provider forces conditional code in cyberware-example-server.
+3. **API parity with the Windows provider** — `rustls-cng-crypto` on Windows already exposes full server-side signing (RSA + ECDSA P-256/P-384/P-521); an asymmetric macOS provider forces conditional code in cf-gears-example-server.
 
 FIPS-claim mechanics are unchanged: Apple corecrypto's CMVP scope already covers every algorithm we add (RSA-PSS / RSA-PKCS#1 v1.5 SHA-2 family; ECDSA P-256/P-384/**P-521** with matching SHA-2). The only Rust-side work is structural DER unwrapping before handing bytes to `SecKeyCreateWithData`.
 
@@ -89,7 +89,7 @@ This table is the load-bearing technical content of this ADR and is **not** dupl
 * **Unit-level**: every signer file has roundtrip tests (sign with our `SigningKey`, verify through `verify::SUPPORTED_SIG_ALGS`). 6 RSA schemes + 3 EC curves.
 * **Cross-implementation PSS-salt regression** (`rsa_pss_apple_salt_length_matches_rfc8017`): signs with our path, verifies with the pure-Rust `rsa` crate using **explicit** `salt_len = digest_len`. Catches a hypothetical future Apple SDK change to default salt length — would manifest as TLS 1.3 interop break against any RFC-compliant peer.
 * **Integration**: `tests/handshake_smoke.rs::server_handshake_*` covers full `ServerConfig`-driven TLS 1.3 / TLS 1.2 handshakes per key type. `server_config_with_loaded_key_advertises_fips` asserts the FIPS invariant survives key import.
-* **Runtime OE gate** (fail-closed): the first `fips_provider()` call invokes `oe::validate_oe()` (reads `kern.osproductversion` via sysctl, matches against [`SUPPORTED_OE_MACOS_MAJOR`](../../../../libs/rustls-corecrypto-provider/src/oe.rs)). Mismatch panics under `--features fips` unless `CYBERWARE_FIPS_OE_OVERRIDE=1` is set. See PRD §8.3.1.
+* **Runtime OE gate** (fail-closed): the first `fips_provider()` call invokes `oe::validate_oe()` (reads `kern.osproductversion` via sysctl, matches against [`SUPPORTED_OE_MACOS_MAJOR`](../../../../libs/rustls-corecrypto-provider/src/oe.rs)). Mismatch panics under `--features fips` unless `CF_GEARS_FIPS_OE_OVERRIDE=1` is set. See PRD §8.3.1.
 * **G-6 wire-shape regression**: [`tests/fips_provider_invariants.rs`](../../../../libs/rustls-corecrypto-provider/tests/fips_provider_invariants.rs) pins the `fips_provider()` shape (AES-GCM only, NIST P-curves only, TLS 1.3 only, `fips() = true`). Catches a refactor that accidentally adds ChaCha20 / X25519 / TLS 1.2 to the FIPS path.
 * **No regression**: existing client-side `handshake_*` tests against `openssl s_server` and `provider::tests::*` stay green.
 
@@ -140,5 +140,5 @@ This table is the load-bearing technical content of this ADR and is **not** dupl
 
 This decision directly addresses:
 
-* `cpt-modkit-nfr-fips-cross-os` — Valid FIPS 140-3 claim on Linux **and** macOS **for both client and server TLS roles**.
-* `cpt-modkit-design-tls-uniformity` — Single rustls-based TLS stack across all supported OSes, with symmetric client/server algorithm scope.
+* `cpt-toolkit-nfr-fips-cross-os` — Valid FIPS 140-3 claim on Linux **and** macOS **for both client and server TLS roles**.
+* `cpt-toolkit-design-tls-uniformity` — Single rustls-based TLS stack across all supported OSes, with symmetric client/server algorithm scope.

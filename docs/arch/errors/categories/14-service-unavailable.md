@@ -19,7 +19,7 @@
 ## Constructor Example
 
 ```rust
-use cf_modkit_errors::CanonicalError;
+use cf_toolkit_errors::CanonicalError;
 
 let err = CanonicalError::service_unavailable()
     .with_retry_after_seconds(30)

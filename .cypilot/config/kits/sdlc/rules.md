@@ -1,4 +1,4 @@
-# Common Rules (cyberware-sdlc)
+# Common Rules (gears-sdlc)
 
 ## Navigation Rules
 
@@ -77,8 +77,8 @@ date: {YYYY-MM-DD}
 
 | Artifact | Template | Examples |
 |----------|----------|----------|
-| PRD | `docs/spec-templates/cyberware-sdlc/PRD/template.md` | — |
-| ADR | `docs/spec-templates/cyberware-sdlc/ADR/template.md` | `docs/spec-templates/cyberware-sdlc/ADR/examples/*.md` |
-| DESIGN | `docs/spec-templates/cyberware-sdlc/DESIGN/template.md` | — |
-| DECOMPOSITION | `docs/spec-templates/cyberware-sdlc/DECOMPOSITION/template.md` | `docs/spec-templates/cyberware-sdlc/DECOMPOSITION/examples/example.md` |
-| FEATURE | `docs/spec-templates/cyberware-sdlc/FEATURE/template.md` | `docs/spec-templates/cyberware-sdlc/FEATURE/examples/*.md` |
+| PRD | `docs/spec-templates/gears-sdlc/PRD/template.md` | — |
+| ADR | `docs/spec-templates/gears-sdlc/ADR/template.md` | `docs/spec-templates/gears-sdlc/ADR/examples/*.md` |
+| DESIGN | `docs/spec-templates/gears-sdlc/DESIGN/template.md` | — |
+| DECOMPOSITION | `docs/spec-templates/gears-sdlc/DECOMPOSITION/template.md` | `docs/spec-templates/gears-sdlc/DECOMPOSITION/examples/example.md` |
+| FEATURE | `docs/spec-templates/gears-sdlc/FEATURE/template.md` | `docs/spec-templates/gears-sdlc/FEATURE/examples/*.md` |

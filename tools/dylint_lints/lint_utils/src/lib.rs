@@ -43,7 +43,7 @@ pub fn is_in_api_rest_folder(source_map: &SourceMap, span: Span) -> bool {
 }
 
 pub fn is_in_module_folder(source_map: &SourceMap, span: Span) -> bool {
-    check_span_path(source_map, span, "/modules/")
+    check_span_path(source_map, span, "/gears/")
 }
 
 /// Extract the filename string from a span.
@@ -198,28 +198,28 @@ pub fn is_in_sdk_crate(cx: &rustc_lint::EarlyContext<'_>, span: Span) -> bool {
     file_path.contains("-sdk/") || file_path.contains("-sdk\\") || is_temp_path(&file_path)
 }
 
-/// Check if span is within libs/modkit-db/ - the internal sqlx wrapper library
+/// Check if span is within libs/toolkit-db/ - the internal sqlx wrapper library
 /// This path is excluded from sqlx restrictions as it provides the abstraction layer
-pub fn is_in_modkit_db_path(source_map: &SourceMap, span: Span) -> bool {
+pub fn is_in_toolkit_db_path(source_map: &SourceMap, span: Span) -> bool {
     // Multiple checks handle different path contexts:
-    // - "/libs/modkit-db/" - absolute path from workspace root
-    // - "libs/modkit-db/" - relative path in some contexts
-    // - "modkit-db/src/" - simulated_dir paths in tests
-    check_span_path(source_map, span, "/libs/modkit-db/")
-        || check_span_path(source_map, span, "libs/modkit-db/")
-        || check_span_path(source_map, span, "modkit-db/src/")
+    // - "/libs/toolkit-db/" - absolute path from workspace root
+    // - "libs/toolkit-db/" - relative path in some contexts
+    // - "toolkit-db/src/" - simulated_dir paths in tests
+    check_span_path(source_map, span, "/libs/toolkit-db/")
+        || check_span_path(source_map, span, "libs/toolkit-db/")
+        || check_span_path(source_map, span, "toolkit-db/src/")
 }
 
-/// Check if span is within apps/cyberware-example-server - the main server binary
+/// Check if span is within apps/cf-gears-example-server - the main server binary
 /// This path is excluded from sqlx restrictions as it needs driver linkage workaround
-pub fn is_in_cyberware_server_path(source_map: &SourceMap, span: Span) -> bool {
+pub fn is_in_cf_gears_server_path(source_map: &SourceMap, span: Span) -> bool {
     // Multiple checks handle different path contexts:
-    // - "/apps/cyberware-example-server/" - absolute path from workspace root
-    // - "apps/cyberware-example-server/" - relative path in some contexts
-    // - "cyberware-example-server/src/" - simulated_dir paths in tests
-    check_span_path(source_map, span, "/apps/cyberware-example-server/")
-        || check_span_path(source_map, span, "apps/cyberware-example-server/")
-        || check_span_path(source_map, span, "cyberware-example-server/src/")
+    // - "/apps/cf-gears-example-server/" - absolute path from workspace root
+    // - "apps/cf-gears-example-server/" - relative path in some contexts
+    // - "cf-gears-example-server/src/" - simulated_dir paths in tests
+    check_span_path(source_map, span, "/apps/cf-gears-example-server/")
+        || check_span_path(source_map, span, "apps/cf-gears-example-server/")
+        || check_span_path(source_map, span, "cf-gears-example-server/src/")
 }
 
 pub fn check_derive_attrs<F>(item: &rustc_ast::Item, mut f: F)
@@ -280,7 +280,7 @@ pub fn is_serde_trait(segments: &[&str], trait_name: &str) -> bool {
     }
 }
 
-/// Check if an item has the `#[modkit_macros::api_dto(...)]` attribute.
+/// Check if an item has the `#[toolkit_macros::api_dto(...)]` attribute.
 ///
 /// The `api_dto` macro automatically adds:
 /// - `#[derive(serde::Serialize)]` (if `response` is specified)
@@ -291,7 +291,7 @@ pub fn is_serde_trait(segments: &[&str], trait_name: &str) -> bool {
 /// Lints checking for these derives/attributes should skip items with this attribute.
 pub fn has_api_dto_attribute(item: &rustc_ast::Item) -> bool {
     for attr in &item.attrs {
-        // Check for modkit_macros::api_dto or just api_dto
+        // Check for toolkit_macros::api_dto or just api_dto
         if let rustc_ast::AttrKind::Normal(attr_item) = &attr.kind {
             let path = &attr_item.item.path;
             let segments: Vec<&str> = path
@@ -300,7 +300,7 @@ pub fn has_api_dto_attribute(item: &rustc_ast::Item) -> bool {
                 .map(|s| s.ident.name.as_str())
                 .collect();
 
-            // Match: api_dto, modkit_macros::api_dto
+            // Match: api_dto, toolkit_macros::api_dto
             if segments.last() == Some(&"api_dto") {
                 return true;
             }
@@ -532,7 +532,7 @@ fn get_path_str_from_session(source_map: &SourceMap, span: Span) -> Option<Strin
 }
 
 /// Extract simulated directory path from a comment at the start of a file.
-/// Looks for a comment like: `// simulated_dir=/cyberfabric/modules/some_module/contract/`
+/// Looks for a comment like: `// simulated_dir=/cf-gears/gears/some_module/contract/`
 /// Returns None if no such comment is found.
 ///
 /// Only checks files in temporary directories to avoid unnecessary file I/O in production.

@@ -2,11 +2,11 @@
 # Distributed Tracing Setup
 
 This guide walks you through setting up **OpenTelemetry distributed tracing** with **Jaeger** or **Uptrace** for the
-Cyber Ware framework for testing purposes.
+Gears middleware for testing purposes.
 
 ## Overview
 
-The Cyber Ware framework includes first-class support for distributed tracing with:
+The Gears middleware includes first-class support for distributed tracing with:
 
 - **Automatic trace context extraction** from incoming HTTP requests (W3C Trace Context)
 - **Automatic trace context injection** for outgoing HTTP requests
@@ -34,14 +34,14 @@ Create a configuration file (e.g., `config/with-tracing.yaml`):
 
 ```yaml
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
   host: "127.0.0.1"
   port: 8087
 
 # Enable OpenTelemetry tracing
 tracing:
   enabled: true
-  service_name: "cyberware-api"
+  service_name: "cf-gears-api"
 
   exporter:
     kind: "otlp_grpc"
@@ -62,18 +62,18 @@ tracing:
 logging:
   default:
     console_level: "info"
-    file: "logs/cyberware.log"
+    file: "logs/cf-gears.log"
 ```
 
 ### 3. Run the Server
 
 ```bash
-cargo run --bin cyberware-server -- --config config/with-tracing.yaml
+cargo run --bin cf-gears-server -- --config config/with-tracing.yaml
 ```
 
 ### 4. View Traces
 
-Open [http://localhost:16686](http://localhost:16686) and search for service `cyberware-api`.
+Open [http://localhost:16686](http://localhost:16686) and search for service `cf-gears-api`.
 
 ---
 
@@ -118,7 +118,7 @@ services:
 ```yaml
 tracing:
   enabled: true
-  service_name: "cyberware-api"
+  service_name: "cf-gears-api"
 
   exporter:
     kind: "otlp_grpc"
@@ -133,18 +133,18 @@ tracing:
   resource:
     service.version: "1.3.7"
     deployment.environment: "dev"
-    service.namespace: "cyberware"
+    service.namespace: "cf-gears"
 ```
 
 ### 3. Run the Server
 
 ```bash
-cargo run --bin cyberware-server -- --config config/with-tracing.yaml
+cargo run --bin cf-gears-server -- --config config/with-tracing.yaml
 ```
 
 ### 4. View Traces
 
-Open [http://localhost:14318](http://localhost:14318) and search for service `cyberware-api`.
+Open [http://localhost:14318](http://localhost:14318) and search for service `cf-gears-api`.
 
 ---
 
@@ -222,9 +222,9 @@ tracing:
   resource:
     service.version: "1.2.3"
     deployment.environment: "production"
-    service.namespace: "cyberware"
+    service.namespace: "cf-gears"
     k8s.cluster.name: "prod-cluster"
-    k8s.namespace.name: "cyberware-ns"
+    k8s.namespace.name: "cf-gears-ns"
 ```
 
 ### HTTP Options
@@ -248,7 +248,7 @@ tracing:
 >
 > ```toml
 > [dependencies]
-> modkit-http = { workspace = true, features = ["otel"] }
+> toolkit-http = { workspace = true, features = ["otel"] }
 > ```
 >
 > Without this feature, the `with_otel()` method will not be available, and you'll get
@@ -257,7 +257,7 @@ tracing:
 ### In Your Module
 
 ```rust,ignore
-use modkit_http::{HttpClient, HttpClientBuilder};
+use toolkit_http::{HttpClient, HttpClientBuilder};
 
 #[async_trait]
 impl MyModule {
@@ -281,10 +281,10 @@ impl MyModule {
 }
 ```
 
-### Configuring the modkit_http::HttpClient
+### Configuring the toolkit_http::HttpClient
 
 ```rust,ignore
-use modkit_http::{HttpClient, HttpClientBuilder};
+use toolkit_http::{HttpClient, HttpClientBuilder};
 use std::time::Duration;
 
 // Full configuration example
@@ -301,7 +301,7 @@ let client = HttpClientBuilder::new()
 Create custom spans for business logic:
 
 ```rust,ignore
-use modkit_http::HttpClientBuilder;
+use toolkit_http::HttpClientBuilder;
 use tracing::{info_span, Instrument, info};
 
 async fn process_user_data(user_id: u64) -> Result<()> {
@@ -354,7 +354,7 @@ You can override any config via environment variables:
 ```bash
 # Enable tracing
 export APP__TRACING__ENABLED=true
-export APP__TRACING__SERVICE_NAME=cyberware-prod
+export APP__TRACING__SERVICE_NAME=cf-gears-prod
 
 # Configure exporter
 export APP__TRACING__EXPORTER__KIND=otlp_grpc

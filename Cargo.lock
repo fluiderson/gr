@@ -1140,12 +1140,12 @@ dependencies = [
  "anyhow",
  "async-trait",
  "calculator-sdk",
+ "cf-gears-grpc-hub",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-transport-grpc",
  "clap",
- "cyberware-grpc-hub",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-modkit-transport-grpc",
  "inventory",
  "tokio",
  "tonic",
@@ -1160,10 +1160,10 @@ dependencies = [
  "async-trait",
  "axum",
  "calculator-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
  "http",
  "inventory",
  "serde",
@@ -1180,10 +1180,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-security",
- "cyberware-modkit-transport-grpc",
- "cyberware-system-sdks",
+ "cf-gears-system-sdks",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-transport-grpc",
  "prost",
  "thiserror 2.0.18",
  "tokio",
@@ -1200,8 +1200,8 @@ dependencies = [
  "anyhow",
  "async-trait",
  "calculator-gateway",
- "cyberware-modkit",
- "cyberware-modkit-security",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-security",
  "thiserror 2.0.18",
  "tracing",
 ]
@@ -1291,6 +1291,1363 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fac387a98bb7c37292057cffc56d62ecb629900026402633ae9160df93a8766"
 dependencies = [
  "nom 7.1.3",
+]
+
+[[package]]
+name = "cf-gears-account-management"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "axum",
+ "bigdecimal",
+ "cf-gears-account-management-sdk",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-resource-group-sdk",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-odata-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-utils",
+ "cf-gears-types-registry-sdk",
+ "fnv",
+ "futures",
+ "gts",
+ "http",
+ "http-body-util",
+ "jsonschema",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "proptest",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "testcontainers",
+ "testcontainers-modules",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tokio-util",
+ "tower",
+ "tracing",
+ "tracing-test",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-account-management-sdk"
+version = "0.1.1"
+dependencies = [
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-odata-macros",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-api-gateway"
+version = "0.2.7"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "axum",
+ "bytes",
+ "cf-gears-authn-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-http",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "chrono",
+ "dashmap",
+ "futures-core",
+ "glob",
+ "governor",
+ "http",
+ "http-body",
+ "inventory",
+ "matchit 0.9.2",
+ "nanoid",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "rust-embed",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-util",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "ureq",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-authn-resolver"
+version = "0.2.16"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-authn-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-authn-resolver-sdk"
+version = "0.3.16"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-authz-resolver"
+version = "0.1.23"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-authz-resolver-sdk"
+version = "0.3.6"
+dependencies = [
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-credstore"
+version = "0.1.22"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-credstore-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-credstore-sdk"
+version = "0.1.24"
+dependencies = [
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
+name = "cf-gears-example-server"
+version = "0.6.1"
+dependencies = [
+ "anyhow",
+ "calculator",
+ "calculator-gateway",
+ "cf-gears-account-management",
+ "cf-gears-api-gateway",
+ "cf-gears-authn-resolver",
+ "cf-gears-authz-resolver",
+ "cf-gears-credstore",
+ "cf-gears-file-parser",
+ "cf-gears-grpc-hub",
+ "cf-gears-mini-chat",
+ "cf-gears-module-orchestrator",
+ "cf-gears-nodes-registry",
+ "cf-gears-oagw",
+ "cf-gears-resource-group",
+ "cf-gears-rg-tr-plugin",
+ "cf-gears-simple-user-settings",
+ "cf-gears-single-tenant-tr-plugin",
+ "cf-gears-static-authn-plugin",
+ "cf-gears-static-authz-plugin",
+ "cf-gears-static-credstore-plugin",
+ "cf-gears-static-idp-plugin",
+ "cf-gears-static-tr-plugin",
+ "cf-gears-tenant-resolver",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-http",
+ "cf-gears-tr-authz-plugin",
+ "cf-gears-types-registry",
+ "clap",
+ "mimalloc",
+ "serde-saphyr 0.0.22",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "users-info",
+]
+
+[[package]]
+name = "cf-gears-file-parser"
+version = "0.1.26"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "base64 0.22.1",
+ "bytes",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "docx-rust",
+ "futures-util",
+ "http",
+ "inventory",
+ "kreuzberg",
+ "mime",
+ "serde",
+ "tempfile",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-fips-probe"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-http",
+ "clap",
+ "tokio",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "cf-gears-grpc-hub"
+version = "0.2.6"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-system-sdks",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-transport-grpc",
+ "http",
+ "inventory",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tower",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-mini-chat"
+version = "0.1.31"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "base64 0.22.1",
+ "bytes",
+ "cf-gears-authn-resolver-sdk",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-mini-chat-sdk",
+ "cf-gears-oagw-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-utils",
+ "cf-gears-types-registry",
+ "cf-gears-types-registry-sdk",
+ "chrono",
+ "futures",
+ "gts",
+ "heck 0.5.0",
+ "http",
+ "image",
+ "inventory",
+ "k8s-openapi",
+ "kube",
+ "multer",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "pin-project-lite",
+ "regex",
+ "sea-orm",
+ "sea-orm-migration",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "temp-env",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tracing-opentelemetry",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-mini-chat-sdk"
+version = "0.10.6"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "time",
+ "tokio-util",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-module-orchestrator"
+version = "0.1.25"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "cf-gears-api-gateway",
+ "cf-gears-system-sdks",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "inventory",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tonic",
+ "tower",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-nodes-registry"
+version = "0.1.25"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "cf-gears-nodes-registry-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-node-info",
+ "chrono",
+ "inventory",
+ "serde",
+ "thiserror 2.0.18",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-nodes-registry-sdk"
+version = "0.1.21"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit-node-info",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-oagw"
+version = "0.2.25"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-stream",
+ "async-trait",
+ "axum",
+ "bytes",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-credstore-sdk",
+ "cf-gears-oagw",
+ "cf-gears-oagw-sdk",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-auth",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-http",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "dashmap",
+ "form_urlencoded",
+ "futures",
+ "futures-util",
+ "gts",
+ "heck 0.5.0",
+ "http",
+ "http-body-util",
+ "httparse",
+ "httpmock",
+ "hyper",
+ "hyper-util",
+ "inventory",
+ "mime",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "pingora-core",
+ "pingora-http",
+ "pingora-load-balancing",
+ "pingora-memory-cache",
+ "pingora-proxy",
+ "psl",
+ "rcgen",
+ "rustls",
+ "rustls-pki-types",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-rustls",
+ "tower",
+ "tracing",
+ "url",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-oagw-sdk"
+version = "0.5.1"
+dependencies = [
+ "async-openai",
+ "async-trait",
+ "axum",
+ "bytes",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-security",
+ "futures-core",
+ "futures-util",
+ "http",
+ "http-body",
+ "http-body-util",
+ "octocrab",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tower",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-oidc-authn-plugin"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.22.1",
+ "cf-gears-authn-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "criterion",
+ "dashmap",
+ "hex",
+ "httpdate",
+ "httpmock",
+ "humantime",
+ "inventory",
+ "jsonwebtoken",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "rand 0.10.1",
+ "rcgen",
+ "regex",
+ "reqwest 0.13.3",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sha2",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-resource-group"
+version = "0.1.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-resource-group-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "gts",
+ "http",
+ "http-body-util",
+ "inventory",
+ "jsonschema",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tower",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-resource-group-sdk"
+version = "0.1.3"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-odata-macros",
+ "cf-gears-toolkit-sdk",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-rg-tr-plugin"
+version = "0.1.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-resource-group-sdk",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "futures",
+ "inventory",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-rustls-corecrypto-provider"
+version = "0.1.0"
+dependencies = [
+ "core-foundation 0.10.1",
+ "core-foundation-sys",
+ "hex",
+ "pkcs8",
+ "rcgen",
+ "rsa",
+ "rustls",
+ "sec1",
+ "security-framework 3.7.0",
+ "security-framework-sys",
+ "sha2",
+ "subtle",
+ "temp-env",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tracing",
+ "zeroize",
+]
+
+[[package]]
+name = "cf-gears-rustls-fips-shim"
+version = "0.1.0"
+dependencies = [
+ "hyper-rustls",
+ "rustls",
+]
+
+[[package]]
+name = "cf-gears-simple-user-settings"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-simple-user-settings-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "inventory",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tower",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-simple-user-settings-sdk"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "time",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-single-tenant-tr-plugin"
+version = "0.1.22"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-static-authn-plugin"
+version = "0.3.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-authn-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-static-authz-plugin"
+version = "0.1.20"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-static-credstore-plugin"
+version = "0.1.18"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-credstore-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde-saphyr 0.0.22",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-static-idp-plugin"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-account-management-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "gts",
+ "inventory",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-static-tr-plugin"
+version = "0.1.21"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-system-sdk-directory"
+version = "0.1.35"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-toolkit-transport-grpc",
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-prost",
+ "tonic-prost-build",
+ "tracing",
+]
+
+[[package]]
+name = "cf-gears-system-sdks"
+version = "0.1.35"
+dependencies = [
+ "cf-gears-system-sdk-directory",
+]
+
+[[package]]
+name = "cf-gears-tenant-resolver"
+version = "0.1.21"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-tenant-resolver-sdk"
+version = "0.3.6"
+dependencies = [
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "gts",
+ "gts-macros",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit"
+version = "0.6.10"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "axum",
+ "cf-gears-rustls-corecrypto-provider",
+ "cf-gears-rustls-fips-shim",
+ "cf-gears-system-sdks",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-sdk",
+ "cf-gears-toolkit-utils",
+ "chrono",
+ "dashmap",
+ "dsn",
+ "enable-ansi-support",
+ "figment",
+ "file-rotate",
+ "futures-core",
+ "futures-util",
+ "gts",
+ "gts-macros",
+ "http",
+ "httpmock",
+ "inventory",
+ "nix 0.31.2",
+ "opentelemetry",
+ "opentelemetry-otlp",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "rustls",
+ "rustls-cng-crypto",
+ "schemars 1.2.1",
+ "sea-orm-migration",
+ "serde",
+ "serde-saphyr 0.0.22",
+ "serde_json",
+ "supports-color",
+ "temp-env",
+ "tempfile",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-metrics",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tower",
+ "tracing",
+ "tracing-appender",
+ "tracing-log",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "tracing-test",
+ "trybuild",
+ "url",
+ "urlencoding",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-auth"
+version = "0.7.0"
+dependencies = [
+ "arc-swap",
+ "async-trait",
+ "base64 0.22.1",
+ "bytes",
+ "cf-gears-toolkit-http",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-utils",
+ "http",
+ "http-body-util",
+ "httpmock",
+ "jsonwebtoken",
+ "rand 0.10.1",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tokio-util",
+ "tower",
+ "tracing",
+ "url",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
+name = "cf-gears-toolkit-canonical-errors"
+version = "0.7.3"
+dependencies = [
+ "axum",
+ "cf-gears-toolkit-canonical-errors-macro",
+ "gts-id",
+ "http",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tracing",
+ "trybuild",
+ "utoipa",
+]
+
+[[package]]
+name = "cf-gears-toolkit-canonical-errors-macro"
+version = "0.6.1"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-db"
+version = "0.8.2"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bigdecimal",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-utils",
+ "chrono",
+ "criterion",
+ "dashmap",
+ "dirs",
+ "figment",
+ "futures-util",
+ "rust_decimal",
+ "ryu",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde-saphyr 0.0.22",
+ "serde_json",
+ "sqlx",
+ "temp-env",
+ "tempfile",
+ "testcontainers",
+ "testcontainers-modules",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
+ "trybuild",
+ "url",
+ "uuid",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "cf-gears-toolkit-db-macros"
+version = "0.6.2"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro-error2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+ "trybuild",
+]
+
+[[package]]
+name = "cf-gears-toolkit-gts"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cf-gears-toolkit-gts-macros",
+ "gts",
+ "gts-macros",
+ "inventory",
+ "schemars 1.2.1",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "cf-gears-toolkit-gts-macros"
+version = "0.1.0"
+dependencies = [
+ "gts-macros",
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-http"
+version = "0.6.5"
+dependencies = [
+ "bytes",
+ "cf-gears-rustls-corecrypto-provider",
+ "cf-gears-rustls-fips-shim",
+ "flate2",
+ "http",
+ "http-body",
+ "http-body-util",
+ "httpdate",
+ "httpmock",
+ "hyper",
+ "hyper-rustls",
+ "hyper-util",
+ "opentelemetry",
+ "opentelemetry_sdk",
+ "pin-project-lite",
+ "rand 0.10.1",
+ "rustls",
+ "rustls-cng-crypto",
+ "rustls-native-certs 0.8.3",
+ "rustls-pki-types",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "thiserror 2.0.18",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "url",
+ "webpki-roots 1.0.6",
+]
+
+[[package]]
+name = "cf-gears-toolkit-macros"
+version = "0.6.2"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "strsim",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-macros-tests"
+version = "0.6.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-transport-grpc",
+ "inventory",
+ "serde",
+ "tokio",
+ "tokio-util",
+ "tonic",
+ "trybuild",
+]
+
+[[package]]
+name = "cf-gears-toolkit-node-info"
+version = "0.6.4"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "hostname",
+ "local-ip-address",
+ "machine-uid",
+ "nvml-wrapper",
+ "regex",
+ "starship-battery",
+ "sysinfo",
+ "thiserror 2.0.18",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-odata"
+version = "0.8.0"
+dependencies = [
+ "base64 0.22.1",
+ "bigdecimal",
+ "cf-gears-toolkit-canonical-errors",
+ "chrono",
+ "chrono-tz",
+ "hex",
+ "http",
+ "peg",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.18",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-odata-macros"
+version = "0.6.5"
+dependencies = [
+ "cf-gears-toolkit-odata",
+ "heck 0.5.0",
+ "proc-macro-error2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+ "trybuild",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-sdk"
+version = "0.6.5"
+dependencies = [
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-odata-macros",
+ "cf-gears-toolkit-security",
+ "chrono",
+ "futures-core",
+ "futures-util",
+ "pin-project-lite",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-security"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "postcard",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-transport-grpc"
+version = "0.6.4"
+dependencies = [
+ "anyhow",
+ "cf-gears-toolkit-security",
+ "rand 0.10.1",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tracing",
+]
+
+[[package]]
+name = "cf-gears-toolkit-utils"
+version = "0.6.3"
+dependencies = [
+ "humantime",
+ "regex",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "temp-env",
+ "zeroize",
+]
+
+[[package]]
+name = "cf-gears-tr-authz-plugin"
+version = "0.1.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-tenant-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-security",
+ "cf-gears-types-registry-sdk",
+ "inventory",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-types-registry"
+version = "0.1.22"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-utils",
+ "cf-gears-types-registry-sdk",
+ "gts",
+ "inventory",
+ "lru 0.16.4",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-types-registry-sdk"
+version = "0.2.2"
+dependencies = [
+ "async-trait",
+ "gts",
+ "serde_json",
+ "thiserror 2.0.18",
+ "uuid",
 ]
 
 [[package]]
@@ -1811,1363 +3168,6 @@ checksum = "78c8292055d1c1df0cce5d180393dc8cce0abec0a7102adb6c7b1eef6016d60a"
 dependencies = [
  "generic-array",
  "typenum",
-]
-
-[[package]]
-name = "cyberware-account-management"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "axum",
- "bigdecimal",
- "cyberware-account-management-sdk",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-odata-macros",
- "cyberware-modkit-security",
- "cyberware-modkit-utils",
- "cyberware-resource-group-sdk",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "fnv",
- "futures",
- "gts",
- "http",
- "http-body-util",
- "jsonschema",
- "opentelemetry",
- "opentelemetry_sdk",
- "parking_lot",
- "proptest",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "testcontainers",
- "testcontainers-modules",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tokio-util",
- "tower",
- "tracing",
- "tracing-test",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-account-management-sdk"
-version = "0.1.1"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-odata",
- "cyberware-modkit-odata-macros",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-api-gateway"
-version = "0.2.7"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "axum",
- "bytes",
- "chrono",
- "cyberware-authn-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-http",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "dashmap",
- "futures-core",
- "glob",
- "governor",
- "http",
- "http-body",
- "inventory",
- "matchit 0.9.2",
- "nanoid",
- "opentelemetry",
- "opentelemetry_sdk",
- "parking_lot",
- "rust-embed",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tokio-util",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "ureq",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-authn-resolver"
-version = "0.2.16"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-authn-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-authn-resolver-sdk"
-version = "0.3.16"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-security",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "secrecy",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-authz-resolver"
-version = "0.1.23"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-authz-resolver-sdk"
-version = "0.3.6"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "secrecy",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-credstore"
-version = "0.1.22"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-credstore-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-credstore-sdk"
-version = "0.1.24"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
- "zeroize",
-]
-
-[[package]]
-name = "cyberware-example-server"
-version = "0.6.1"
-dependencies = [
- "anyhow",
- "calculator",
- "calculator-gateway",
- "clap",
- "cyberware-account-management",
- "cyberware-api-gateway",
- "cyberware-authn-resolver",
- "cyberware-authz-resolver",
- "cyberware-credstore",
- "cyberware-file-parser",
- "cyberware-grpc-hub",
- "cyberware-mini-chat",
- "cyberware-modkit",
- "cyberware-modkit-http",
- "cyberware-module-orchestrator",
- "cyberware-nodes-registry",
- "cyberware-oagw",
- "cyberware-resource-group",
- "cyberware-rg-tr-plugin",
- "cyberware-simple-user-settings",
- "cyberware-single-tenant-tr-plugin",
- "cyberware-static-authn-plugin",
- "cyberware-static-authz-plugin",
- "cyberware-static-credstore-plugin",
- "cyberware-static-idp-plugin",
- "cyberware-static-tr-plugin",
- "cyberware-tenant-resolver",
- "cyberware-tr-authz-plugin",
- "cyberware-types-registry",
- "mimalloc",
- "serde-saphyr 0.0.22",
- "serde_json",
- "tempfile",
- "tokio",
- "tracing",
- "users-info",
-]
-
-[[package]]
-name = "cyberware-file-parser"
-version = "0.1.26"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "base64 0.22.1",
- "bytes",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "docx-rust",
- "futures-util",
- "http",
- "inventory",
- "kreuzberg",
- "mime",
- "serde",
- "tempfile",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-fips-probe"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "cyberware-modkit",
- "cyberware-modkit-http",
- "tokio",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "cyberware-grpc-hub"
-version = "0.2.6"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-transport-grpc",
- "cyberware-system-sdks",
- "http",
- "inventory",
- "parking_lot",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tower",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-mini-chat"
-version = "0.1.31"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "base64 0.22.1",
- "bytes",
- "chrono",
- "cyberware-authn-resolver-sdk",
- "cyberware-authz-resolver-sdk",
- "cyberware-mini-chat-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-gts",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-modkit-utils",
- "cyberware-oagw-sdk",
- "cyberware-types-registry",
- "cyberware-types-registry-sdk",
- "futures",
- "gts",
- "heck 0.5.0",
- "http",
- "image",
- "inventory",
- "k8s-openapi",
- "kube",
- "multer",
- "opentelemetry",
- "opentelemetry_sdk",
- "pin-project-lite",
- "regex",
- "sea-orm",
- "sea-orm-migration",
- "secrecy",
- "serde",
- "serde_json",
- "temp-env",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tokio-util",
- "tracing",
- "tracing-opentelemetry",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-mini-chat-sdk"
-version = "0.10.6"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "time",
- "tokio-util",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit"
-version = "0.6.10"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "axum",
- "chrono",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-gts",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-sdk",
- "cyberware-modkit-utils",
- "cyberware-rustls-corecrypto-provider",
- "cyberware-rustls-fips-shim",
- "cyberware-system-sdks",
- "dashmap",
- "dsn",
- "enable-ansi-support",
- "figment",
- "file-rotate",
- "futures-core",
- "futures-util",
- "gts",
- "gts-macros",
- "http",
- "httpmock",
- "inventory",
- "nix 0.31.2",
- "opentelemetry",
- "opentelemetry-otlp",
- "opentelemetry_sdk",
- "parking_lot",
- "rustls",
- "rustls-cng-crypto",
- "schemars 1.2.1",
- "sea-orm-migration",
- "serde",
- "serde-saphyr 0.0.22",
- "serde_json",
- "supports-color",
- "temp-env",
- "tempfile",
- "thiserror 2.0.18",
- "tokio",
- "tokio-metrics",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tower",
- "tracing",
- "tracing-appender",
- "tracing-log",
- "tracing-opentelemetry",
- "tracing-subscriber",
- "tracing-test",
- "trybuild",
- "url",
- "urlencoding",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-auth"
-version = "0.7.0"
-dependencies = [
- "arc-swap",
- "async-trait",
- "base64 0.22.1",
- "bytes",
- "cyberware-modkit-http",
- "cyberware-modkit-security",
- "cyberware-modkit-utils",
- "http",
- "http-body-util",
- "httpmock",
- "jsonwebtoken",
- "rand 0.10.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tokio-util",
- "tower",
- "tracing",
- "url",
- "uuid",
- "zeroize",
-]
-
-[[package]]
-name = "cyberware-modkit-canonical-errors"
-version = "0.7.3"
-dependencies = [
- "axum",
- "cyberware-modkit-canonical-errors-macro",
- "gts-id",
- "http",
- "sea-orm",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tracing",
- "trybuild",
- "utoipa",
-]
-
-[[package]]
-name = "cyberware-modkit-canonical-errors-macro"
-version = "0.6.1"
-dependencies = [
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-db"
-version = "0.8.2"
-dependencies = [
- "anyhow",
- "async-trait",
- "bigdecimal",
- "chrono",
- "criterion",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-modkit-utils",
- "dashmap",
- "dirs",
- "figment",
- "futures-util",
- "rust_decimal",
- "ryu",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde-saphyr 0.0.22",
- "serde_json",
- "sqlx",
- "temp-env",
- "tempfile",
- "testcontainers",
- "testcontainers-modules",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tokio-util",
- "tracing",
- "tracing-appender",
- "tracing-subscriber",
- "trybuild",
- "url",
- "uuid",
- "xxhash-rust",
-]
-
-[[package]]
-name = "cyberware-modkit-db-macros"
-version = "0.6.2"
-dependencies = [
- "heck 0.5.0",
- "proc-macro-error2",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
- "trybuild",
-]
-
-[[package]]
-name = "cyberware-modkit-gts"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cyberware-modkit-gts-macros",
- "gts",
- "gts-macros",
- "inventory",
- "schemars 1.2.1",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "cyberware-modkit-gts-macros"
-version = "0.1.0"
-dependencies = [
- "gts-macros",
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-http"
-version = "0.6.5"
-dependencies = [
- "bytes",
- "cyberware-rustls-corecrypto-provider",
- "cyberware-rustls-fips-shim",
- "flate2",
- "http",
- "http-body",
- "http-body-util",
- "httpdate",
- "httpmock",
- "hyper",
- "hyper-rustls",
- "hyper-util",
- "opentelemetry",
- "opentelemetry_sdk",
- "pin-project-lite",
- "rand 0.10.1",
- "rustls",
- "rustls-cng-crypto",
- "rustls-native-certs 0.8.3",
- "rustls-pki-types",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "thiserror 2.0.18",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-opentelemetry",
- "tracing-subscriber",
- "url",
- "webpki-roots 1.0.6",
-]
-
-[[package]]
-name = "cyberware-modkit-macros"
-version = "0.6.2"
-dependencies = [
- "heck 0.5.0",
- "proc-macro2",
- "quote",
- "strsim",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-macros-tests"
-version = "0.6.1"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-modkit-transport-grpc",
- "inventory",
- "serde",
- "tokio",
- "tokio-util",
- "tonic",
- "trybuild",
-]
-
-[[package]]
-name = "cyberware-modkit-node-info"
-version = "0.6.4"
-dependencies = [
- "anyhow",
- "chrono",
- "hostname",
- "local-ip-address",
- "machine-uid",
- "nvml-wrapper",
- "regex",
- "starship-battery",
- "sysinfo",
- "thiserror 2.0.18",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-odata"
-version = "0.8.0"
-dependencies = [
- "base64 0.22.1",
- "bigdecimal",
- "chrono",
- "chrono-tz",
- "cyberware-modkit-canonical-errors",
- "hex",
- "http",
- "peg",
- "serde",
- "serde_json",
- "sha2",
- "thiserror 2.0.18",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-odata-macros"
-version = "0.6.5"
-dependencies = [
- "cyberware-modkit-odata",
- "heck 0.5.0",
- "proc-macro-error2",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
- "trybuild",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-sdk"
-version = "0.6.5"
-dependencies = [
- "chrono",
- "cyberware-modkit-odata",
- "cyberware-modkit-odata-macros",
- "cyberware-modkit-security",
- "futures-core",
- "futures-util",
- "pin-project-lite",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-security"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "postcard",
- "secrecy",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-transport-grpc"
-version = "0.6.4"
-dependencies = [
- "anyhow",
- "cyberware-modkit-security",
- "rand 0.10.1",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tracing",
-]
-
-[[package]]
-name = "cyberware-modkit-utils"
-version = "0.6.3"
-dependencies = [
- "humantime",
- "regex",
- "secrecy",
- "serde",
- "serde_json",
- "temp-env",
- "zeroize",
-]
-
-[[package]]
-name = "cyberware-module-orchestrator"
-version = "0.1.25"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "cyberware-api-gateway",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-system-sdks",
- "inventory",
- "parking_lot",
- "serde",
- "serde_json",
- "tokio",
- "tonic",
- "tower",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-nodes-registry"
-version = "0.1.25"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "chrono",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-macros",
- "cyberware-modkit-node-info",
- "cyberware-nodes-registry-sdk",
- "inventory",
- "serde",
- "thiserror 2.0.18",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-nodes-registry-sdk"
-version = "0.1.21"
-dependencies = [
- "async-trait",
- "cyberware-modkit-node-info",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-oagw"
-version = "0.2.25"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-stream",
- "async-trait",
- "axum",
- "bytes",
- "cyberware-authz-resolver-sdk",
- "cyberware-credstore-sdk",
- "cyberware-modkit",
- "cyberware-modkit-auth",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-http",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-oagw",
- "cyberware-oagw-sdk",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "dashmap",
- "form_urlencoded",
- "futures",
- "futures-util",
- "gts",
- "heck 0.5.0",
- "http",
- "http-body-util",
- "httparse",
- "httpmock",
- "hyper",
- "hyper-util",
- "inventory",
- "mime",
- "opentelemetry",
- "opentelemetry_sdk",
- "parking_lot",
- "pingora-core",
- "pingora-http",
- "pingora-load-balancing",
- "pingora-memory-cache",
- "pingora-proxy",
- "psl",
- "rcgen",
- "rustls",
- "rustls-pki-types",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tokio-rustls",
- "tower",
- "tracing",
- "url",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-oagw-sdk"
-version = "0.5.1"
-dependencies = [
- "async-openai",
- "async-trait",
- "axum",
- "bytes",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-security",
- "futures-core",
- "futures-util",
- "http",
- "http-body",
- "http-body-util",
- "octocrab",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tower",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-oidc-authn-plugin"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.22.1",
- "criterion",
- "cyberware-authn-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "dashmap",
- "hex",
- "httpdate",
- "httpmock",
- "humantime",
- "inventory",
- "jsonwebtoken",
- "opentelemetry",
- "opentelemetry_sdk",
- "parking_lot",
- "rand 0.10.1",
- "rcgen",
- "regex",
- "reqwest 0.13.3",
- "secrecy",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sha2",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-resource-group"
-version = "0.1.3"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-resource-group-sdk",
- "cyberware-types-registry-sdk",
- "gts",
- "http",
- "http-body-util",
- "inventory",
- "jsonschema",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tower",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-resource-group-sdk"
-version = "0.1.3"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-odata",
- "cyberware-modkit-odata-macros",
- "cyberware-modkit-sdk",
- "cyberware-modkit-security",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-rg-tr-plugin"
-version = "0.1.3"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-resource-group-sdk",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "futures",
- "inventory",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-rustls-corecrypto-provider"
-version = "0.1.0"
-dependencies = [
- "core-foundation 0.10.1",
- "core-foundation-sys",
- "hex",
- "pkcs8",
- "rcgen",
- "rsa",
- "rustls",
- "sec1",
- "security-framework 3.7.0",
- "security-framework-sys",
- "sha2",
- "subtle",
- "temp-env",
- "tempfile",
- "thiserror 2.0.18",
- "tracing",
- "zeroize",
-]
-
-[[package]]
-name = "cyberware-rustls-fips-shim"
-version = "0.1.0"
-dependencies = [
- "hyper-rustls",
- "rustls",
-]
-
-[[package]]
-name = "cyberware-simple-user-settings"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-simple-user-settings-sdk",
- "inventory",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tower",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-simple-user-settings-sdk"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "time",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-single-tenant-tr-plugin"
-version = "0.1.22"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-static-authn-plugin"
-version = "0.3.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-authn-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "secrecy",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-static-authz-plugin"
-version = "0.1.20"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-static-credstore-plugin"
-version = "0.1.18"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-credstore-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde-saphyr 0.0.22",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-static-idp-plugin"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-account-management-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-types-registry-sdk",
- "gts",
- "inventory",
- "parking_lot",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-static-tr-plugin"
-version = "0.1.21"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-system-sdk-directory"
-version = "0.1.35"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit-transport-grpc",
- "prost",
- "tokio",
- "tonic",
- "tonic-prost",
- "tonic-prost-build",
- "tracing",
-]
-
-[[package]]
-name = "cyberware-system-sdks"
-version = "0.1.35"
-dependencies = [
- "cyberware-system-sdk-directory",
-]
-
-[[package]]
-name = "cyberware-tenant-resolver"
-version = "0.1.21"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-tenant-resolver-sdk"
-version = "0.3.6"
-dependencies = [
- "async-trait",
- "cyberware-modkit",
- "cyberware-modkit-gts",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "gts",
- "gts-macros",
- "schemars 1.2.1",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-tr-authz-plugin"
-version = "0.1.3"
-dependencies = [
- "anyhow",
- "async-trait",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-macros",
- "cyberware-modkit-security",
- "cyberware-tenant-resolver-sdk",
- "cyberware-types-registry-sdk",
- "inventory",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-types-registry"
-version = "0.1.22"
-dependencies = [
- "anyhow",
- "async-trait",
- "axum",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-gts",
- "cyberware-modkit-macros",
- "cyberware-modkit-utils",
- "cyberware-types-registry-sdk",
- "gts",
- "inventory",
- "lru 0.16.4",
- "parking_lot",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-types-registry-sdk"
-version = "0.2.2"
-dependencies = [
- "async-trait",
- "gts",
- "serde_json",
- "thiserror 2.0.18",
- "uuid",
 ]
 
 [[package]]
@@ -10219,17 +10219,17 @@ dependencies = [
  "anyhow",
  "async-trait",
  "axum",
- "cyberware-api-gateway",
- "cyberware-authz-resolver-sdk",
- "cyberware-modkit",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-http",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-sdk",
- "cyberware-modkit-security",
+ "cf-gears-api-gateway",
+ "cf-gears-authz-resolver-sdk",
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-http",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-sdk",
+ "cf-gears-toolkit-security",
  "futures-util",
  "http",
  "httpmock",
@@ -10262,11 +10262,11 @@ name = "users-info-sdk"
 version = "0.6.1"
 dependencies = [
  "async-trait",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-odata",
- "cyberware-modkit-odata-macros",
- "cyberware-modkit-sdk",
- "cyberware-modkit-security",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-odata-macros",
+ "cf-gears-toolkit-sdk",
+ "cf-gears-toolkit-security",
  "futures",
  "futures-core",
  "time",
@@ -10279,17 +10279,17 @@ name = "users-info-server"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "cf-gears-api-gateway",
+ "cf-gears-authn-resolver",
+ "cf-gears-authz-resolver",
+ "cf-gears-grpc-hub",
+ "cf-gears-single-tenant-tr-plugin",
+ "cf-gears-static-authn-plugin",
+ "cf-gears-static-authz-plugin",
+ "cf-gears-tenant-resolver",
+ "cf-gears-toolkit",
+ "cf-gears-types-registry",
  "clap",
- "cyberware-api-gateway",
- "cyberware-authn-resolver",
- "cyberware-authz-resolver",
- "cyberware-grpc-hub",
- "cyberware-modkit",
- "cyberware-single-tenant-tr-plugin",
- "cyberware-static-authn-plugin",
- "cyberware-static-authz-plugin",
- "cyberware-tenant-resolver",
- "cyberware-types-registry",
  "tokio",
  "tracing",
  "users-info",

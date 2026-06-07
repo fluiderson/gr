@@ -151,19 +151,19 @@ jobs:
             echo "sccache failed, falling back to plain rustc"
           fi
 
-      - name: UI tests for modkit macros libraries
+      - name: UI tests for toolkit macros libraries
         run: make test-macros
 
       - name: Test users_info with Postgres (integration)
         run: make test-users-info-pg
 
-      - name: Test modkit-db (sqlite integration)
+      - name: Test toolkit-db (sqlite integration)
         run: make test-sqlite
 
-      - name: Test modkit-db (pg integration)
+      - name: Test toolkit-db (pg integration)
         run: make test-pg
 
-      - name: Test modkit-db (mysql integration)
+      - name: Test toolkit-db (mysql integration)
         run: make test-mysql
 
   test-fips:
@@ -236,7 +236,7 @@ jobs:
           fi
 
       # Linux: aws-lc-fips path via the existing make target
-      # (cyberware-modkit + cyberware-modkit-http, bootstrap + fips).
+      # (cf-gears-toolkit + cf-gears-toolkit-http, bootstrap + fips).
       - name: FIPS tests (Linux / aws-lc-fips)
         if: runner.os == 'Linux'
         shell: bash
@@ -247,15 +247,15 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          cargo test -p cyberware-rustls-corecrypto-provider --features fips
-          cargo test -p cyberware-modkit-http --features fips
+          cargo test -p cf-gears-rustls-corecrypto-provider --features fips
+          cargo test -p cf-gears-toolkit-http --features fips
 
       # Windows: build-verify the CNG provider path. Compile-only is sufficient —
       # runtime FIPS execution depends on host FIPS-mode policy (see ADR 0003).
       - name: FIPS build check (Windows / CNG)
         if: runner.os == 'Windows'
         shell: bash
-        run: cargo check --target x86_64-pc-windows-msvc -p cyberware-modkit-http --features fips
+        run: cargo check --target x86_64-pc-windows-msvc -p cf-gears-toolkit-http --features fips
 
   cypilot:
     name: Cypilot

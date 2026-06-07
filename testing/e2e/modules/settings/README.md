@@ -33,19 +33,19 @@ This directory contains end-to-end tests for the settings module REST API.
 Run all settings tests:
 ```bash
 E2E_BASE_URL=http://localhost:8087 \
-  testing/e2e/.venv/bin/python -m pytest testing/e2e/modules/settings -vv
+  testing/e2e/.venv/bin/python -m pytest testing/e2e/gears/settings -vv
 ```
 
 Run specific test file:
 ```bash
 E2E_BASE_URL=http://localhost:8087 \
-  testing/e2e/.venv/bin/python -m pytest testing/e2e/modules/settings/test_settings_get.py -vv
+  testing/e2e/.venv/bin/python -m pytest testing/e2e/gears/settings/test_settings_get.py -vv
 ```
 
 Run specific test:
 ```bash
 E2E_BASE_URL=http://localhost:8087 \
-  testing/e2e/.venv/bin/python -m pytest testing/e2e/modules/settings/test_settings_patch.py::test_patch_settings_theme_only -vv
+  testing/e2e/.venv/bin/python -m pytest testing/e2e/gears/settings/test_settings_patch.py::test_patch_settings_theme_only -vv
 ```
 
 ### With authentication
@@ -53,7 +53,7 @@ E2E_BASE_URL=http://localhost:8087 \
 ```bash
 E2E_BASE_URL=http://localhost:8087 \
 E2E_AUTH_TOKEN=your_token_here \
-  testing/e2e/.venv/bin/python -m pytest testing/e2e/modules/settings -vv
+  testing/e2e/.venv/bin/python -m pytest testing/e2e/gears/settings -vv
 ```
 
 ## Test Coverage

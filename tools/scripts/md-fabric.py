@@ -41,14 +41,14 @@ _RECTPACK_ALGOS: tuple[Any, ...] = (
 
 _CATEGORY_STYLE: dict[str, tuple[str, str, str]] = {
     "cypilot": ("rgba(110,60,210,0.06)",  "rgba(110,60,210,0.30)",  "rgba(90,45,190,0.85)"),
-    "modkit":  ("rgba(200,100,10,0.06)",  "rgba(200,100,10,0.30)",  "rgba(165,80,5,0.85)"),
+    "toolkit":  ("rgba(200,100,10,0.06)",  "rgba(200,100,10,0.30)",  "rgba(165,80,5,0.85)"),
     "modules": ("rgba(20,145,60,0.06)",   "rgba(20,145,60,0.30)",   "rgba(10,115,40,0.85)"),
     "other":   ("rgba(100,100,100,0.04)", "rgba(100,100,100,0.20)", "rgba(60,60,60,0.75)"),
 }
 
 _NODE_COLORS: dict[str, dict[str, str]] = {
     "cypilot": {"background": "#f4eeff", "border": "#7744cc"},
-    "modkit":  {"background": "#fff5e6", "border": "#c07000"},
+    "toolkit":  {"background": "#fff5e6", "border": "#c07000"},
     "modules": {"background": "#edfff4", "border": "#28a060"},
     "other":   {"background": "#f4f4f4", "border": "#888888"},
 }
@@ -2478,7 +2478,7 @@ const options = {{
     documents:  {{ color: {{ background: "#eaf3ff", border: "#3572b0" }} }},
     others:     {{ color: {{ background: "#eeeeee", border: "#777777" }} }},
     cypilot:    {{ color: {{ background: "#f4eeff", border: "#7744cc" }} }},
-    modkit:     {{ color: {{ background: "#fff5e6", border: "#c07000" }} }},
+    toolkit:     {{ color: {{ background: "#fff5e6", border: "#c07000" }} }},
     modules:    {{ color: {{ background: "#edfff4", border: "#28a060" }} }},
     other:      {{ color: {{ background: "#f4f4f4", border: "#888888" }} }},
   }},

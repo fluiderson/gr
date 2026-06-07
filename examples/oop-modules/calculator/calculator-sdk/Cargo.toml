@@ -12,12 +12,12 @@ build = "build.rs"
 # Core dependencies for API trait
 async-trait = { workspace = true }
 thiserror = { workspace = true }
-modkit-security = { workspace = true }
+toolkit-security = { workspace = true }
 
 # gRPC transport dependencies
-modkit-transport-grpc = { workspace = true }
-modkit = { workspace = true }
-cyberware-system-sdks = { workspace = true, features = ["directory"] }
+toolkit-transport-grpc = { workspace = true }
+toolkit = { workspace = true }
+cf-gears-system-sdks = { workspace = true, features = ["directory"] }
 tonic = { workspace = true, features = ["transport"] }
 tonic-prost = { workspace = true }
 prost = { workspace = true }

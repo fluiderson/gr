@@ -9,9 +9,9 @@ use anyhow::Result;
 use async_trait::async_trait;
 use axum::Router;
 
-use modkit::api::OpenApiRegistry;
-use modkit::context::ModuleCtx;
-use modkit::contracts::RestApiCapability;
+use toolkit::api::OpenApiRegistry;
+use toolkit::context::ModuleCtx;
+use toolkit::contracts::RestApiCapability;
 
 use crate::api::rest::routes;
 use crate::domain::Service;
@@ -20,7 +20,7 @@ use crate::domain::Service;
 ///
 /// Exposes a REST API delegating to calculator service.
 /// Registers Service in ClientHub for SDK consumers to access.
-#[modkit::module(
+#[toolkit::module(
     name = "calculator-gateway",
     capabilities = [rest],
     deps = ["calculator"]
@@ -34,7 +34,7 @@ impl Default for CalculatorGateway {
 }
 
 #[async_trait]
-impl modkit::Module for CalculatorGateway {
+impl toolkit::Module for CalculatorGateway {
     async fn init(&self, ctx: &ModuleCtx) -> Result<()> {
         // Create domain service with ClientHub for dependency resolution
         let service = Arc::new(Service::new(ctx.client_hub()));

@@ -6,10 +6,10 @@
 use std::sync::Arc;
 
 use calculator_sdk::CalculatorClientV1;
-use modkit::client_hub::ClientHub;
-use modkit_macros::domain_model;
-use modkit_security::SecurityContext;
 use tokio::sync::OnceCell;
+use toolkit::client_hub::ClientHub;
+use toolkit_macros::domain_model;
+use toolkit_security::SecurityContext;
 use tracing::{debug, instrument};
 
 /// Error type for Service operations.
@@ -60,7 +60,7 @@ impl Service {
             .get_or_try_init(|| async {
                 let directory = self
                     .client_hub
-                    .get::<dyn modkit::DirectoryClient>()
+                    .get::<dyn toolkit::DirectoryClient>()
                     .map_err(|e| {
                         ServiceError::Internal(format!("DirectoryClient not available: {}", e))
                     })?;

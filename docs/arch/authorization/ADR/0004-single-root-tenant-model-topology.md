@@ -1,14 +1,14 @@
 ---
 status: accepted
 date: 2026-04-17
-decision-makers: Cyber Fabric Architects Committee
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Adopt Single-Root Tree Topology for the Tenant Model
 
 ## Context and Problem Statement
 
-Cyber Ware models its tenants hierarchically. Modules rely on that hierarchy for ownership scoping, subtree queries in the Secure ORM, barrier enforcement, and resolution of "act as" semantics in service-to-service (S2S) flows. Before committing to a particular shape we must choose the canonical topology and record the reasoning.
+Gears model its tenants hierarchically. Modules rely on that hierarchy for ownership scoping, subtree queries in the Secure ORM, barrier enforcement, and resolution of "act as" semantics in service-to-service (S2S) flows. Before committing to a particular shape we must choose the canonical topology and record the reasoning.
 
 Three shapes were considered:
 
@@ -19,7 +19,7 @@ Three shapes were considered:
 The choice affects several concrete engineering concerns:
 
 - **S2S tenant-scoped OAuth credentials.** Some services do not expose tenant-less objects — every object they manage has a tenant owner — yet they still need to perform calls under the top-level tenant while obeying the standard tenant-scoped authorization machinery. Such calls are authenticated via an OAuth client registered at the vendor's IdP. The number of roots determines the number of OAuth clients that must be provisioned and routed between. (Operations on tenant-less objects use a different flow and are outside the scope of this decision.)
-- **Deployment shape.** The platform must work both for multi-tenant vendor deployments and for single-user consumer products built on Cyber Ware. The same tenant topology must be interpretable in both.
+- **Deployment shape.** The platform must work both for multi-tenant vendor deployments and for single-user consumer products built on Gears. The same tenant topology must be interpretable in both.
 - **Reasoning and tooling cost.** Closure tables, barriers, and `get_ancestors` / `get_descendants` semantics are substantially simpler for a tree than for a DAG.
 
 ## Decision Drivers
@@ -29,7 +29,7 @@ The choice affects several concrete engineering concerns:
 - **Operator mental model** — The topology should be easy to reason about for both platform operators and module authors.
 - **Avoid DAG complexity** — Closure-table maintenance, conflicting barriers, and ancestry queries on a DAG add substantial complexity without a concrete use case demanding them today.
 - **Autonomy of business sub-trees** — Multi-tenant deployments must be able to host independent organizations with strong isolation.
-- **Support consumer / single-user deployments** — Products built on Cyber Ware for a single end user must not be forced to invent an artificial second tenant just to satisfy topology rules.
+- **Support consumer / single-user deployments** — Products built on Gears for a single end user must not be forced to invent an artificial second tenant just to satisfy topology rules.
 
 ## Considered Options
 
@@ -44,7 +44,7 @@ Chosen option: **Option A — Single-root tree**, because it gives us a single c
 **Interpretation by deployment shape:**
 
 - **Multi-tenant deployment.** Independent organizations are modelled as *sub-roots* directly under the root. The root itself holds no business objects; it acts as a structural anchor.
-- **Single-user / consumer deployment of a Cyber Ware -based product.** The root *is* the tenant that owns all business objects. No sub-roots are created.
+- **Single-user / consumer deployment of a Gears -based product.** The root *is* the tenant that owns all business objects. No sub-roots are created.
 
 Both shapes satisfy the same topology invariant: the hierarchy has exactly one tenant with `parent_id = NULL`. What differs is whether business objects live on the root or only below it.
 

@@ -8,7 +8,7 @@ Usage:
         [--tracked-team-name NAME] [--min-module-net-loc N] \
         [--skip-review-turnaround] [owner/repo]
 
-Default repo: cyberfabric/cyberware-rust
+Default repo: constructorfabric/gears-rust
 Requires: gh CLI installed and authenticated.
 
 Tracked team membership:
@@ -35,7 +35,7 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
-DEFAULT_REPO = "cyberfabric/cyberware-rust"
+DEFAULT_REPO = "constructorfabric/gears-rust"
 DEFAULT_EXCLUDE_LABELS = ["pr-issue"]
 
 # Accounts to filter out of human tables

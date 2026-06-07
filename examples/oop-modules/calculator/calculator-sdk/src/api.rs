@@ -3,7 +3,7 @@
 //! Contract trait and types for the calculator service.
 
 use async_trait::async_trait;
-use modkit_security::SecurityContext;
+use toolkit_security::SecurityContext;
 
 /// Calculator API trait (Version 1)
 ///

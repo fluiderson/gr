@@ -4,7 +4,7 @@
 # allowing us to test the route_policies middleware.
 
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 database:
   servers:
@@ -21,7 +21,7 @@ database:
 logging:
   default:
     console_level: info
-    file: "logs/cyberware-scope-e2e.log"
+    file: "logs/cf-gears-scope-e2e.log"
     file_level: debug
 
 modules:
@@ -32,7 +32,7 @@ modules:
       cors_enabled: false
 
       openapi:
-        title: "Cyber Ware Server API - Scope Enforcement E2E"
+        title: "CF/Gears Server API - Scope Enforcement E2E"
         version: "0.1.0"
 
       defaults:
@@ -66,11 +66,11 @@ modules:
   # AuthN pipeline - validates bearer tokens
   authn-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   static-authn-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       mode: static_tokens
       # Define tokens with specific scopes for testing
@@ -109,21 +109,21 @@ modules:
   # AuthZ pipeline
   authz-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   static-authz-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
 
   # Tenant resolver
   tenant-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   static-tr-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 20
       tenants:
         - id: "00000000-df51-5b42-9538-d2b56b7ee953"
@@ -134,12 +134,12 @@ modules:
   types-registry:
     config: {}
 
-  # File parser module (required by cyberware-server)
+  # File parser module (required by cf-gears-server)
   file-parser:
     config:
       allowed_local_base_dir: /tmp
 
-  # Simple user settings module (required by cyberware-server)
+  # Simple user settings module (required by cf-gears-server)
   simple-user-settings:
     database:
       server: "sqlite_users"

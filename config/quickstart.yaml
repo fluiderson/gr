@@ -1,10 +1,10 @@
 # Updated: 2026-04-16 by Constructor Tech
-# Cyber Ware Example Server Configuration
+# CF/Gears Example Server Configuration
 #
 # Database Architecture Overview:
 # ===============================
 #
-# Cyber Ware example server uses a centralized DbManager that:
+# CF/Gears example server uses a centralized DbManager that:
 # 1. Loads global database server templates from `database.servers`
 # 2. For each module, merges server template with module-specific overrides
 # 3. Creates isolated database connections per module
@@ -19,7 +19,7 @@
 
 # Core server configuration (global section)
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 # Database configuration (DbManager architecture)
 #
@@ -65,7 +65,7 @@ logging:
   # global section
   default:
     console_level: info
-    file: "logs/cyberware.log"
+    file: "logs/cf-gears.log"
     file_level: info
     max_age_days: 28
     max_backups: 3
@@ -91,12 +91,12 @@ modules:
       bind_addr: "127.0.0.1:8087"
       enable_docs: true
       cors_enabled: false
-      prefix_path: "/cw"
+      prefix_path: "/cf"
       # OpenAPI Documentation Configuration
       openapi:
-        title: "Cyber Ware Example Server API"
+        title: "CF/Gears Example Server API"
         version: "0.1.0"
-        description: "Cyber Ware Example Server API Documentation"
+        description: "CF/Gears Example Server API Documentation"
       defaults:
         body_limit_bytes: 64000000
         rate_limit:
@@ -115,22 +115,22 @@ modules:
   grpc-hub:
     config:
       # Use ephemeral port; OoP modules receive the actual bound address from master host
-      listen_addr: "uds:///tmp/cyberware-grpc"
+      listen_addr: "uds:///tmp/cf-gears-grpc"
 
   # AuthN pipeline - used when auth_disabled: false.
   # AuthZ pipeline - used always (with default root SecurityContext when auth is disabled).
   # Requires --features static-authn,static-authz for the static plugins.
   authn-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   authz-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   static-authn-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       mode: accept_all
       s2s_credentials:
@@ -139,7 +139,7 @@ modules:
 
   static-authz-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
 
   account-management:
@@ -166,7 +166,7 @@ modules:
         # the silent `NoopIdpProvider` fallback that returns 501. AM's
         # `deps = [...]` does not name `static-idp-plugin` directly (AM
         # is plugin-impl-agnostic), so without `idp.required=true` the
-        # ModKit topo-sort could initialise AM before the plugin and
+        # ToolKit topo-sort could initialise AM before the plugin and
         # leave it serving 501s for the lifetime of the process. With
         # `required=true` AM aborts startup loud and fast if it can't
         # see the plugin — the operator then knows to investigate
@@ -250,7 +250,7 @@ modules:
       server: "sqlite_users"               # Inherits params and pool settings from sqlite_users
 
       # Module-specific database file (required for SQLite modules)
-      file: "users_info.db"                # Creates: ~/.cyberfabric/users_info/users_info.db
+      file: "users_info.db"                # Creates: ~/.cf-gears/users_info/users_info.db
 
       # Module can override server settings:
       # params:
@@ -279,15 +279,15 @@ modules:
 
   tenant-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
   static-tr-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 20
       # Tenant tree configuration (example: company with 2 divisions, each with departments)
       tenants:
         # Root tenant — structural anchor, also used by auth-disabled mode
-        # (must match DEFAULT_TENANT_ID in modkit-security). The tenant tree
+        # (must match DEFAULT_TENANT_ID in toolkit-security). The tenant tree
         # has exactly one root.
         - id: "00000000-df51-5b42-9538-d2b56b7ee953"
           name: "default"
@@ -349,11 +349,11 @@ modules:
 opentelemetry:
   # Shared resource identity (attached to all traces and metrics)
   resource:
-    service_name: "cyberware-api"
+    service_name: "cf-gears-api"
     attributes:
       service.version: "1.3.7"
       deployment.environment: "dev"
-      service.namespace: "cyberware"
+      service.namespace: "cf-gears"
 
   # Default exporter shared by tracing and metrics.
   # Per-signal `exporter` fields override this when present.
@@ -408,11 +408,11 @@ opentelemetry:
 #     main_postgres:
 #       host: "localhost"
 #       port: 5432
-#       user: "cyberware"
+#       user: "cf_gears"
 #       password: "${POSTGRES_PASSWORD}"  # From environment variable
 #       params:
 #         sslmode: "require"
-#         application_name: "cyberware"
+#         application_name: "cf_gears"
 #       pool:
 #         max_conns: 20
 #         acquire_timeout: "30s"

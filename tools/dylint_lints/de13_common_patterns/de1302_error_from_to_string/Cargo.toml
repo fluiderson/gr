@@ -3,7 +3,7 @@
 [package]
 name = "de1302_error_from_to_string"
 version = "0.1.0"
-authors = ["Cyber Fabric"]
+authors = ["Constructor Fabric"]
 description = "Calling .to_string() in From<XxxError> impls destroys the error chain (DE1302)"
 edition.workspace = true
 publish = false

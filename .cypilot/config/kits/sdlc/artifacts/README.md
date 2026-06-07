@@ -1,6 +1,6 @@
-# Cyber Ware SDLC — Artifacts
+# CF/Gears SDLC — Artifacts
 
-This directory contains Cypilot kit templates/checklists/examples for Cyber Ware.
+This directory contains Cypilot kit templates/checklists/examples for CF/Gears.
 
 KINDs:
 - `PRD`

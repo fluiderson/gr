@@ -1,6 +1,6 @@
 // simulated_dir=modules/simple-resource-registry/simple-resource-registry/src/api/rest
 
-use modkit::api::OperationBuilder;
+use toolkit::api::OperationBuilder;
 
 const INVALID_TAG: &str = "simple resource registry";
 

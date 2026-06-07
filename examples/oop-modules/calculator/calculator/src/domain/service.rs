@@ -3,7 +3,7 @@
 //!
 //! Contains the core business logic for accumulator operations.
 
-use modkit_macros::domain_model;
+use toolkit_macros::domain_model;
 use tracing::debug;
 
 /// Domain service that performs accumulator operations.

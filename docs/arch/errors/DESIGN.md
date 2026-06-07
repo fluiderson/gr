@@ -4,7 +4,7 @@
 
 ### 1.1 Architectural Vision
 
-The canonical error system provides a single, universal error type (`CanonicalError`) that all Cyber Ware modules use to express failures. It replaces the ad-hoc `Problem::new()` / `ErrDef` / `declare_errors!` / `ErrorCode` patterns with a typed, transport-agnostic model.
+The canonical error system provides a single, universal error type (`CanonicalError`) that all Gears use to express failures. It replaces the ad-hoc `Problem::new()` / `ErrDef` / `declare_errors!` / `ErrorCode` patterns with a typed, transport-agnostic model.
 
 **Canonical errors** are a closed set of 16 error categories (based on Google's canonical error codes). Each category has:
 - A typed context struct carrying machine-readable error details
@@ -31,7 +31,7 @@ async fn process_data() -> Result<Data, CanonicalError> {
 }
 
 // 3. Resource-scoped error construction
-use modkit_canonical_errors::resource_error;
+use toolkit_canonical_errors::resource_error;
 
 #[resource_error("gts.cf.core.users.user.v1~")]
 struct UserResourceError;
@@ -54,7 +54,7 @@ let validation_err = UserResourceError::invalid_argument()
 **Resource-scoped errors** are a convenience layer for module-owned resources. The `#[resource_error]` attribute macro declares a resource type and generates constructors that auto-tag every error with the resource's GTS identity:
 
 ```rust
-use modkit_canonical_errors::resource_error;
+use toolkit_canonical_errors::resource_error;
 
 #[resource_error("gts.cf.core.users.user.v1~")]
 struct UserResourceError;
@@ -238,7 +238,7 @@ Every error response consists of **contract parts** (fixed per category) and **v
 - `trace_id`
 - Context field values
 
-**Breaking changes** (require major version bump of `cyberware-modkit-errors`):
+**Breaking changes** (require major version bump of `cf-gears-toolkit-errors`):
 - Removing or renaming a canonical category
 - Changing the context type associated with a category
 - Removing or renaming a field in a context type schema
@@ -257,7 +257,7 @@ Every error response consists of **contract parts** (fixed per category) and **v
 Resource types are declared via the `#[resource_error]` attribute macro that associates a GTS identifier with a named type. The macro generates error constructors for 13 canonical categories (all except `internal`, `service_unavailable`, and `unauthenticated`, which are not resource-scoped), and tags every generated constructor with `resource_type` automatically.
 
 ```rust
-use modkit_canonical_errors::resource_error;
+use toolkit_canonical_errors::resource_error;
 
 #[resource_error("gts.cf.core.users.user.v1~")]
 struct UserResourceError;
@@ -279,7 +279,7 @@ async fn get_user(Path(id): Path<String>) -> Result<Json<User>, CanonicalError> 
 
 **Technology**: Rust enums, GTS
 
-**Location**: [`libs/modkit-canonical-errors/src/`](../../../libs/modkit-canonical-errors/src/)
+**Location**: [`libs/toolkit-canonical-errors/src/`](../../../libs/toolkit-canonical-errors/src/)
 
 **Core Entities**:
 
@@ -293,7 +293,7 @@ async fn get_user(Path(id): Path<String>) -> Result<Json<User>, CanonicalError> 
 
 ```text
 ┌─────────────────────────────────────────────────┐
-│  libs/modkit-errors                             │
+│  libs/toolkit-errors                             │
 │  ┌───────────────┐  ┌─────────────────────────┐ │
 │  │ CanonicalError│  │ Context Types           │ │
 │  │ (16 variants) │──│ Validation, ResourceInfo│ │
@@ -307,7 +307,7 @@ async fn get_user(Path(id): Path<String>) -> Result<Json<User>, CanonicalError> 
 │  │ → Problem       │  for Problem               │
 │  └─────────────────┘                            │
 ├─────────────────────────────────────────────────┤
-│  libs/modkit-canonical-errors-macro              │
+│  libs/toolkit-canonical-errors-macro              │
 │  ┌──────────────────────┐                       │
 │  │ #[resource_error]    │ macro                 │
 │  └──────────────────────┘                       │
@@ -582,7 +582,7 @@ UserResourceError::permission_denied(d)     .with_reason(r).create()
 **Direct canonical error instantiation**:
 
 ```rust
-use modkit_canonical_errors::resource_error;
+use toolkit_canonical_errors::resource_error;
 
 #[resource_error("gts.cf.core.users.user.v1~")]
 struct UserResourceError;
@@ -595,7 +595,7 @@ let err = UserResourceError::invalid_argument()
 **Resource-scoped error instantiation**:
 
 ```rust
-use modkit_canonical_errors::resource_error;
+use toolkit_canonical_errors::resource_error;
 
 #[resource_error("gts.cf.core.users.user.v1~")]
 struct UserResourceError;
@@ -674,7 +674,7 @@ The `trace_id` and `instance` fields are **not** set by handler code. They are i
 **Middleware implementation example**:
 
 ```rust
-use cf_modkit_errors::{CanonicalError, Problem};
+use cf_toolkit_errors::{CanonicalError, Problem};
 use axum::http::Uri;
 
 // In error middleware layer:
@@ -742,7 +742,7 @@ Not applicable. Errors are transient in-memory values. No persistent storage.
 |------|------|-----------|-----------------|
 | 1. Compile-time | `cargo build` | Typed enum variants, exhaustive `match`, `#[resource_error]` macro, `GtsSchema` const, Dylint lint rules (`dylint_lints/`), `#[non_exhaustive]` on enum + variants, `pub(crate)` internal constructors | Wrong context type, missing match arm, GTS typos, direct `Problem` construction, legacy error patterns, direct variant construction, bypassing builder API |
 | 2. Test-time | `cargo test` | Showcase tests with `assert_eq!` on full Problem JSON per category; JSON Schema equality assertions per context type | Field renames, default message changes, status code changes, schema drift |
-| 3. CI-time | PR merge gate | `cargo-semver-checks` on `cyberware-modkit-errors`; schema file diffing; snapshot CI gate | Removed types, changed signatures, schema evolution |
+| 3. CI-time | PR merge gate | `cargo-semver-checks` on `cf-gears-toolkit-errors`; schema file diffing; snapshot CI gate | Removed types, changed signatures, schema evolution |
 | 4. Design-time | Architecture | Single `Problem` conversion point; dedicated context constructors; `GtsSchema` generates schemas from types | Ad-hoc JSON construction, missing required fields, schema/code divergence |
 
 ## 4. Category Reference
@@ -956,5 +956,5 @@ All variants share the same structure: `{ ctx: ContextType, detail: String, reso
 
 - **PRD**: [PRD.md](./PRD.md)
 - **ADRs**: [ADR/](./ADR/)
-- **Existing implementation**: [`libs/modkit-canonical-errors/src/problem.rs`](../../../libs/modkit-canonical-errors/src/problem.rs)
+- **Existing implementation**: [`libs/toolkit-canonical-errors/src/problem.rs`](../../../libs/toolkit-canonical-errors/src/problem.rs)
 - **Supersedes**: PR #290 (`docs/unified-error-system/`)

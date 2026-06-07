@@ -1,14 +1,14 @@
 ---
 cypilot: true
 type: requirement
-name: ModKit Framework Compliance Review
+name: ToolKit Framework Compliance Review
 version: 1.0
-purpose: Verify that code changes follow ModKit architectural rules and invariants
+purpose: Verify that code changes follow ToolKit architectural rules and invariants
 ---
 
-# ModKit Framework Compliance Review
+# ToolKit Framework Compliance Review
 
-This review verifies that the pull request follows **ModKit architectural invariants and patterns**.
+This review verifies that the pull request follows **ToolKit architectural invariants and patterns**.
 
 It runs **in addition to the Rust PR review guidelines**.
 
@@ -16,7 +16,7 @@ Focus only on **framework-specific compliance**, not generic Rust style.
 
 ## Authoritative reference
 
-When a change touches module layout, `@/lib/modkit`*, plugins, REST wiring, ClientHub, OpenAPI, lifecycle/stateful tasks, SSE, or standardized HTTP errors, consult `docs/modkit_unified_system/README.md` — the canonical ModKit architecture document. Findings that contradict it take priority.
+When a change touches module layout, `@/lib/toolkit`*, plugins, REST wiring, ClientHub, OpenAPI, lifecycle/stateful tasks, SSE, or standardized HTTP errors, consult `docs/toolkit_unified_system/README.md` — the canonical ToolKit architecture document. Findings that contradict it take priority.
 
 ---
 
@@ -39,9 +39,9 @@ Do not repeat generic Rust findings.
 
 # Severity
 
-CRITICAL – breaks framework security model or architecture invariants  
-HIGH – breaks module architecture or integration contracts  
-MEDIUM – deviation from recommended ModKit patterns  
+CRITICAL – breaks framework security model or architecture invariants
+HIGH – breaks module architecture or integration contracts
+MEDIUM – deviation from recommended ToolKit patterns
 LOW – minor style / best practice
 
 ---
@@ -52,7 +52,7 @@ These rules apply to all modules.
 
 ---
 
-## MODKIT-CORE-001: SDK Pattern Enforcement
+## TOOLKIT-CORE-001: SDK Pattern Enforcement
 
 Public module APIs MUST be defined in `<module>-sdk` crates.
 
@@ -71,11 +71,11 @@ Violation examples:
 
 Why it matters:
 
-ModKit enforces transport-agnostic APIs and module isolation.
+ToolKit enforces transport-agnostic APIs and module isolation.
 
 ---
 
-## MODKIT-CORE-002: Module Layout Compliance
+## TOOLKIT-CORE-002: Module Layout Compliance
 
 Modules must follow the canonical structure.
 
@@ -103,14 +103,14 @@ Ensures separation of API, domain, and infrastructure.
 
 ---
 
-## MODKIT-CORE-003: Module Naming Convention
+## TOOLKIT-CORE-003: Module Naming Convention
 
 Module names must be **kebab-case**.
 
 Check:
 
 - Folder names
-- `#[modkit::module(name = "...")]`
+- `#[toolkit::module(name = "...")]`
 
 Why it matters:
 
@@ -122,7 +122,7 @@ Naming consistency is enforced by CI and macros.
 
 ---
 
-## MODKIT-REST-001: OperationBuilder Usage
+## TOOLKIT-REST-001: OperationBuilder Usage
 
 All REST endpoints must be defined via `OperationBuilder`.
 
@@ -139,7 +139,7 @@ OperationBuilder guarantees compile-time completeness and OpenAPI correctness.
 
 ---
 
-## MODKIT-REST-002: Authentication Declaration
+## TOOLKIT-REST-002: Authentication Declaration
 
 Every endpoint must declare its auth posture.
 
@@ -154,7 +154,7 @@ Gateway middleware depends on this metadata.
 
 ---
 
-## MODKIT-REST-003: SecurityContext Extraction
+## TOOLKIT-REST-003: SecurityContext Extraction
 
 Handlers must receive `SecurityContext` via Axum extension.
 
@@ -181,7 +181,7 @@ AuthN is gateway responsibility.
 
 ---
 
-## MODKIT-ERR-001: RFC 9457 Problem Usage
+## TOOLKIT-ERR-001: RFC 9457 Problem Usage
 
 All REST errors must use `Problem`.
 
@@ -193,11 +193,11 @@ Check:
 
 Why it matters:
 
-ModKit standardizes error handling with RFC-9457.
+ToolKit standardizes error handling with RFC-9457.
 
 ---
 
-## MODKIT-ERR-002: Domain Error Separation
+## TOOLKIT-ERR-002: Domain Error Separation
 
 Domain errors must not contain transport logic.
 
@@ -219,7 +219,7 @@ DomainError → SDK Error → Problem
 
 ---
 
-## MODKIT-SEC-001: SecureConn Enforcement
+## TOOLKIT-SEC-001: SecureConn Enforcement
 
 All database access must go through `SecureConn`.
 
@@ -235,7 +235,7 @@ SecureConn enforces authorization constraints.
 
 ---
 
-## MODKIT-SEC-002: PolicyEnforcer Usage
+## TOOLKIT-SEC-002: PolicyEnforcer Usage
 
 Authorization must be handled through `PolicyEnforcer`.
 
@@ -254,7 +254,7 @@ Authorization decisions must come from PDP.
 
 ---
 
-## MODKIT-DB-001: Repository Pattern
+## TOOLKIT-DB-001: Repository Pattern
 
 Repository methods must accept `&impl DBRunner`.
 
@@ -265,7 +265,7 @@ Check:
 
 ---
 
-## MODKIT-DB-002: SQL Restrictions
+## TOOLKIT-DB-002: SQL Restrictions
 
 Raw SQL must only exist in migrations.
 
@@ -284,7 +284,7 @@ Database safety and migration discipline.
 
 ---
 
-## MODKIT-CLIENT-001: ClientHub Resolution
+## TOOLKIT-CLIENT-001: ClientHub Resolution
 
 Modules must communicate via ClientHub.
 
@@ -301,7 +301,7 @@ ctx.client_hub().get::<dyn MyModuleApi>()
 
 ---
 
-## MODKIT-CLIENT-002: Plugin Isolation
+## TOOLKIT-CLIENT-002: Plugin Isolation
 
 Regular modules must not depend on plugin modules.
 
@@ -316,7 +316,7 @@ Check:
 
 ---
 
-## MODKIT-ODATA-001: ODataFilterable Usage
+## TOOLKIT-ODATA-001: ODataFilterable Usage
 
 DTO filtering must use `ODataFilterable`.
 
@@ -331,7 +331,7 @@ Check:
 
 ---
 
-## MODKIT-LIFE-001: CancellationToken Usage
+## TOOLKIT-LIFE-001: CancellationToken Usage
 
 Background tasks must respect cancellation.
 
@@ -346,7 +346,7 @@ Check:
 
 ---
 
-## MODKIT-OOP-001: SDK Pattern for gRPC
+## TOOLKIT-OOP-001: SDK Pattern for gRPC
 
 Out-of-process modules must expose API via SDK crate.
 
@@ -371,7 +371,7 @@ Be suspicious of:
 
 # Review Philosophy
 
-ModKit prioritizes:
+ToolKit prioritizes:
 
 - module isolation
 - transport-agnostic APIs

@@ -1,7 +1,7 @@
 //! API trait and error types for CalculatorGateway
 
 use async_trait::async_trait;
-use modkit_security::SecurityContext;
+use toolkit_security::SecurityContext;
 
 /// Calculator Gateway API trait (Version 1)
 ///

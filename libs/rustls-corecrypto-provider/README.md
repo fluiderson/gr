@@ -1,4 +1,4 @@
-# cyberware-rustls-corecrypto-provider
+# cf-gears-rustls-corecrypto-provider
 
 A `rustls::crypto::CryptoProvider` backed by Apple **corecrypto** (the FIPS
 140-3 validated cryptographic module shipped inside macOS) via
@@ -127,7 +127,7 @@ Every `fips()` impl in this crate delegates to a single function,
 [`oe::fips_witness_ok()`](src/oe.rs). It returns `true` iff (a) the
 running macOS major is inside [`oe::SUPPORTED_OE_MACOS_MAJOR`] (today:
 `[12, 13, 14, 15]`), or (b) the override env-var
-[`oe::OE_OVERRIDE_ENV`] (`CYBERWARE_FIPS_OE_OVERRIDE`) is set. On any
+[`oe::OE_OVERRIDE_ENV`] (`CF_GEARS_FIPS_OE_OVERRIDE`) is set. On any
 other macOS version `fips_witness_ok()` returns `false` and so does
 every `fips()` impl in the crate; downstream `ClientConfig::fips()` /
 `ServerConfig::fips()` then honestly reflect the runtime witness rather
@@ -147,7 +147,7 @@ This mirrors `rustls-cng-crypto`'s pattern on Windows, where
 - **Cached.** The witness is computed once per process via
   `std::sync::OnceLock<bool>`. One `sysctlbyname` call total.
 
-Override semantics: `CYBERWARE_FIPS_OE_OVERRIDE=1` forces the witness
+Override semantics: `CF_GEARS_FIPS_OE_OVERRIDE=1` forces the witness
 to `true` on a macOS version that is *not* in the whitelist. Intended
 for CI on pre-release macOS while Apple's next corecrypto CMVP cert is
 pending. **Must never be set in production.**

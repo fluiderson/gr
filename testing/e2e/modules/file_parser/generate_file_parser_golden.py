@@ -129,7 +129,7 @@ def main():
     """Main entry point for the golden markdown generator."""
     # Determine paths
     script_dir = Path(__file__).parent
-    # testdata is at e2e/testdata, script is at e2e/modules/file-parser
+    # testdata is at e2e/testdata, script is at e2e/gears/file-parser
     testdata_dir = script_dir.parent.parent / "testdata"
     md_output_dir = testdata_dir / "md"
 

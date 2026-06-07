@@ -1,15 +1,15 @@
-// simulated_dir=/cyberfabric/modules/example/src/domain/
+// simulated_dir=/cf-gears/gears/example/src/domain/
 
 // Test: Domain structs WITH #[domain_model] should NOT trigger lint
 
 // For testing purposes, we define a dummy domain_model attribute
-// In real code, this comes from modkit_macros
+// In real code, this comes from toolkit_macros
 #[allow(dead_code)]
-mod modkit {
-    pub use modkit_macros::domain_model;
+mod toolkit {
+    pub use toolkit_macros::domain_model;
 }
 
-use modkit::domain_model;
+use toolkit::domain_model;
 
 // Should not trigger DE0309 - domain_model attribute
 #[domain_model]

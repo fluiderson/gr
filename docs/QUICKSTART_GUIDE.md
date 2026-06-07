@@ -1,6 +1,6 @@
-# Cyber Ware Server - Quickstart Guide
+# Gears Server - Quickstart Guide
 
-Start Cyber Ware example server and verify it works. For project overview, see [README.md](../README.md).
+Start Gears example server and verify it works. For project overview, see [README.md](../README.md).
 
 ---
 
@@ -15,7 +15,7 @@ make quickstart
 ```
 
 Server runs on `http://127.0.0.1:8087`.
-The example configuration also sets `modules.api-gateway.config.prefix_path: "/cw"` in `config/quickstart.yaml`, so API docs and endpoints are exposed under `/cw`.
+The example configuration also sets `modules.api-gateway.config.prefix_path: "/cf"` in `config/quickstart.yaml`, so API docs and endpoints are exposed under `/cf`.
 Change `prefix_path` if you want a different base path, or set it to an empty string to serve the API at the root.
 
 ---
@@ -33,30 +33,30 @@ curl -s http://127.0.0.1:8087/health
 
 ### Interactive Documentation
 
-Open <http://127.0.0.1:8087/cw/docs> in your browser for the full API reference with interactive testing.
+Open <http://127.0.0.1:8087/cf/docs> in your browser for the full API reference with interactive testing.
 
 ### OpenAPI Spec
 
 ```bash
-curl -s http://127.0.0.1:8087/cw/openapi.json > openapi.json
+curl -s http://127.0.0.1:8087/cf/openapi.json > openapi.json
 ```
 
 ### Module Examples
 
 Each module has a QUICKSTART.md with minimal curl examples:
 
-- [File Parser](../modules/file-parser/QUICKSTART.md) - Parse documents into structured blocks
-- [Nodes Registry](../modules/system/nodes-registry/QUICKSTART.md) - Hardware and system info
-- [Tenant Resolver](../modules/system/tenant-resolver/QUICKSTART.md) - Multi-tenant hierarchy
+- [File Parser](../gears/file-parser/QUICKSTART.md) - Parse documents into structured blocks
+- [Nodes Registry](../gears/system/nodes-registry/QUICKSTART.md) - Hardware and system info
+- [Tenant Resolver](../gears/system/tenant-resolver/QUICKSTART.md) - Multi-tenant hierarchy
 
-> **Note:** Module quickstarts show basic usage only. Use `/cw/docs` for complete API documentation in the example setup. This path is configurable via `api_gateway.prefix_path`.
+> **Note:** Module quickstarts show basic usage only. Use `/cf/docs` for complete API documentation in the example setup. This path is configurable via `api_gateway.prefix_path`.
 
 ---
 
 ## Stop the Server
 
 ```bash
-pkill -f cyberware-server
+pkill -f cf-gears-server
 ```
 
 ---
@@ -65,7 +65,7 @@ pkill -f cyberware-server
 
 | Issue | Solution |
 |-------|----------|
-| Port 8087 in use | `pkill -f cyberware-server` |
+| Port 8087 in use | `pkill -f cf-gears-server` |
 | Empty tenant-resolver | Use `make example` instead of `make quickstart` |
 | Connection refused | Server not running - check logs |
 
@@ -73,6 +73,6 @@ pkill -f cyberware-server
 
 ## Further Reading
 
-- [/cw/docs](http://127.0.0.1:8087/cw/docs) - Full API reference
+- [/cf/docs](http://127.0.0.1:8087/cf/docs) - Full API reference
 - [ARCHITECTURE_MANIFEST.md](ARCHITECTURE_MANIFEST.md) - Architecture principles
-- [MODKIT_UNIFIED_SYSTEM/README.md](./modkit_unified_system/README.md) - Module system
+- [TOOLKIT_UNIFIED_SYSTEM/README.md](./toolkit_unified_system/README.md) - Module system

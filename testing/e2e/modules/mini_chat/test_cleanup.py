@@ -406,18 +406,18 @@ def get_outbox_messages(queue_name: str, limit: int = 50) -> list[dict]:
     Checks both incoming (not yet sequenced) and outgoing (sequenced) tables
     because the sequencer runs asynchronously.
 
-    ModKit outbox schema:
-    - modkit_outbox_partitions: queue -> partition_id mapping
-    - modkit_outbox_incoming / modkit_outbox_outgoing: id, partition_id, body_id
-    - modkit_outbox_body: id, payload, payload_type, created_at
+    ToolKit outbox schema:
+    - toolkit_outbox_partitions: queue -> partition_id mapping
+    - toolkit_outbox_incoming / toolkit_outbox_outgoing: id, partition_id, body_id
+    - toolkit_outbox_body: id, payload, payload_type, created_at
     """
     # Query both incoming (not yet sequenced) and outgoing (sequenced).
     outgoing = query_db(
         """
         SELECT b.payload, b.payload_type, b.created_at
-        FROM modkit_outbox_outgoing o
-        JOIN modkit_outbox_body b ON o.body_id = b.id
-        JOIN modkit_outbox_partitions p ON o.partition_id = p.id
+        FROM toolkit_outbox_outgoing o
+        JOIN toolkit_outbox_body b ON o.body_id = b.id
+        JOIN toolkit_outbox_partitions p ON o.partition_id = p.id
         WHERE p.queue = ?
         ORDER BY b.created_at DESC LIMIT ?
         """,
@@ -426,9 +426,9 @@ def get_outbox_messages(queue_name: str, limit: int = 50) -> list[dict]:
     incoming = query_db(
         """
         SELECT b.payload, b.payload_type, b.created_at
-        FROM modkit_outbox_incoming i
-        JOIN modkit_outbox_body b ON i.body_id = b.id
-        JOIN modkit_outbox_partitions p ON i.partition_id = p.id
+        FROM toolkit_outbox_incoming i
+        JOIN toolkit_outbox_body b ON i.body_id = b.id
+        JOIN toolkit_outbox_partitions p ON i.partition_id = p.id
         WHERE p.queue = ?
         ORDER BY b.created_at DESC LIMIT ?
         """,
@@ -494,7 +494,7 @@ class TestCleanupWorkerDB:
         # regardless of processing state. Query it directly.
         import json
         all_bodies = query_db(
-            "SELECT payload FROM modkit_outbox_body ORDER BY id DESC LIMIT 50"
+            "SELECT payload FROM toolkit_outbox_body ORDER BY id DESC LIMIT 50"
         )
         found = False
         for row in all_bodies:
@@ -534,7 +534,7 @@ class TestCleanupWorkerDB:
         # Query outbox body table directly (durable, unaffected by handler processing).
         import json
         all_bodies = query_db(
-            "SELECT payload FROM modkit_outbox_body ORDER BY id DESC LIMIT 50"
+            "SELECT payload FROM toolkit_outbox_body ORDER BY id DESC LIMIT 50"
         )
         found = False
         for row in all_bodies:
@@ -612,7 +612,7 @@ class TestCleanupWorkerDB:
         # Query outbox body table directly.
         import json
         all_bodies = query_db(
-            "SELECT payload FROM modkit_outbox_body ORDER BY id DESC LIMIT 50"
+            "SELECT payload FROM toolkit_outbox_body ORDER BY id DESC LIMIT 50"
         )
         found = any(
             json.loads(row["payload"]).get("chat_id") == chat_id

@@ -1,12 +1,12 @@
 ---
 status: accepted
 date: 2026-05-14
-decision-makers: cyberware core team
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Workspace-level FIPS dependency policy via cargo-deny
 
-**ID**: `cpt-modkit-adr-fips-dependency-policy`
+**ID**: `cpt-toolkit-adr-fips-dependency-policy`
 
 ## Table of Contents
 
@@ -75,7 +75,7 @@ Categories:
 
 ### Phase B — Pending transitive cleanup
 
-The following crates are **legitimately transitively pulled** by upstream dependencies under `--features fips`. Each requires upstream-side work before it can be moved to the deny list. Snapshot verified at landing time via `cargo tree -p cyberware-fips-probe --features fips`:
+The following crates are **legitimately transitively pulled** by upstream dependencies under `--features fips`. Each requires upstream-side work before it can be moved to the deny list. Snapshot verified at landing time via `cargo tree -p cf-gears-fips-probe --features fips`:
 
 | Crate (currently in graph) | Pulled by (representative upstream) | Cleanup approach |
 |---|---|---|
@@ -134,5 +134,5 @@ If even stricter assurance is needed later, a custom `dylint` lint can walk `use
 
 This decision directly addresses:
 
-* `cpt-modkit-nfr-fips-boundary-strictness` — Build-time enforcement that the FIPS boundary contains only validated cryptographic modules.
-* `cpt-modkit-design-fips-supply-chain` — Workspace deny-list ensures the dep graph cannot drift into non-validated crypto without explicit governance.
+* `cpt-toolkit-nfr-fips-boundary-strictness` — Build-time enforcement that the FIPS boundary contains only validated cryptographic modules.
+* `cpt-toolkit-design-fips-supply-chain` — Workspace deny-list ensures the dep graph cannot drift into non-validated crypto without explicit governance.

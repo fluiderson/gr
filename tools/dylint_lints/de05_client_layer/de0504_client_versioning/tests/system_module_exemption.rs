@@ -1,6 +1,6 @@
 /// Integration tests to verify system modules are exempt from versioning requirements.
 ///
-/// These tests ensure that Client traits in modules/system/* do NOT trigger DE0504,
+/// These tests ensure that Client traits in gears/system/* do NOT trigger DE0504,
 /// while Client traits in non-system modules and examples compile cleanly (because
 /// they already have V1 suffixes from the refactoring).
 ///
@@ -24,7 +24,7 @@ fn test_system_modules_are_exempt() {
         .args([
             "check",
             "-p",
-            "cyberware-tenant-resolver-sdk",
+            "cf-gears-tenant-resolver-sdk",
             "--message-format=json",
         ])
         .current_dir(workspace_root())
@@ -51,7 +51,7 @@ fn test_system_modules_are_exempt() {
     assert!(
         !has_de0504_error,
         "System module tenant_resolver-sdk should NOT trigger DE0504 for TenantResolverClient\n\
-         System modules (modules/system/*) are exempt from versioning requirements.\n\
+         System gears (gears/system/*) are exempt from versioning requirements.\n\
          Stderr: {}\nStdout: {}",
         stderr, stdout
     );
@@ -63,7 +63,7 @@ fn test_non_system_modules_require_versioning() {
         .args([
             "check",
             "-p",
-            "cyberware-simple-user-settings-sdk",
+            "cf-gears-simple-user-settings-sdk",
             "--message-format=json",
         ])
         .current_dir(workspace_root())

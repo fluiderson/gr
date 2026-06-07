@@ -24,7 +24,7 @@ from lib.prereq import (
 def print_ascii_header():
     """Print ASCII header"""
     print("=" * 80)
-    print("  CYBERFABRIC TEST ENVIRONMENT PREREQUISITES CHECK")
+    print("  CF/GEARS TEST ENVIRONMENT PREREQUISITES CHECK")
     print("=" * 80)
     print()
 
@@ -102,7 +102,7 @@ def check_all_prereqs(prereq_list=None) -> bool:
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(
-        description="Check Cyber Ware test environment prerequisites"
+        description="Check Gears test environment prerequisites"
     )
     parser.add_argument(
         "--mode", "-m",

@@ -536,6 +536,222 @@ dependencies = [
 ]
 
 [[package]]
+name = "cf-gears-system-sdk-directory"
+version = "0.1.35"
+dependencies = [
+ "anyhow",
+ "async-trait",
+]
+
+[[package]]
+name = "cf-gears-system-sdks"
+version = "0.1.35"
+dependencies = [
+ "cf-gears-system-sdk-directory",
+]
+
+[[package]]
+name = "cf-gears-toolkit"
+version = "0.6.10"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "async-trait",
+ "axum 0.8.9",
+ "cf-gears-system-sdks",
+ "cf-gears-toolkit-canonical-errors",
+ "cf-gears-toolkit-db",
+ "cf-gears-toolkit-gts",
+ "cf-gears-toolkit-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-sdk",
+ "cf-gears-toolkit-utils",
+ "dashmap",
+ "figment",
+ "futures-core",
+ "futures-util",
+ "gts",
+ "gts-macros",
+ "http",
+ "inventory",
+ "nix 0.31.2",
+ "opentelemetry",
+ "opentelemetry-otlp",
+ "opentelemetry_sdk",
+ "parking_lot",
+ "rustls",
+ "schemars",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tracing",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "urlencoding",
+ "utoipa",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-canonical-errors"
+version = "0.7.3"
+dependencies = [
+ "axum 0.8.9",
+ "cf-gears-toolkit-canonical-errors-macro",
+ "http",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tracing",
+ "utoipa",
+]
+
+[[package]]
+name = "cf-gears-toolkit-canonical-errors-macro"
+version = "0.6.1"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-db"
+version = "0.8.2"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bigdecimal",
+ "cf-gears-toolkit-db-macros",
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "cf-gears-toolkit-utils",
+ "chrono",
+ "dashmap",
+ "dirs",
+ "figment",
+ "rust_decimal",
+ "ryu",
+ "sea-orm",
+ "sea-orm-migration",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "time",
+ "tokio",
+ "tracing",
+ "url",
+ "uuid",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "cf-gears-toolkit-db-macros"
+version = "0.6.2"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro-error2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-gts"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cf-gears-toolkit-gts-macros",
+ "gts",
+ "gts-macros",
+ "inventory",
+ "schemars",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "cf-gears-toolkit-gts-macros"
+version = "0.1.0"
+dependencies = [
+ "gts-macros",
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-macros"
+version = "0.6.2"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "strsim",
+ "syn 2.0.117",
+]
+
+[[package]]
+name = "cf-gears-toolkit-odata"
+version = "0.8.0"
+dependencies = [
+ "base64",
+ "bigdecimal",
+ "cf-gears-toolkit-canonical-errors",
+ "chrono",
+ "chrono-tz",
+ "hex",
+ "http",
+ "peg",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.18",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-sdk"
+version = "0.6.5"
+dependencies = [
+ "cf-gears-toolkit-odata",
+ "cf-gears-toolkit-security",
+ "futures-core",
+ "pin-project-lite",
+]
+
+[[package]]
+name = "cf-gears-toolkit-security"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "postcard",
+ "secrecy",
+ "serde",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
+name = "cf-gears-toolkit-utils"
+version = "0.6.3"
+dependencies = [
+ "humantime",
+ "regex",
+ "secrecy",
+ "serde",
+ "zeroize",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -697,222 +913,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyberware-modkit"
-version = "0.6.10"
-dependencies = [
- "anyhow",
- "arc-swap",
- "async-trait",
- "axum 0.8.9",
- "cyberware-modkit-canonical-errors",
- "cyberware-modkit-db",
- "cyberware-modkit-gts",
- "cyberware-modkit-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-sdk",
- "cyberware-modkit-utils",
- "cyberware-system-sdks",
- "dashmap",
- "figment",
- "futures-core",
- "futures-util",
- "gts",
- "gts-macros",
- "http",
- "inventory",
- "nix 0.31.2",
- "opentelemetry",
- "opentelemetry-otlp",
- "opentelemetry_sdk",
- "parking_lot",
- "rustls",
- "schemars",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tracing",
- "tracing-opentelemetry",
- "tracing-subscriber",
- "urlencoding",
- "utoipa",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-canonical-errors"
-version = "0.7.3"
-dependencies = [
- "axum 0.8.9",
- "cyberware-modkit-canonical-errors-macro",
- "http",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tracing",
- "utoipa",
-]
-
-[[package]]
-name = "cyberware-modkit-canonical-errors-macro"
-version = "0.6.1"
-dependencies = [
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-db"
-version = "0.8.2"
-dependencies = [
- "anyhow",
- "async-trait",
- "bigdecimal",
- "chrono",
- "cyberware-modkit-db-macros",
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "cyberware-modkit-utils",
- "dashmap",
- "dirs",
- "figment",
- "rust_decimal",
- "ryu",
- "sea-orm",
- "sea-orm-migration",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "time",
- "tokio",
- "tracing",
- "url",
- "uuid",
- "xxhash-rust",
-]
-
-[[package]]
-name = "cyberware-modkit-db-macros"
-version = "0.6.2"
-dependencies = [
- "heck 0.5.0",
- "proc-macro-error2",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-gts"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cyberware-modkit-gts-macros",
- "gts",
- "gts-macros",
- "inventory",
- "schemars",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "cyberware-modkit-gts-macros"
-version = "0.1.0"
-dependencies = [
- "gts-macros",
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-macros"
-version = "0.6.2"
-dependencies = [
- "heck 0.5.0",
- "proc-macro2",
- "quote",
- "strsim",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "cyberware-modkit-odata"
-version = "0.8.0"
-dependencies = [
- "base64",
- "bigdecimal",
- "chrono",
- "chrono-tz",
- "cyberware-modkit-canonical-errors",
- "hex",
- "http",
- "peg",
- "serde",
- "serde_json",
- "sha2",
- "thiserror 2.0.18",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-sdk"
-version = "0.6.5"
-dependencies = [
- "cyberware-modkit-odata",
- "cyberware-modkit-security",
- "futures-core",
- "pin-project-lite",
-]
-
-[[package]]
-name = "cyberware-modkit-security"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "postcard",
- "secrecy",
- "serde",
- "thiserror 2.0.18",
- "uuid",
-]
-
-[[package]]
-name = "cyberware-modkit-utils"
-version = "0.6.3"
-dependencies = [
- "humantime",
- "regex",
- "secrecy",
- "serde",
- "zeroize",
-]
-
-[[package]]
-name = "cyberware-system-sdk-directory"
-version = "0.1.35"
-dependencies = [
- "anyhow",
- "async-trait",
-]
-
-[[package]]
-name = "cyberware-system-sdks"
-version = "0.1.35"
-dependencies = [
- "cyberware-system-sdk-directory",
-]
-
-[[package]]
 name = "darling"
 version = "0.20.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1004,9 +1004,9 @@ dependencies = [
 name = "de0104_no_api_dto_in_contract"
 version = "0.1.0"
 dependencies = [
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
  "clippy_utils",
- "cyberware-modkit",
- "cyberware-modkit-macros",
  "dylint_linting",
  "dylint_testing",
  "lint_utils",
@@ -1076,8 +1076,8 @@ dependencies = [
 name = "de0205_operation_builder"
 version = "0.1.0"
 dependencies = [
+ "cf-gears-toolkit",
  "clippy_utils",
- "cyberware-modkit",
  "dylint_linting",
  "dylint_testing",
  "lint_utils",
@@ -1117,9 +1117,9 @@ dependencies = [
 name = "de0309_must_have_domain_model"
 version = "0.1.0"
 dependencies = [
+ "cf-gears-toolkit",
+ "cf-gears-toolkit-macros",
  "clippy_utils",
- "cyberware-modkit",
- "cyberware-modkit-macros",
  "dylint_linting",
  "dylint_testing",
  "lint_utils",

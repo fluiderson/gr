@@ -50,7 +50,7 @@ pub const SUPPORTED_OE_MACOS_MAJOR: &[u32] = &[12, 13, 14, 15, 26];
 /// switch. The crate no longer panics — the override now flips the
 /// witness from `false` to `true`. See the README "Runtime FIPS witness"
 /// section.)
-pub const OE_OVERRIDE_ENV: &str = "CYBERWARE_FIPS_OE_OVERRIDE";
+pub const OE_OVERRIDE_ENV: &str = "CF_GEARS_FIPS_OE_OVERRIDE";
 
 /// Outcome of OE validation. Distinct from `rustls::Error` because this
 /// is a deployment-environment problem, not a TLS-layer problem.

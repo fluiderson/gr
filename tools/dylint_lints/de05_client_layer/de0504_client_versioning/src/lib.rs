@@ -16,12 +16,12 @@ dylint_linting::declare_early_lint! {
     /// # Why is this bad?
     ///
     /// Non-system modules require explicit versioning for their public API contracts to enable
-    /// parallel versions and clear upgrade paths. System modules are exempt because they follow
+    /// parallel versions and clear upgrade paths. System gears are exempt because they follow
     /// different versioning rules managed at the platform level.
     ///
     /// # Scope
-    /// - **Applies to**: All SDK crates in `modules/*` (except `modules/system/*`) and `examples/*`
-    /// - **Does NOT apply to**: System modules only (`modules/system/*`)
+    /// - **Applies to**: All SDK crates in `modules/*` (except `gears/system/*`) and `examples/*`
+    /// - **Does NOT apply to**: System gears only (`gears/system/*`)
     ///
     /// # Example
     /// ```rust,ignore
@@ -35,7 +35,7 @@ dylint_linting::declare_early_lint! {
     ///     async fn get_user(&self) -> Result<User, Error>;
     /// }
     ///
-    /// // OK (in modules/system/* - exempt from versioning)
+    /// // OK (in gears/system/* - exempt from versioning)
     /// pub trait TypesRegistryClient: Send + Sync {
     ///     async fn register(&self) -> Result<(), Error>;
     /// }
@@ -57,7 +57,7 @@ impl EarlyLintPass for De0504ClientVersioning {
             return;
         }
 
-        // EXEMPTION: Skip system modules (modules/system/*) from versioning requirements.
+        // EXEMPTION: Skip system modules (gears/system/*) from versioning requirements.
         // UI tests always run for testing purposes even if they simulate system modules.
         if is_system_module(cx, item.span) && !is_ui_test(cx, item.span) {
             return;
@@ -92,12 +92,12 @@ fn is_ui_test(cx: &EarlyContext<'_>, span: Span) -> bool {
     lint_utils::is_temp_path(&file_path)
 }
 
-/// Checks if the file is part of a system module (modules/system/*).
+/// Checks if the file is part of a system module (gears/system/*).
 fn is_system_module(cx: &EarlyContext<'_>, span: Span) -> bool {
     let Some(file_path) = lint_utils::filename_str(cx.sess().source_map(), span) else {
         return false;
     };
-    file_path.contains("modules/system/") || file_path.contains("modules\\system\\")
+    file_path.contains("gears/system/") || file_path.contains("modules\\system\\")
 }
 
 fn emit_lint(

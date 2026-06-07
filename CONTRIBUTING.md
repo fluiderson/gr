@@ -1,6 +1,6 @@
-# Contributing to Cyber Ware
+# Contributing to CF/Gears
 
-Thank you for your interest in contributing to Cyber Ware! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Constructor Fabric Gears! This document provides guidelines and information for contributors.
 
 We welcome contributions in:
 
@@ -26,7 +26,7 @@ We welcome contributions in:
 ```bash
 # Clone the repository
 git clone --recurse-submodules <repository-url>
-cd cyberware-rust
+cd gears-rust
 
 # If you didn't clone with --recurse-submodules (includes Cypilot for PR reviews)
 git submodule update --init --recursive
@@ -47,7 +47,7 @@ make test
 make quickstart
 
 # Start the development server with the example users_info module
-cargo run --bin cyberware-example-server --features users-info-example -- --config config/quickstart.yaml run
+cargo run --bin cf-gears-example-server --features users-info-example -- --config config/quickstart.yaml run
 ```
 
 ## 2. Development Workflow
@@ -68,14 +68,14 @@ As an alternative, you can fork the repository to your own GitHub account.
 
 ### 2.2. New Modules Development
 
-Cyber Ware follows a spec-driven development (SDD) approach for large features. Module development starts with specifications that live alongside the code. When you add features, make design decisions, or introduce upstream requirements, you must use the following templates and keep them aligned with the implementation:
+Constructor Fabric Gears follows a spec-driven development (SDD) approach for large features. Module development starts with specifications that live alongside the code. When you add features, make design decisions, or introduce upstream requirements, you must use the following templates and keep them aligned with the implementation:
 
 - **[Overview & Guide](./docs/spec-templates/README.md)** — Template system overview, governance, FDD ID conventions, and document placement rules
-- **[PRD.md](./docs/spec-templates/cyberware-sdlc/PRD/template.md)** — Product Requirements Document: vision, actors, capabilities, use cases, FR/NFR
-- **[DESIGN.md](./docs/spec-templates/cyberware-sdlc/DESIGN/template.md)** — Technical Design: architecture, principles, constraints, domain model, API contracts
-- **[ADR.md](./docs/spec-templates/cyberware-sdlc/ADR/template.md)** — Architecture Decision Record: decisions, options, trade-offs, consequences
-- **[FEATURE.md](./docs/spec-templates/cyberware-sdlc/FEATURE/template.md)** — Feature Specification: flows, algorithms, states, requirements
-- **[UPSTREAM_REQS.md](./docs/spec-templates/cyberware-sdlc/UPSTREAM_REQS/template.md)** — Upstream Requirements: technical requirements from other modules to this module
+- **[PRD.md](./docs/spec-templates/gears-sdlc/PRD/template.md)** — Product Requirements Document: vision, actors, capabilities, use cases, FR/NFR
+- **[DESIGN.md](./docs/spec-templates/gears-sdlc/DESIGN/template.md)** — Technical Design: architecture, principles, constraints, domain model, API contracts
+- **[ADR.md](./docs/spec-templates/gears-sdlc/ADR/template.md)** — Architecture Decision Record: decisions, options, trade-offs, consequences
+- **[FEATURE.md](./docs/spec-templates/gears-sdlc/FEATURE/template.md)** — Feature Specification: flows, algorithms, states, requirements
+- **[UPSTREAM_REQS.md](./docs/spec-templates/gears-sdlc/UPSTREAM_REQS/template.md)** — Upstream Requirements: technical requirements from other modules to this module
 
 ### 2.3. Make Your Changes
 
@@ -83,9 +83,9 @@ Follow the coding standards and guidelines:
 
 1. See common [RUST.md](./guidelines/DNA/languages/RUST.md) guideline
 2. When develop new REST API use [API.md](./guidelines/DNA/REST/API.md), [STATUS_CODES](./guidelines/DNA/REST/STATUS_CODES.md)
-3. When develop new Module use [ModKit Unified System](./docs/modkit_unified_system/README.md)
+3. When develop new Module use [ToolKit Unified System](./docs/toolkit_unified_system/README.md)
 4. Security policy [SECURITY.md](./SECURITY.md) and secure coding [guidelines/SECURITY.md](./guidelines/SECURITY.md)
-5. ModKit architecture and invariants [docs/modkit_unified_system/README.md](./docs/modkit_unified_system/README.md)
+5. ToolKit architecture and invariants [docs/toolkit_unified_system/README.md](./docs/toolkit_unified_system/README.md)
 
 Module directories under `modules/` must use kebab-case (validated by `tools/scripts/validate_module_names.py` and enforced in CI).
 
@@ -181,7 +181,7 @@ Follow a structured commit message format:
 ```
 
 - `<type>`: change category (see table below)
-- `<module>` (optional): the area touched (e.g., api_gateway, modkit, ecommerce)
+- `<module>` (optional): the area touched (e.g., api_gateway, toolkit, ecommerce)
 - `<description>`: concise, imperative summary
 
 Accepted commit types:
@@ -313,7 +313,7 @@ See [docs/pr-review/README.md](./docs/pr-review/README.md) for full setup (GitHu
 
 ## 3. Versioning
 
-This topic defines how Cyber Ware versions crates and handles breaking changes.
+This topic defines how Constructor Fabric Gears versions crates and handles breaking changes.
 
 ## Scope
 
@@ -417,13 +417,13 @@ We use per-crate versioning, controlled via Cargo manifests and release automati
 
 ### Version sources
 - Modules and SDKs keep explicit `version = "..."` in their `Cargo.toml`.
-- ModKit libs may use `version.workspace = true` (unified framework versioning).
+- ToolKit libs may use `version.workspace = true` (unified framework versioning).
 
-## ModKit Unified Release Rule
+## ToolKit Unified Release Rule
 
-ModKit is released as a unified framework:
-- Only `cyberware-modkit` produces changelog entries and GitHub releases.
-- Other `cyberware-modkit-*` crates are published to crates.io but do not create separate changelog entries/releases.
+ToolKit is released as a unified framework:
+- Only `cf-gears-toolkit` produces changelog entries and GitHub releases.
+- Other `cf-gears-toolkit-*` crates are published to crates.io but do not create separate changelog entries/releases.
 
 ## Release Process (Automation)
 
@@ -472,4 +472,4 @@ Before merging changes that affect public crates/contracts:
 
 ---
 
-Thank you for contributing to Cyber Ware!
+Thank you for contributing to Constructor Fabric Gears!

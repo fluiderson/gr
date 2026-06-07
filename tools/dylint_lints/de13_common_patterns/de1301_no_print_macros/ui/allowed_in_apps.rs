@@ -1,4 +1,4 @@
-// simulated_dir=/cyberfabric/apps/cyberware-example-server/src/main.rs
+// simulated_dir=/cf-gears/apps/cf-gears-example-server/src/main.rs
 
 fn main() {
     print!("allowed in apps");

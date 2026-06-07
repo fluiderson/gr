@@ -1,6 +1,6 @@
 CI := 1
 
-OPENAPI_URL ?= http://127.0.0.1:8087/cw/openapi.json
+OPENAPI_URL ?= http://127.0.0.1:8087/cf/openapi.json
 OPENAPI_OUT ?= docs/api/api.json
 
 # E2E feature set (single source of truth: config/e2e-features.txt)
@@ -247,7 +247,7 @@ kani:
 ## Run Geiger scanner for unsafe code in dependencies
 geiger:
 	$(call check_tool,cargo-geiger)
-	cd apps/cyberware-example-server && cargo geiger --all-features
+	cd apps/cf-gears-example-server && cargo geiger --all-features
 
 ## Check there are no compile time warnings
 lint:
@@ -262,9 +262,9 @@ gts-docs:
 		--vendor cf,vendor,example,fabrikam \
 		--exclude "target/*" \
 		--exclude "docs/api/*" \
-		--exclude "modules/chat-engine/*" \
+		--exclude "gears/chat-engine/*" \
 		--exclude "**/helm/*/templates/*" \
-		docs modules libs examples
+		docs gears libs examples
 
 install-tools:
 	@command -v cargo-nextest >/dev/null 2>&1 || cargo install cargo-nextest
@@ -319,11 +319,11 @@ security: deny fips-policy
 
 .PHONY: openapi md-fabric
 
-# Generate OpenAPI spec from running cyberware-example-server
+# Generate OpenAPI spec from running cf-gears-example-server
 openapi:
 	@command -v curl >/dev/null || (echo "curl is required to generate OpenAPI spec" && exit 1)
-	@echo "Starting cyberware-example-server to generate OpenAPI spec..."
-	@$(call start_server_and_wait,cargo run --bin cyberware-example-server $(E2E_ARGS) -- --config config/quickstart.yaml,$(OPENAPI_URL),300) && \
+	@echo "Starting cf-gears-example-server to generate OpenAPI spec..."
+	@$(call start_server_and_wait,cargo run --bin cf-gears-example-server $(E2E_ARGS) -- --config config/quickstart.yaml,$(OPENAPI_URL),300) && \
 	echo "Fetching OpenAPI spec..." && \
 	mkdir -p $$(dirname "$(OPENAPI_OUT)") && \
 	curl -fsS "$(OPENAPI_URL)" -o "$(OPENAPI_OUT)" && \
@@ -364,24 +364,24 @@ test: install-tools
 	cargo nextest run --workspace
 
 test-no-macros: install-tools
-	cargo nextest run --workspace --exclude cyberware-modkit-macros-tests --exclude cyberware-modkit-db-macros
+	cargo nextest run --workspace --exclude cf-gears-toolkit-macros-tests --exclude cf-gears-toolkit-db-macros
 
 test-macros: install-tools
-	cargo nextest run -p cyberware-modkit-db-macros
-	cargo nextest run -p cyberware-modkit-macros-tests
+	cargo nextest run -p cf-gears-toolkit-db-macros
+	cargo nextest run -p cf-gears-toolkit-macros-tests
 
 ## Run SQLite integration tests
 test-sqlite: install-tools
-	cargo nextest run -p cyberware-modkit-db --features sqlite,integration,preview-outbox
-	cargo build -p cyberware-modkit-db --examples --features sqlite,preview-outbox
+	cargo nextest run -p cf-gears-toolkit-db --features sqlite,integration,preview-outbox
+	cargo build -p cf-gears-toolkit-db --examples --features sqlite,preview-outbox
 
 ## Run PostgreSQL integration tests
 test-pg: install-tools
-	cargo nextest run -p cyberware-modkit-db --features pg,integration,preview-outbox
+	cargo nextest run -p cf-gears-toolkit-db --features pg,integration,preview-outbox
 
 ## Run MySQL integration tests
 test-mysql: install-tools
-	cargo nextest run -p cyberware-modkit-db --features mysql,integration,preview-outbox
+	cargo nextest run -p cf-gears-toolkit-db --features mysql,integration,preview-outbox
 
 # Run all database integration tests
 test-db: test-sqlite test-pg test-mysql
@@ -392,24 +392,24 @@ test-users-info-pg: install-tools
 
 ## Run FIPS-mode integration tests (requires Go for aws-lc-fips-sys).
 ## Covers:
-##   - cyberware-modkit         : bootstrap + init_crypto_provider dispatch
-##   - cyberware-modkit-http    : TLS client fail-closed path (NoCryptoProvider,
+##   - cf-gears-toolkit         : bootstrap + init_crypto_provider dispatch
+##   - cf-gears-toolkit-http    : TLS client fail-closed path (NoCryptoProvider,
 ##                                apply_fips_hardening, builder/client FIPS-feature
 ##                                test surface). See issue #1935.
-##   - cyberware-oagw           : startup validation rejects allow_http_upstream
+##   - cf-gears-oagw           : startup validation rejects allow_http_upstream
 ##                                under --features fips (PR #1985).
 ##
 ## Per-package `pkg/feat` syntax is required because `bootstrap` exists only
-## on `cyberware-modkit` and the crates have independent FIPS feature
-## spaces (modkit doesn't depend on modkit-http; oagw forwards modkit-http/fips
+## on `cf-gears-toolkit` and the crates have independent FIPS feature
+## spaces (toolkit doesn't depend on toolkit-http; oagw forwards toolkit-http/fips
 ## via its own `fips` feature). Single invocation so the shared FIPS dep graph
 ## compiles once.
 test-fips: install-tools
-	cargo nextest run -p cyberware-modkit -p cyberware-modkit-http -p cyberware-oagw \
-		--features cyberware-modkit/bootstrap,cyberware-modkit/fips,cyberware-modkit-http/fips,cyberware-oagw/fips
+	cargo nextest run -p cf-gears-toolkit -p cf-gears-toolkit-http -p cf-gears-oagw \
+		--features cf-gears-toolkit/bootstrap,cf-gears-toolkit/fips,cf-gears-toolkit-http/fips,cf-gears-oagw/fips
 
 ## Cross-compile gate for the Windows+FIPS path (Windows handshake
-## verification is the manual runbook in cyberware-fips-probe/README.md). Catches
+## verification is the manual runbook in cf-gears-fips-probe/README.md). Catches
 ## type / cfg / feature-graph regressions for `rustls-cng-crypto` and the
 ## dep-graph (`rustls-cng-crypto` present, `aws-lc-fips-sys` absent).
 ##
@@ -427,14 +427,14 @@ test-fips: install-tools
 ##
 ## Pair this with the dep-graph regression check, which needs no toolchain
 ## at all and runs on any host:
-##   cargo tree --target x86_64-pc-windows-msvc -p cyberware-example-server \
+##   cargo tree --target x86_64-pc-windows-msvc -p cf-gears-example-server \
 ##       --features fips -e features | grep aws-lc-fips    # must be empty
 .PHONY: check-windows-fips
 check-windows-fips:
 	$(call check_tool,cargo-xwin)
 	$(call check_tool,ninja)
 	rustup target add x86_64-pc-windows-msvc
-	cargo xwin check --target x86_64-pc-windows-msvc -p cyberware-example-server --features fips
+	cargo xwin check --target x86_64-pc-windows-msvc -p cf-gears-example-server --features fips
 
 # -------- Benchmarks --------
 
@@ -443,38 +443,38 @@ check-windows-fips:
 
 ## Run outbox throughput benchmarks against PostgreSQL
 bench-pg:
-	cargo bench -p cyberware-modkit-db --features pg,preview-outbox --bench outbox_throughput -- postgres
+	cargo bench -p cf-gears-toolkit-db --features pg,preview-outbox --bench outbox_throughput -- postgres
 
 ## Run outbox throughput benchmarks against MySQL
 bench-mysql:
-	cargo bench -p cyberware-modkit-db --features mysql,preview-outbox --bench outbox_throughput -- mysql
+	cargo bench -p cf-gears-toolkit-db --features mysql,preview-outbox --bench outbox_throughput -- mysql
 
 ## Run outbox throughput benchmarks against MariaDB
 bench-mariadb:
-	cargo bench -p cyberware-modkit-db --features mysql,preview-outbox --bench outbox_throughput -- mariadb
+	cargo bench -p cf-gears-toolkit-db --features mysql,preview-outbox --bench outbox_throughput -- mariadb
 
 ## Run outbox throughput benchmarks against SQLite
 bench-sqlite:
-	cargo bench -p cyberware-modkit-db --features sqlite,preview-outbox --bench outbox_throughput -- sqlite
+	cargo bench -p cf-gears-toolkit-db --features sqlite,preview-outbox --bench outbox_throughput -- sqlite
 
 ## Run outbox throughput benchmarks against all database engines
 bench-db: bench-pg bench-mysql bench-mariadb bench-sqlite
 
 ## Run long-haul (1M+10M) outbox benchmarks against PostgreSQL
 bench-pg-longhaul:
-	cargo bench -p cyberware-modkit-db --features pg,preview-outbox --bench outbox_throughput -- postgres_longhaul
+	cargo bench -p cf-gears-toolkit-db --features pg,preview-outbox --bench outbox_throughput -- postgres_longhaul
 
 ## Run long-haul (1M+10M) outbox benchmarks against MySQL
 bench-mysql-longhaul:
-	cargo bench -p cyberware-modkit-db --features mysql,preview-outbox --bench outbox_throughput -- mysql_longhaul
+	cargo bench -p cf-gears-toolkit-db --features mysql,preview-outbox --bench outbox_throughput -- mysql_longhaul
 
 ## Run long-haul (1M+10M) outbox benchmarks against MariaDB
 bench-mariadb-longhaul:
-	cargo bench -p cyberware-modkit-db --features mysql,preview-outbox --bench outbox_throughput -- mariadb_longhaul
+	cargo bench -p cf-gears-toolkit-db --features mysql,preview-outbox --bench outbox_throughput -- mariadb_longhaul
 
 ## Run long-haul (100K 1P) outbox benchmarks against SQLite
 bench-sqlite-longhaul:
-	cargo bench -p cyberware-modkit-db --features sqlite,preview-outbox --bench outbox_throughput -- sqlite_longhaul
+	cargo bench -p cf-gears-toolkit-db --features sqlite,preview-outbox --bench outbox_throughput -- sqlite_longhaul
 
 ## Run long-haul outbox benchmarks against all database engines
 bench-db-longhaul: bench-pg-longhaul bench-mysql-longhaul bench-mariadb-longhaul bench-sqlite-longhaul
@@ -511,14 +511,14 @@ e2e-local-smoke:
 MINI_CHAT_FEATURES = mini-chat,static-authn,static-authz,single-tenant,static-credstore
 MINI_CHAT_K8S_FEATURES = $(MINI_CHAT_FEATURES),k8s
 
-MINI_CHAT_IMAGE ?= cyberware-mini-chat
+MINI_CHAT_IMAGE ?= cf-gears-mini-chat
 MINI_CHAT_TAG   ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo latest)
 
 ## Run mini-chat E2E tests (separate binary with mini-chat features)
 e2e-mini-chat:
-	cargo build --bin cyberware-example-server --features=$(MINI_CHAT_FEATURES)
-	E2E_BINARY=target/debug/cyberware-example-server \
-		python3 -m pytest testing/e2e/modules/mini_chat/ --mode offline -vv
+	cargo build --bin cf-gears-example-server --features=$(MINI_CHAT_FEATURES)
+	E2E_BINARY=target/debug/cf-gears-example-server \
+		python3 -m pytest testing/e2e/gears/mini_chat/ --mode offline -vv
 
 # -------- Code coverage --------
 
@@ -603,20 +603,20 @@ fuzz-corpus: fuzz-install
 # Start server with quickstart config
 quickstart:
 	mkdir -p data
-	cargo run --bin cyberware-example-server -- --config config/quickstart.yaml run
+	cargo run --bin cf-gears-example-server -- --config config/quickstart.yaml run
 
 ## Run server with example module
 example:
-	cargo run --bin cyberware-example-server $(E2E_ARGS) -- --config config/quickstart.yaml run
+	cargo run --bin cf-gears-example-server $(E2E_ARGS) -- --config config/quickstart.yaml run
 
 # mini-chat targets are for running the mini-chat module locally and in Kubernetes, with options for building Docker images and deploying with Helm.
 ## Run server with fips module
 fips:
-	cargo run --bin cyberware-example-server --features fips,static-authn,static-authz,single-tenant,static-credstore,otel -- --config config/quickstart.yaml run
+	cargo run --bin cf-gears-example-server --features fips,static-authn,static-authz,single-tenant,static-credstore,otel -- --config config/quickstart.yaml run
 
 ## Run server with mini-chat module
 mini-chat:
-	cargo run --bin cyberware-example-server --features mini-chat,static-authn,static-authz,single-tenant,static-credstore,otel -- --config config/mini-chat.yaml run
+	cargo run --bin cf-gears-example-server --features mini-chat,static-authn,static-authz,single-tenant,static-credstore,otel -- --config config/mini-chat.yaml run
 
 ## Build mini-chat Docker image for K8s (dev build by default, RELEASE=1 for optimized)
 ## On linux: builds on host (reuses local target/), then packages the binary.
@@ -628,19 +628,19 @@ MINI_CHAT_TARGET_DIR = $(or $(CARGO_TARGET_DIR),target)/$(if $(RELEASE),release,
 mini-chat-docker:
 ifeq ($(shell uname -s),Linux)
 	@echo "==> Linux host: building on host, packaging into image"
-	cargo build $(MINI_CHAT_CARGO_RELEASE_FLAG) --bin cyberware-example-server --package=cyberware-example-server \
+	cargo build $(MINI_CHAT_CARGO_RELEASE_FLAG) --bin cf-gears-example-server --package=cf-gears-example-server \
 		--features "$(MINI_CHAT_K8S_FEATURES)"
 	@mkdir -p .docker-stage
-	@cp $(MINI_CHAT_TARGET_DIR)/cyberware-example-server .docker-stage/cyberware-example-server
+	@cp $(MINI_CHAT_TARGET_DIR)/cf-gears-example-server .docker-stage/cf-gears-example-server
 	DOCKER_BUILDKIT=1 docker build \
-		-f modules/mini-chat/deploy/docker/mini-chat-prebuilt.Dockerfile \
-		--build-arg BINARY_PATH=".docker-stage/cyberware-example-server" \
+		-f gears/mini-chat/deploy/docker/mini-chat-prebuilt.Dockerfile \
+		--build-arg BINARY_PATH=".docker-stage/cf-gears-example-server" \
 		-t $(MINI_CHAT_IMAGE):$(MINI_CHAT_TAG) .
 	@rm -rf .docker-stage
 else
 	@echo "==> Non-linux host: full Docker build"
 	DOCKER_BUILDKIT=1 docker build \
-		-f modules/mini-chat/deploy/docker/mini-chat.Dockerfile \
+		-f gears/mini-chat/deploy/docker/mini-chat.Dockerfile \
 		--build-arg CARGO_FEATURES="$(MINI_CHAT_K8S_FEATURES)" \
 		--build-arg BUILD_PROFILE="$(MINI_CHAT_PROFILE)" \
 		-t $(MINI_CHAT_IMAGE):$(MINI_CHAT_TAG) .
@@ -656,7 +656,7 @@ mini-chat-helm: mini-chat-docker
 	else \
 		echo "ERROR: k3s or minikube required"; exit 1; \
 	fi
-	helm upgrade --install mini-chat modules/mini-chat/deploy/helm/mini-chat/ \
+	helm upgrade --install mini-chat gears/mini-chat/deploy/helm/mini-chat/ \
 		--set image.tag="$(MINI_CHAT_TAG)" \
 		--set secrets.azureOpenaiApiKey="$${AZURE_OPENAI_API_KEY}" \
 		--set secrets.azureOpenaiApiHost="$${AZURE_OPENAI_API_HOST}" \
@@ -667,7 +667,7 @@ mini-chat-helm: mini-chat-docker
 
 ## Render mini-chat Helm templates (dry-run)
 mini-chat-helm-template:
-	helm template mini-chat modules/mini-chat/deploy/helm/mini-chat/
+	helm template mini-chat gears/mini-chat/deploy/helm/mini-chat/
 
 ## One-command: ensure minikube is up, deploy latest chart, port-forward
 ## Usage: make mini-chat-up
@@ -703,7 +703,7 @@ mini-chat-up:
 		echo "WARNING: AZURE_OPENAI_API_KEY or AZURE_OPENAI_API_HOST not set."; \
 		echo "  export AZURE_OPENAI_API_KEY=... AZURE_OPENAI_API_HOST=..."; \
 	fi
-	helm upgrade --install mini-chat modules/mini-chat/deploy/helm/mini-chat/ \
+	helm upgrade --install mini-chat gears/mini-chat/deploy/helm/mini-chat/ \
 		--set image.tag="$(MINI_CHAT_TAG)" \
 		--set secrets.azureOpenaiApiKey="$${AZURE_OPENAI_API_KEY}" \
 		--set secrets.azureOpenaiApiHost="$${AZURE_OPENAI_API_HOST}" \
@@ -714,7 +714,7 @@ mini-chat-up:
 	@echo ""
 	@echo "mini-chat is running. In a separate terminal run:"
 	@echo "  make mini-chat-port-forward"
-	@echo "Then access: http://localhost:8087/cw/mini-chat"
+	@echo "Then access: http://localhost:8087/cf/mini-chat"
 
 ## Persistent port-forward with auto-reconnect (run in a separate terminal)
 mini-chat-port-forward:
@@ -732,7 +732,7 @@ mini-chat-down:
 
 oop-example:
 	cargo build -p calculator --features oop_module
-	cargo run --bin cyberware-example-server --features oop-example,users-info-example,static-authn,static-authz,static-tenants,static-credstore -- --config config/quickstart.yaml run
+	cargo run --bin cf-gears-example-server --features oop-example,users-info-example,static-authn,static-authz,static-tenants,static-credstore -- --config config/quickstart.yaml run
 
 # Run all quality checks
 check: .setup-stamp fmt cypilot-validate clippy lychee security dylint-test dylint gts-docs test
@@ -744,15 +744,15 @@ ci_docs: lychee gts-docs
 # Run CI pipeline locally, requires docker
 ci: fmt clippy test-no-macros test-macros test-db deny test-users-info-pg lychee gts-docs dylint dylint-test
 
-# Build the cyberware-example-server release binary using a toolchain from the rust-toolchain.toml
+# Build the cf-gears-example-server release binary using a toolchain from the rust-toolchain.toml
 cargo-build:
-	cargo build --release --bin cyberware-example-server $(E2E_ARGS)
+	cargo build --release --bin cf-gears-example-server $(E2E_ARGS)
 
 # Split debug symbols into separate artifact(s) and strip the binary.
 # Requires platform tools: objcopy (Linux), dsymutil+strip (macOS).
 # On Windows MSVC the PDB is already separate; no extra tools needed.
 split-debug:
-	cargo xtask split-debug cyberware-example-server
+	cargo xtask split-debug cf-gears-example-server
 
 # Build the release binary, then split debug symbols.
 # Use 'make cargo-build' if you don't need stripped artifacts or lack

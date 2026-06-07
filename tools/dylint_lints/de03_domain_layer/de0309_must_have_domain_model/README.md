@@ -32,7 +32,7 @@ pub struct User {           // Missing #[domain_model]
 
 ```rust
 // src/domain/user.rs
-use modkit_macros::domain_model;
+use toolkit_macros::domain_model;
 
 #[domain_model]
 pub struct User {
@@ -57,5 +57,5 @@ This lint is designed for Test-Driven Development:
 
 ## See Also
 
-- [`#[domain_model]` macro documentation](../../../../libs/modkit-macros/src/domain_model.rs)
-- [Domain Layer Architecture](../../../../docs/modkit_unified_system/02_module_layout_and_sdk_pattern.md)
+- [`#[domain_model]` macro documentation](../../../../libs/toolkit-macros/src/domain_model.rs)
+- [Domain Layer Architecture](../../../../docs/toolkit_unified_system/02_module_layout_and_sdk_pattern.md)

@@ -1,8 +1,8 @@
-// simulated_dir=/cyberfabric/modules/some_module/api/rest/
+// simulated_dir=/cf-gears/gears/some_module/api/rest/
 #![allow(dead_code)]
 
 // Should not trigger DE0104 - api_dto in contract
-#[modkit_macros::api_dto(request, response)]
+#[toolkit_macros::api_dto(request, response)]
 pub struct UserDto {
     pub id: String,
     pub name: String,

@@ -28,7 +28,7 @@ use crate::walk::Walker;
 #[command(
     name = "gts-analyze",
     version,
-    about = "Analyze GTS (Global Type System) usage in a single Cyber Ware module."
+    about = "Analyze GTS (Global Type System) usage in a single Gear."
 )]
 struct Cli {
     /// Module directory to scan.

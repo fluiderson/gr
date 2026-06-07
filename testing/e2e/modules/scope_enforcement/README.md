@@ -7,12 +7,12 @@ early rejection of requests based on token scopes without calling the PDP.
 
 1. Build the server with required features:
    ```bash
-   cargo build --release --bin cyberware-server --features users-info-example,static-authn,static-authz,static-tenants
+   cargo build --release --bin cf-gears-server --features users-info-example,static-authn,static-authz,static-tenants
    ```
 
 2. Start the server with the scope enforcement config:
    ```bash
-   cargo run --release --bin cyberware-server --features users-info-example,static-authn,static-authz,static-tenants \
+   cargo run --release --bin cf-gears-server --features users-info-example,static-authn,static-authz,static-tenants \
      -- --config config/e2e-scope-enforcement.yaml
    ```
 
@@ -30,10 +30,10 @@ These tests require the scope enforcement config and are **not** part of the sta
 export E2E_SCOPE_ENFORCEMENT=1
 
 # Run all scope enforcement tests
-python3 -m pytest testing/e2e/modules/scope_enforcement -v
+python3 -m pytest testing/e2e/gears/scope_enforcement -v
 
 # Run specific test class
-python3 -m pytest testing/e2e/modules/scope_enforcement/test_scope_enforcement.py::TestScopeEnforcementDenied -v
+python3 -m pytest testing/e2e/gears/scope_enforcement/test_scope_enforcement.py::TestScopeEnforcementDenied -v
 ```
 
 ## Test Tokens

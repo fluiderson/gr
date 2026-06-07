@@ -45,13 +45,13 @@ use uuid::Uuid;
 pub enum DomainError {
     #[error("User not found: {id}")]
     UserNotFound { id: Uuid },
-    
+
     #[error("Email '{email}' already exists")]
     EmailAlreadyExists { email: String },
-    
+
     #[error("Validation failed: {field}: {message}")]
     Validation { field: String, message: String },
-    
+
     #[error("Database error: {message}")]
     Database { message: String },
 }
@@ -60,7 +60,7 @@ pub enum DomainError {
 ```rust
 // ✅ Good - API layer handles HTTP mapping
 // File: src/api/rest/error.rs
-use modkit::api::problem::Problem;
+use toolkit::api::problem::Problem;
 use crate::domain::error::DomainError;
 
 impl From<DomainError> for Problem {

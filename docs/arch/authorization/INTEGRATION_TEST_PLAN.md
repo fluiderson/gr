@@ -3,7 +3,7 @@
 
 # AuthZ + Resource Group Integration Test Plan
 
-Design-time test plan for verifying the RG ↔ AuthZ interaction locally in cyberware-server. Covers three phases: tenant scoping (`p1`), group-based predicates (`p1`), and MTLS bypass (`p2` — deferred, not implemented yet).
+Design-time test plan for verifying the RG ↔ AuthZ interaction locally in cf-gears-server. Covers three phases: tenant scoping (`p1`), group-based predicates (`p1`), and MTLS bypass (`p2` — deferred, not implemented yet).
 
 For background on how AuthZ uses RG data, see [RESOURCE_GROUP_MODEL.md](./RESOURCE_GROUP_MODEL.md). For concrete SQL-level scenarios, see [AUTHZ_USAGE_SCENARIOS.md](./AUTHZ_USAGE_SCENARIOS.md) scenarios S14–S21.
 
@@ -28,17 +28,17 @@ For background on how AuthZ uses RG data, see [RESOURCE_GROUP_MODEL.md](./RESOUR
 ## Planned File Layout
 
 ```
-testing/e2e/modules/resource_group/        ← E2E tests (pytest, HTTP against running server)
+testing/e2e/gears/resource_group/        ← E2E tests (pytest, HTTP against running server)
   conftest.py                              ← Fixtures: base_url, auth headers, type/group factories
   test_authz_tenant_scoping.py             ← Phase 1: CRUD + tenant isolation + hierarchy + membership
 
-modules/system/resource-group/
+gears/system/resource-group/
   resource-group/tests/                    ← Rust integration tests (in-process, no HTTP)
     authz_integration_test.rs              ← PolicyEnforcer + mock AuthZ: 9 tests
     tenant_scoping_test.rs                 ← AccessScope scoping: 10 tests
 ```
 
-Follows existing project conventions: `testing/e2e/modules/{module}/` for HTTP-level tests (see `oagw/`, `mini_chat/`, `types_registry/`), `modules/.../tests/` for Rust in-process tests.
+Follows existing project conventions: `testing/e2e/gears/{module}/` for HTTP-level tests (see `oagw/`, `mini_chat/`, `types_registry/`), `modules/.../tests/` for Rust in-process tests.
 
 ---
 
@@ -52,8 +52,8 @@ Follows existing project conventions: `testing/e2e/modules/{module}/` for HTTP-l
 
 ```bash
 docker run -d --name rg-postgres \
-  -e POSTGRES_USER=cyberware \
-  -e POSTGRES_PASSWORD=cyberware \
+  -e POSTGRES_USER=cf_gears \
+  -e POSTGRES_PASSWORD=cf_gears \
   -e POSTGRES_DB=resource_group \
   -p 5433:5432 postgres:16-alpine
 ```
@@ -66,7 +66,7 @@ In `config/quickstart.yaml`, the resource-group module requires PostgreSQL:
 modules:
   resource-group:
     database:
-      dsn: "postgres://cyberware:cyberware@127.0.0.1:5433/resource_group"
+      dsn: "postgres://cf_gears:cf_gears@127.0.0.1:5433/resource_group"
       pool:
         max_conns: 5
         acquire_timeout: "30s"
@@ -77,10 +77,10 @@ modules:
 
 ```bash
 # Without AuthZ (dev mode, auth_disabled: true)
-cargo run --bin cyberware-server -- --config config/quickstart.yaml run
+cargo run --bin cf-gears-server -- --config config/quickstart.yaml run
 
 # With AuthZ (auth_disabled: false + static plugins)
-cargo run --bin cyberware-server \
+cargo run --bin cf-gears-server \
   --features static-authn,static-authz \
   -- --config config/quickstart.yaml run
 ```
@@ -89,10 +89,10 @@ cargo run --bin cyberware-server \
 
 ```bash
 # Rust integration tests (no server/DB required)
-cargo test -p cyberware-resource-group --test authz_integration_test --test tenant_scoping_test
+cargo test -p cf-gears-resource-group --test authz_integration_test --test tenant_scoping_test
 
 # E2E tests (requires running server + PostgreSQL)
-E2E_BASE_URL=http://localhost:8087 pytest testing/e2e/modules/resource_group/ -v
+E2E_BASE_URL=http://localhost:8087 pytest testing/e2e/gears/resource_group/ -v
 ```
 
 ---
@@ -170,11 +170,11 @@ Request → API Gateway (AuthN) → SecurityContext{tenant=T1}
 
 1. **Predicate types** (`authz-resolver-sdk/src/constraints.rs`): add `InGroupPredicate` (group_ids) and `InGroupSubtreePredicate` (ancestor_ids) to `Predicate` enum with serde support (`"op":"in_group"`, `"op":"in_group_subtree"`)
 
-2. **ScopeFilter variants** (`modkit-security/src/access_scope.rs`): `InGroupScopeFilter`, `InGroupSubtreeScopeFilter` carry property + group/ancestor UUIDs. Well-known table constants in `rg_tables` module (`MEMBERSHIP_TABLE`, `CLOSURE_TABLE`, column names)
+2. **ScopeFilter variants** (`toolkit-security/src/access_scope.rs`): `InGroupScopeFilter`, `InGroupSubtreeScopeFilter` carry property + group/ancestor UUIDs. Well-known table constants in `rg_tables` module (`MEMBERSHIP_TABLE`, `CLOSURE_TABLE`, column names)
 
 3. **PEP compiler** (`authz-resolver-sdk/src/pep/compiler.rs`): compiles `InGroup`/`InGroupSubtree` predicates into corresponding `ScopeFilter` variants via `json_to_scope_value`
 
-4. **SecureORM** (`modkit-db/src/secure/cond.rs`): `build_constraint_condition` generates subquery SQL:
+4. **SecureORM** (`toolkit-db/src/secure/cond.rs`): `build_constraint_condition` generates subquery SQL:
    - `InGroup` → `col IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (...))`
    - `InGroupSubtree` → `col IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (SELECT descendant_id FROM resource_group_closure WHERE ancestor_id IN (...)))`
 
@@ -275,22 +275,22 @@ Configure API Gateway to forward client certificate CN header to RG module for M
 ```bash
 # MTLS request to allowed endpoint (descendants) — AuthZ bypassed
 curl --cert plugin.pem --key plugin-key.pem --cacert ca.pem \
-  https://127.0.0.1:8087/cw/resource-group/v1/groups/{group_id}/descendants
+  https://127.0.0.1:8087/cf/resource-group/v1/groups/{group_id}/descendants
 # Expected: 200 OK with descendants data
 
 # MTLS request to allowed endpoint (ancestors) — AuthZ bypassed
 curl --cert plugin.pem --key plugin-key.pem --cacert ca.pem \
-  https://127.0.0.1:8087/cw/resource-group/v1/groups/{group_id}/ancestors
+  https://127.0.0.1:8087/cf/resource-group/v1/groups/{group_id}/ancestors
 # Expected: 200 OK with ancestors data
 
 # MTLS request to disallowed endpoint (POST groups) — rejected
 curl --cert plugin.pem --key plugin-key.pem --cacert ca.pem \
-  -X POST https://127.0.0.1:8087/cw/resource-group/v1/groups
+  -X POST https://127.0.0.1:8087/cf/resource-group/v1/groups
 # Expected: 403 Forbidden
 
 # JWT request to descendants endpoint — full AuthZ applied
 curl -H "Authorization: Bearer test" \
-  http://127.0.0.1:8087/cw/resource-group/v1/groups/{group_id}/descendants
+  http://127.0.0.1:8087/cf/resource-group/v1/groups/{group_id}/descendants
 # Expected: 200 OK with AuthZ-scoped results
 ```
 
@@ -379,6 +379,6 @@ python3 scripts/ci.py e2e-local --config config/e2e-tr-authz.yaml -- -k "resourc
 
 - [RESOURCE_GROUP_MODEL.md](./RESOURCE_GROUP_MODEL.md) — How AuthZ uses RG data
 - [AUTHZ_USAGE_SCENARIOS.md](./AUTHZ_USAGE_SCENARIOS.md) — SQL-level scenarios (S14–S21 for groups)
-- [RG DESIGN](../../../modules/system/resource-group/docs/DESIGN.md) — RG module design, auth modes, init sequence
+- [RG DESIGN](../../../gears/system/resource-group/docs/DESIGN.md) — RG module design, auth modes, init sequence
 - [AuthZ DESIGN](./DESIGN.md) — Core authorization design
-- [RG PRD](../../../modules/system/resource-group/docs/PRD.md) — Product requirements
+- [RG PRD](../../../gears/system/resource-group/docs/PRD.md) — Product requirements

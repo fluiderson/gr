@@ -8,8 +8,8 @@
 
 ### 1.1 Purpose
 
-Cyber Ware MUST be deployable into environments that require a FIPS 140-3 cryptographic claim (US federal procurement,
-regulated industries, large enterprise security baselines). This PRD defines what the FIPS-mode build of Cyber Ware
+Gears MUST be deployable into environments that require a FIPS 140-3 cryptographic claim (US federal procurement,
+regulated industries, large enterprise security baselines). This PRD defines what the FIPS-mode build of Gears
 claims, what it does not claim, and the verification gates that make the claim defensible.
 
 The scope is the TLS data plane (outbound HTTPS, inbound HTTPS / mTLS termination, internal service mesh) on Linux,
@@ -25,7 +25,7 @@ Vendors often advertise "FIPS-enabled" builds while quietly violating one of the
 
 The Rust ecosystem has no single cross-platform CMVP-validated crypto module equivalent to Go 1.25's `crypto/fips140`.
 The OpenSSL FIPS Provider 3.1.2 (cert #4985) has cross-platform OE but requires giving up `rustls` (the TLS state
-machine moves into `libssl` C code, surrendering memory-safety guarantees). Cyber Ware already has `rustls` in
+machine moves into `libssl` C code, surrendering memory-safety guarantees). Gears already have `rustls` in
 production; the cost of replacing it with `libssl` outweighs the cost of maintaining three rustls `CryptoProvider`
 integrations.
 
@@ -66,27 +66,27 @@ the ADRs in [`adrs/`](adrs/).
 
 #### Security / Compliance Reviewer
 
-**ID**: `cpt-modkit-fips-actor-compliance-reviewer`
+**ID**: `cpt-toolkit-fips-actor-compliance-reviewer`
 
-- **Role**: Reviews a Cyber Ware deployment's FIPS posture before procurement sign-off or audit. Reads ADRs and PRD,
+- **Role**: Reviews a Gears deployment's FIPS posture before procurement sign-off or audit. Reads ADRs and PRD,
   runs verification gates, checks CMVP cert OE coverage against the targeted OS version.
 - **Needs**: Defensible audit trail (linkage smoke, dep-graph regression, wire-level probe, cert-OE cross-check);
   honest "does NOT claim" list; release checklist artefacts.
 
 #### Operations / Deployment Engineer
 
-**ID**: `cpt-modkit-fips-actor-ops`
+**ID**: `cpt-toolkit-fips-actor-ops`
 
-- **Role**: Builds, ships, and operates Cyber Ware under `--features fips`. Configures OS-level FIPS-mode flags where
+- **Role**: Builds, ships, and operates Gears under `--features fips`. Configures OS-level FIPS-mode flags where
   required (Windows registry), installs the binary on hosts inside the cert's OE.
 - **Needs**: One build flag, no special runtime config beyond OS-native FIPS-mode flags; clear error message when the
   deployment host is outside the cert's OE; documented per-OS toolchain requirements.
 
-#### Cyber Ware Module Developer
+#### CF/Gear Developer
 
-**ID**: `cpt-modkit-fips-actor-internal-dev`
+**ID**: `cpt-toolkit-fips-actor-internal-dev`
 
-- **Role**: Writes Rust code inside Cyber Ware modules. Must not introduce non-FIPS-validated crypto primitives (
+- **Role**: Writes Rust code inside Gears. Must not introduce non-FIPS-validated crypto primitives (
   intentionally or transitively) into the FIPS-build dep graph.
 - **Needs**: `cargo-deny` policy that rejects forbidden crates at PR time before they merge; clear list of supported
   algorithms.
@@ -95,7 +95,7 @@ the ADRs in [`adrs/`](adrs/).
 
 #### CMVP Module (Apple corecrypto / AWS-LC FIPS / Windows CNG)
 
-**ID**: `cpt-modkit-fips-actor-cmvp-module`
+**ID**: `cpt-toolkit-fips-actor-cmvp-module`
 
 - **Role**: External CMVP-validated cryptographic module. Performs every TLS-relevant primitive (RNG, hash, HMAC, AEAD,
   HKDF, ECDHE, ECDSA, RSA sign/verify) on behalf of `rustls`. Validated and shipped by Apple / AWS Labs / Microsoft
@@ -103,22 +103,22 @@ the ADRs in [`adrs/`](adrs/).
 
 #### TLS Peer
 
-**ID**: `cpt-modkit-fips-actor-tls-peer`
+**ID**: `cpt-toolkit-fips-actor-tls-peer`
 
 - **Role**: Any external HTTPS server (outbound case) or HTTPS client (inbound / mTLS case) that completes a TLS 1.2 or
-  1.3 handshake with Cyber Ware. Must offer an Approved cipher suite + curve + signature scheme for the handshake to
+  1.3 handshake with Gears. Must offer an Approved cipher suite + curve + signature scheme for the handshake to
   succeed.
 
 ## 3. Operational Concept & Environment
 
 ### 3.1 Module-Specific Environment Constraints
 
-These constraints derive from the CMVP ecosystem and Cargo's resolution model; they cannot be relaxed by Cyber Ware-side
+These constraints derive from the CMVP ecosystem and Cargo's resolution model; they cannot be relaxed by Gears-side
 engineering.
 
 - **Apple corecrypto is the only path to macOS FIPS.** Apple's `Security.framework` only exposes RSA and NIST P-curves;
   Apple does not submit any third-party module under their OE. Macos FIPS deployments MUST route through corecrypto via
-  the in-tree `cyberware-rustls-corecrypto-provider`.
+  the in-tree `cf-gears-rustls-corecrypto-provider`.
   See [ADR 0001](adrs/0001-macos-fips-via-corecrypto-provider.md), [ADR 0004](adrs/0004-macos-server-side-tls-via-corecrypto.md).
 - **Windows CNG is the only path to Windows FIPS.** Microsoft does not submit third-party modules; `rustls-symcrypt` is
   not currently CMVP-validated. Windows FIPS deployments MUST route through CNG via `rustls-cng-crypto`.
@@ -127,10 +127,10 @@ engineering.
   CAVS-listed TLS-PRF primitive (unlike AWS-LC FIPS). Consequence: macOS+FIPS deployments MUST restrict to TLS 1.3.
 - **Cargo has no target-conditional feature activation.** `[features] fips = ["rustls/fips"]` would activate
   `rustls/fips` on every target, including the macOS and Windows targets where `aws-lc-fips-sys` is dead code.
-  Workaround: empty shim crate `cyberware-rustls-fips-shim` with `[target.cfg(...)]`-gated deps.
+  Workaround: empty shim crate `cf-gears-rustls-fips-shim` with `[target.cfg(...)]`-gated deps.
   See [ADR 0002](adrs/0002-fips-feature-target-conditional-shim.md).
 - **Windows requires OS-level FIPS-mode.** CNG only enforces Approved-only algorithm restrictions when
-  `HKLM\System\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy = 1`. Cyber Ware refuses to start on Windows without
+  `HKLM\System\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy = 1`. Gears refuse to start on Windows without
   this; `rustls_cng_crypto::fips_provider()` returns an empty provider when the flag is off, and the bootstrap detects
   the empty-provider shape and fails closed.
 
@@ -139,7 +139,7 @@ engineering.
 ### 4.1 In Scope
 
 - TLS data plane (handshake + record layer) on Linux, macOS, Windows under `--features fips`.
-- Outbound HTTPS via `modkit-http`.
+- Outbound HTTPS via `toolkit-http`.
 - Inbound HTTPS termination and mTLS client-cert authentication via `rustls::ServerConfig` built on the FIPS provider.
 - Server-side TLS signing (RSA-PSS, RSA-PKCS#1 v1.5, ECDSA P-256/P-384/P-521) routed through the CMVP module.
 - Wire-level cipher-suite restriction to AES-GCM + ECDHE on NIST P-curves + Approved signature schemes.
@@ -150,7 +150,7 @@ engineering.
 
 ### 4.2 Out of Scope
 
-- **Cyber Ware itself on the CMVP Validated Modules list.** Cyber Ware is a consumer of validated modules; the validated
+- **Gears themselves on the CMVP Validated Modules list.** Gears are consumers of validated modules; the validated
   modules are Apple corecrypto, AWS-LC FIPS Provider, and Microsoft Windows CNG.
 - **Non-TLS crypto in the binary.** JWT signature validation (`jsonwebtoken`) uses `ring` / non-FIPS
   `aws-lc-rs`. `ring`, non-FIPS `aws-lc-rs`, and `chacha20` are linked into the macOS+fips binary via transitive deps
@@ -178,7 +178,7 @@ engineering.
 
 #### Outbound HTTPS routes through a CMVP-validated module
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-outbound-tls`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-outbound-tls`
 
 The system **MUST** route every TLS-relevant cryptographic primitive (random, hash, HMAC, AEAD encrypt/decrypt, HKDF,
 ECDHE, ECDSA sign/verify, RSA-PSS/PKCS#1 sign/verify) performed during outbound HTTPS through the CMVP-validated module
@@ -186,22 +186,21 @@ appropriate for the running OS (AWS-LC FIPS on Linux, Apple corecrypto on macOS,
 
 - **Rationale**: A FIPS 140-3 claim is only valid when every primitive terminates inside the CMVP boundary; any
   primitive performed in non-validated Rust code or in a different C library voids the claim.
-- **Actors**: `cpt-modkit-fips-actor-cmvp-module`, `cpt-modkit-fips-actor-tls-peer`
+- **Actors**: `cpt-toolkit-fips-actor-cmvp-module`, `cpt-toolkit-fips-actor-tls-peer`
 - **Acceptance Evidence**: Linkage smoke per [§9](#9-acceptance-criteria) (e.g. `otool -L` shows only
   `Security.framework` on macOS+fips); wire-level probe at `https://www.howsmyssl.com/a/check` reports AES-GCM-only
   `given_cipher_suites`.
 
 #### Inbound HTTPS / mTLS routes through a CMVP-validated module
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-inbound-tls`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-inbound-tls`
 
 The system **MUST** support `rustls::ServerConfig` construction over the FIPS provider so that inbound HTTPS termination
 and mTLS client-certificate authentication route every cryptographic primitive — including server-side / client-cert
 signing — through the CMVP-validated module.
 
-- **Rationale**: Deployments without a reverse-proxy edge layer (single-process edge, on-prem, mTLS) need server-side
-  TLS in Cyber Ware itself; the FIPS claim must extend to those code paths.
-- **Actors**: `cpt-modkit-fips-actor-cmvp-module`, `cpt-modkit-fips-actor-tls-peer`
+- **Rationale**: Deployments without a reverse-proxy edge layer (single-process edge, on-prem, mTLS) need server-side TLS in Gears libraries; the FIPS claim must extend to those code paths.
+- **Actors**: `cpt-toolkit-fips-actor-cmvp-module`, `cpt-toolkit-fips-actor-tls-peer`
 - **Acceptance Evidence**: `tests/handshake_smoke.rs::server_handshake_*` covers TLS 1.3 × {P-256, P-384, P-521,
   RSA-2048} and TLS 1.2 × {ECDHE_ECDSA, ECDHE_RSA}; `server_config_on_fips_provider_advertises_fips` asserts
   `ServerConfig::fips() == true` under `fips_provider()` + EMS.
@@ -210,7 +209,7 @@ signing — through the CMVP-validated module.
 
 #### Wire profile contains only Approved algorithms
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-wire-profile`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-wire-profile`
 
 The system **MUST** restrict the wire-level cipher-suite list, key-exchange group list, and signature scheme list under
 `--features fips` to FIPS-Approved algorithms: AES-128/256-GCM, ECDHE on NIST P-256/P-384, ECDSA on P-256/P-384/P-521,
@@ -218,14 +217,14 @@ RSA-PSS and RSA-PKCS#1 v1.5 with SHA-256/384/512, HKDF over SHA-256/384, SHA-2 f
 
 - **Rationale**: A `ClientHello` that offers a non-Approved algorithm (ChaCha20-Poly1305, X25519, MLKEM, Ed25519) is a
   wire-level FIPS claim violation even if the negotiated suite is Approved.
-- **Actors**: `cpt-modkit-fips-actor-tls-peer`
+- **Actors**: `cpt-toolkit-fips-actor-tls-peer`
 - **Acceptance Evidence**: `tests/fips_provider_invariants.rs` (G-6 regression:
   `fips_provider_has_only_aes_gcm_cipher_suites`, `fips_provider_has_only_nist_kx_groups`,
   `fips_provider_has_only_tls13_protocol`).
 
 #### RSA modulus minimum enforced at key load
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-rsa-modulus`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-rsa-modulus`
 
 The system **MUST** reject RSA private keys with modulus < 2048 bits at load time, per NIST FIPS 186-5 §5.1.
 
@@ -235,24 +234,24 @@ The system **MUST** reject RSA private keys with modulus < 2048 bits at load tim
 
 #### TLS 1.2 EMS required under FIPS claim
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-tls12-ems`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-tls12-ems`
 
 The system **MUST** set `require_ems = true` on every TLS 1.2 `ClientConfig` / `ServerConfig` constructed under
 `--features fips`, per NIST SP 800-52 Rev. 2 §3.5.
 
 - **Rationale**: Without EMS, a TLS 1.2 master-secret can be derived from session state that does not bind to the
   handshake's full transcript, breaking the FIPS claim's session-key derivation chain.
-- **Acceptance Evidence**: `libs/modkit-http/src/tls.rs::build_client_config` sets the flag and asserts
+- **Acceptance Evidence**: `libs/toolkit-http/src/tls.rs::build_client_config` sets the flag and asserts
   `config.fips() == true` under `feature = "fips"`.
 
 ### 5.3 EC Key Boundary Preservation
 
 #### EC public point read from SEC1, never derived
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-ec-publickey-read`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-ec-publickey-read`
 
 The system **MUST NOT** derive an EC public point `Q = d · G` from a private scalar `d` in non-CMVP-validated Rust code
-on macOS. EC keys imported via `cyberware-rustls-corecrypto-provider` MUST read the public point from the SEC1
+on macOS. EC keys imported via `cf-gears-rustls-corecrypto-provider` MUST read the public point from the SEC1
 `EcPrivateKey.publicKey` OPTIONAL field; SEC1 inputs without `publicKey`, or with `publicKey` in compressed form, MUST
 be rejected fail-closed.
 
@@ -265,7 +264,7 @@ be rejected fail-closed.
 
 #### Dep-graph bans non-FIPS crypto crates
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-dep-graph-policy`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-dep-graph-policy`
 
 The system **MUST** refuse to compile under `--features fips` if the resolved dependency graph contains any crate from
 the Phase A ban list in [`deny-fips.toml`](../../../deny-fips.toml). Phase A covers non-Approved hashes (`md2`, `md4`,
@@ -282,11 +281,11 @@ CryptoProviders (`rustls-symcrypt`, `rustls-mbedcrypto-provider`, …).
 
 #### macOS OE validation at provider construction
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-macos-oe-check`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-macos-oe-check`
 
 The system **MUST** verify the running macOS major version against the active Apple corecrypto CMVP cert OE table at
 `fips_provider()` construction time on macOS. Mismatch under `--features fips` MUST fail closed by panicking the
-process; the env-var `CYBERWARE_FIPS_OE_OVERRIDE=1` downgrades fail-closed to a `tracing::warn!` for CI use on
+process; the env-var `CF_GEARS_FIPS_OE_OVERRIDE=1` downgrades fail-closed to a `tracing::warn!` for CI use on
 pre-release macOS.
 
 - **Rationale**: A binary built with `--features fips` that runs on a macOS version outside the cert's OE has no valid
@@ -297,7 +296,7 @@ pre-release macOS.
 
 #### Windows OS-level FIPS-mode required
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-fr-windows-fips-mode`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-fr-windows-fips-mode`
 
 The system **MUST** refuse to install the CNG-backed crypto provider on Windows when the OS-level FIPS-mode flag (
 `HKLM\System\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy`) is not `1`. The bootstrap MUST detect
@@ -306,7 +305,7 @@ installing a non-handshakeable provider.
 
 - **Rationale**: CNG only enforces Approved-only algorithm restrictions when FIPS-mode is enabled; without the flag the
   CMVP cert's claim does not apply to runtime crypto operations.
-- **Acceptance Evidence**: Manual smoke per `examples/cyberware-fips-probe/README.md` "Verify on Windows" — negative case (
+- **Acceptance Evidence**: Manual smoke per `examples/cf-gears-fips-probe/README.md` "Verify on Windows" — negative case (
   FIPS-mode off → refusal).
 
 ## 6. Non-Functional Requirements
@@ -315,7 +314,7 @@ installing a non-handshakeable provider.
 
 #### Toolchain-availability for cross-compile
 
-- [ ] `p2` - **ID**: `cpt-modkit-fips-nfr-cross-compile-toolchain`
+- [ ] `p2` - **ID**: `cpt-toolkit-fips-nfr-cross-compile-toolchain`
 
 The system **MUST** support cross-compile of the Windows `--features fips` build from a developer Linux or macOS host
 using `cargo install cargo-xwin` plus `ninja` for the cmake-driven C deps. No Visual Studio, Xcode, or third-party
@@ -326,23 +325,23 @@ closed-source SDK MUST be required for the cross-compile gate to run in CI.
 
 #### Binary-linkage exclusivity per OS
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-nfr-binary-linkage`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-nfr-binary-linkage`
 
 The system **MUST NOT** link the AWS-LC FIPS dylib into macOS or Windows `--features fips` builds. Linkage smoke
 per [§9](#9-acceptance-criteria) MUST show only Apple `Security.framework` on macOS and only `bcrypt.dll` on Windows (no
 `aws-lc-fips*.so` / `*.dylib` / `*.dll`).
 
-- **Threshold**: `otool -L target/release/cyberware-fips-probe | grep -E 'aws|ssl|crypto'` returns only `Security.framework` on
-  macOS; `dumpbin /imports cyberware-fips-probe.exe | findstr /i "bcrypt aws"` returns only `bcrypt.dll` on Windows.
+- **Threshold**: `otool -L target/release/cf-gears-fips-probe | grep -E 'aws|ssl|crypto'` returns only `Security.framework` on
+  macOS; `dumpbin /imports cf-gears-fips-probe.exe | findstr /i "bcrypt aws"` returns only `bcrypt.dll` on Windows.
 - **Rationale**: A FIPS claim asserted while a non-OE module is linked into the binary is questionable even if the
   non-OE module is never called; cleaner to exclude it from the link entirely.
 
 #### Memory-safety preservation under FIPS-build
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-nfr-memory-safety`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-nfr-memory-safety`
 
 The TLS state machine MUST remain implemented in memory-safe Rust (`rustls`) under `--features fips`. Heartbleed-class
-C-TLS-state-machine vulnerabilities MUST NOT enter Cyber Ware's threat model via the FIPS toolchain.
+C-TLS-state-machine vulnerabilities MUST NOT enter Gears' threat model via the FIPS toolchain.
 
 - **Rationale**: The OpenSSL FIPS Provider 3.1.2 (CMVP cert #4985) is the only cross-platform CMVP-validated option in
   the ecosystem; using it requires `openssl::ssl::SslStream`, which moves the TLS state machine into `libssl` C code. We
@@ -350,7 +349,7 @@ C-TLS-state-machine vulnerabilities MUST NOT enter Cyber Ware's threat model via
 
 #### Cross-OS architectural uniformity
 
-- [ ] `p2` - **ID**: `cpt-modkit-fips-nfr-cross-os-uniformity`
+- [ ] `p2` - **ID**: `cpt-toolkit-fips-nfr-cross-os-uniformity`
 
 Adding a new supported OS, or upgrading an existing supported OS to a new major version, MUST NOT require rewriting the
 TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST change.
@@ -364,20 +363,20 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 #### `--features fips` build flag
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-interface-cargo-feature`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-interface-cargo-feature`
 
-- **Type**: Cargo feature on `cyberware-modkit`, `cyberware-modkit-http`, and `cyberware-fips-probe`.
+- **Type**: Cargo feature on `cf-gears-toolkit`, `cf-gears-toolkit-http`, and `cf-gears-fips-probe`.
 - **Stability**: stable.
-- **Description**: Single user-facing API for selecting the FIPS-conformant build. Enables `cyberware-rustls-fips-shim` on
-  Linux (which pulls `rustls/fips` + `hyper-rustls/fips`), `cyberware-rustls-corecrypto-provider/fips` on macOS, and
+- **Description**: Single user-facing API for selecting the FIPS-conformant build. Enables `cf-gears-rustls-fips-shim` on
+  Linux (which pulls `rustls/fips` + `hyper-rustls/fips`), `cf-gears-rustls-corecrypto-provider/fips` on macOS, and
   `rustls-cng-crypto/fips` on Windows.
 - **Breaking Change Policy**: Removal or renaming requires a major version bump and a documented migration path per ADR.
 
-#### `modkit::bootstrap::init_crypto_provider`
+#### `toolkit::bootstrap::init_crypto_provider`
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-interface-init-crypto-provider`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-interface-init-crypto-provider`
 
-- **Type**: Rust public function on `cyberware-modkit`.
+- **Type**: Rust public function on `cf-gears-toolkit`.
 - **Stability**: stable.
 - **Description**: One-shot installer of the process-wide rustls `CryptoProvider`. Behaviour gated by
   `cfg(feature = "fips")` + `cfg(target_os = ...)`. Documented to be safe to call multiple times — only the first
@@ -385,11 +384,11 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 - **Breaking Change Policy**: Adding new `CryptoProviderError` variants is a non-breaking change (enum is
   `#[non_exhaustive]`); removing variants is breaking.
 
-#### `cyberware_rustls_corecrypto_provider::{default_provider, fips_provider}`
+#### `cf_gears_rustls_corecrypto_provider::{default_provider, fips_provider}`
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-interface-corecrypto-provider`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-interface-corecrypto-provider`
 
-- **Type**: Rust public functions on `cyberware-rustls-corecrypto-provider`.
+- **Type**: Rust public functions on `cf-gears-rustls-corecrypto-provider`.
 - **Stability**: unstable (`0.1.x`).
 - **Description**: Factory functions returning `rustls::crypto::CryptoProvider`. `default_provider()` returns TLS 1.2 +
   1.3 with `fips() = false`; `fips_provider()` returns TLS 1.3 only with `fips() = true`. Under the crate's own `fips`
@@ -401,18 +400,18 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 #### CMVP-validated module ABI
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-contract-cmvp-module-abi`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-contract-cmvp-module-abi`
 
 - **Direction**: required from external system.
 - **Protocol/Format**: Apple `Security.framework` / `CommonCrypto` (macOS), `bcrypt.dll` / `ncrypt.dll` (Windows),
   AWS-LC C ABI (Linux).
 - **Compatibility**: Each module's ABI is stable per OS major version; Apple, Microsoft, and AWS Labs publish a new CMVP
-  cert per OS major release. The Cyber Ware code adapts via the per-target `CryptoProvider` integration; binary
+  cert per OS major release. The Gears code adapts via the per-target `CryptoProvider` integration; binary
   compatibility is maintained by re-linking against the OS-supplied module at run time.
 
 #### TLS 1.2 / 1.3 peer wire compatibility
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-contract-tls-peer-wire`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-contract-tls-peer-wire`
 
 - **Direction**: provided to external systems (TLS peers).
 - **Protocol/Format**: RFC 5246 (TLS 1.2), RFC 8446 (TLS 1.3), RFC 5288 (TLS 1.2 GCM), RFC 7627 (TLS 1.2 EMS).
@@ -424,18 +423,18 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 ### 8.1 Outbound HTTPS to a FIPS-required backend
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-usecase-outbound-https`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-usecase-outbound-https`
 
-**Actor**: `cpt-modkit-fips-actor-tls-peer`
+**Actor**: `cpt-toolkit-fips-actor-tls-peer`
 
 **Preconditions**:
 
-- Cyber Ware is built with `--features fips`.
+- Gears are built with `--features fips`.
 - The deployment host's OS is inside the active CMVP cert's OE for the relevant module.
 
 **Main Flow**:
 
-1. Cyber Ware module calls `modkit_http::HttpClientBuilder::new().build()`.
+1. CF/Gear calls `toolkit_http::HttpClientBuilder::new().build()`.
 2. The HTTP client invokes `tls::get_crypto_provider()`, which returns the installed default rustls `CryptoProvider` (
    corecrypto on macOS, AWS-LC FIPS on Linux, CNG on Windows).
 3. The HTTP client constructs a `rustls::ClientConfig` with `require_ems = true` (TLS 1.2) and
@@ -450,33 +449,32 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 **Alternative Flows**:
 
-- **Peer offers only non-Approved algorithms** (ChaCha20-Poly1305, X25519): rustls's handshake fails; Cyber Ware returns
-  a `handshake_failure` to the caller. No silent downgrade.
+- **Peer offers only non-Approved algorithms** (ChaCha20-Poly1305, X25519): rustls's handshake fails; Gears return a `handshake_failure` to the caller. No silent downgrade.
 
 ### 8.2 Inbound HTTPS termination with mTLS
 
-- [ ] `p1` - **ID**: `cpt-modkit-fips-usecase-inbound-mtls`
+- [ ] `p1` - **ID**: `cpt-toolkit-fips-usecase-inbound-mtls`
 
-**Actor**: `cpt-modkit-fips-actor-tls-peer` (TLS client)
+**Actor**: `cpt-toolkit-fips-actor-tls-peer` (TLS client)
 
 **Preconditions**:
 
-- Cyber Ware is built with `--features fips`.
+- Gears are built with `--features fips`.
 - Server certificate + private key are available on disk (PEM/DER, RSA ≥ 2048 or NIST P-curve).
 - Server-cert is signed by a CA that the client trusts.
-- Client cert is signed by a CA that Cyber Ware trusts (for mTLS).
+- Client cert is signed by a CA that Gears libraries trust (for mTLS).
 
 **Main Flow**:
 
-1. Cyber Ware constructs a `rustls::ServerConfig::builder_with_provider(fips_provider().into())` and calls
-   `.with_single_cert(chain, key)`.
-2. Server-side `KeyProvider::load_private_key` parses the PEM/DER, performs structural unwrap (PKCS#8 → PKCS#1 for RSA,
-   PKCS#8/SEC1 → X9.63 for EC), and hands the bytes to `SecKeyCreateWithData` (macOS) / `BCryptImportKeyPair` (
-   Windows) / `EVP_PKEY_new` (Linux).
+1. Gears construct a `rustls::ServerConfig::builder_with_provider(fips_provider().into())` and calls `.with_single_cert(chain, key)`.
+
+2. Server-side `KeyProvider::load_private_key` parses the PEM/DER, performs structural unwrap (PKCS#8 → PKCS#1 for RSA, PKCS#8/SEC1 → X9.63 for EC), and hands the bytes to `SecKeyCreateWithData` (macOS) / `BCryptImportKeyPair` (Windows) / `EVP_PKEY_new` (Linux).
+
 3. For RSA, the loader rejects keys with modulus < 2048 bits.
+
 4. For EC, the loader reads `publicKey` from SEC1; if absent or compressed, rejects.
-5. On TLS handshake, the client's certificate is verified against the trust roots, and the server's signature in
-   `CertificateVerify` is produced via the CMVP module.
+
+5. On TLS handshake, the client's certificate is verified against the trust roots, and the server's signature in `CertificateVerify` is produced via the CMVP module.
 
 **Postconditions**:
 
@@ -493,18 +491,18 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 - [ ] `make fips-policy` exits clean on the workspace; no Phase A crate from [`deny-fips.toml`](../../../deny-fips.toml)
   appears in the `--features fips` resolved dep graph.
-- [ ] `cargo tree --target aarch64-apple-darwin -p cyberware-example-server --features fips` shows
-  `cyberware-rustls-corecrypto-provider` present and `aws-lc-fips-sys` absent.
-- [ ] `cargo tree --target x86_64-unknown-linux-gnu -p cyberware-example-server --features fips` shows `aws-lc-fips-sys`
+- [ ] `cargo tree --target aarch64-apple-darwin -p cf-gears-example-server --features fips` shows
+  `cf-gears-rustls-corecrypto-provider` present and `aws-lc-fips-sys` absent.
+- [ ] `cargo tree --target x86_64-unknown-linux-gnu -p cf-gears-example-server --features fips` shows `aws-lc-fips-sys`
   present.
-- [ ] `cargo tree --target x86_64-pc-windows-msvc -p cyberware-example-server --features fips` shows `rustls-cng-crypto`
+- [ ] `cargo tree --target x86_64-pc-windows-msvc -p cf-gears-example-server --features fips` shows `rustls-cng-crypto`
   present and `aws-lc-fips-sys` absent.
-- [ ] `otool -L target/release/cyberware-fips-probe | grep -E 'aws|ssl|crypto|Security'` on macOS+fips shows only
+- [ ] `otool -L target/release/cf-gears-fips-probe | grep -E 'aws|ssl|crypto|Security'` on macOS+fips shows only
   `Security.framework`.
-- [ ] `dumpbin /imports target/release/cyberware-fips-probe.exe | findstr /i "bcrypt aws"` on Windows+fips shows only
+- [ ] `dumpbin /imports target/release/cf-gears-fips-probe.exe | findstr /i "bcrypt aws"` on Windows+fips shows only
   `bcrypt.dll`.
-- [ ] `cargo test -p cyberware-rustls-corecrypto-provider --features fips --test fips_provider_invariants` passes.
-- [ ] `cargo run -p cyberware-fips-probe --features fips -- --url https://www.howsmyssl.com/a/check` reports
+- [ ] `cargo test -p cf-gears-rustls-corecrypto-provider --features fips --test fips_provider_invariants` passes.
+- [ ] `cargo run -p cf-gears-fips-probe --features fips -- --url https://www.howsmyssl.com/a/check` reports
   `given_cipher_suites` containing only AES-GCM, `given_named_groups` only `secp256r1` / `secp384r1`,
   `post_quantum_key_agreement: false`.
 - [ ] Apple corecrypto CMVP cert search
@@ -521,9 +519,9 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 |----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
 | `rustls` 0.23                                            | TLS state machine (handshake, record layer, alerts). Memory-safe Rust.                                                                               | `p1`        |
 | `aws-lc-fips-sys`                                        | Linux FIPS-validated crypto module (CMVP cert #4816). Activated via `rustls/fips`.                                                                   | `p1`        |
-| Apple corecrypto / `Security.framework` / `CommonCrypto` | macOS OS-supplied CMVP-validated module. Routed via in-tree `cyberware-rustls-corecrypto-provider`.                                                         | `p1`        |
+| Apple corecrypto / `Security.framework` / `CommonCrypto` | macOS OS-supplied CMVP-validated module. Routed via in-tree `cf-gears-rustls-corecrypto-provider`.                                                         | `p1`        |
 | Microsoft Windows CNG (`bcrypt.dll`)                     | Windows OS-supplied CMVP-validated module. Routed via `rustls-cng-crypto` (community crate, caret-pinned `0.1.x`).                                   | `p1`        |
-| `cyberware-rustls-fips-shim` (in-tree)                          | Target-conditional feature shim activating `rustls/fips` only on non-macOS, non-Windows targets.                                                     | `p1`        |
+| `cf-gears-rustls-fips-shim` (in-tree)                          | Target-conditional feature shim activating `rustls/fips` only on non-macOS, non-Windows targets.                                                     | `p1`        |
 | `cargo-deny`                                             | Dep-graph policy enforcement for [`deny-fips.toml`](../../../deny-fips.toml).                                                                        | `p2`        |
 | `cargo-xwin` + `ninja`                                   | Cross-compile toolchain for Windows from Linux/macOS hosts. CI only.                                                                                 | `p3`        |
 | `pkcs8` + `sec1`                                         | Pure-Rust DER parsing for PKCS#8 / SEC1 EC key envelope unwrap. **No curve arithmetic** — keys pass to corecrypto without crypto operations in Rust. | `p2`        |
@@ -532,7 +530,7 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 - The deployment host runs an OS version inside the CMVP cert's OE for the relevant module (verified per release via §9
   release-checklist).
-- Windows deployments enable system-wide FIPS-mode via Group Policy or registry before installing Cyber Ware.
+- Windows deployments enable system-wide FIPS-mode via Group Policy or registry before installing Gears.
 - Operators configure server-side TLS keys at ≥ 2048-bit modulus for RSA or NIST P-curve for EC; legacy 1024-bit RSA
   keys are rejected at load.
 - Standard key-generation tooling (`rcgen`, `openssl`, GnuTLS) emits SEC1 EC keys with the `publicKey` OPTIONAL field;
@@ -547,7 +545,7 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 
 | Risk                                                                                         | Impact                                                                                                       | Mitigation                                                                                                                                                    |
 |----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Apple publishes a new corecrypto CMVP cert later than expected after a macOS major release   | New macOS deployments cannot pass §9 release-checklist; field deployments on the older OS major remain valid | `CYBERWARE_FIPS_OE_OVERRIDE=1` env-var for CI on pre-release macOS; release-checklist documents which macOS majors are currently covered                      |
+| Apple publishes a new corecrypto CMVP cert later than expected after a macOS major release   | New macOS deployments cannot pass §9 release-checklist; field deployments on the older OS major remain valid | `CF_GEARS_FIPS_OE_OVERRIDE=1` env-var for CI on pre-release macOS; release-checklist documents which macOS majors are currently covered                      |
 | `rustls-cng-crypto` is a single-maintainer young crate; upstream may stagnate                | Windows FIPS posture loses upstream maintenance                                                              | Caret-pin to `0.1.x`; migration path to `rustls-symcrypt` documented in [ADR 0003](adrs/0003-windows-fips-via-rustls-cng-crypto.md) as a trigger-based switch |
 | Apple SDK silently changes RSA-PSS salt-length default                                       | TLS 1.3 interop breaks with RFC-compliant peers; FIPS-claim becomes ambiguous                                | Cross-impl regression test `rsa_pss_apple_salt_length_matches_rfc8017` runs on every CI build                                                                 |
 | Transitive dep pulls a banned Phase A crate into a future PR                                 | Build-time FIPS regression                                                                                   | `make fips-policy` is a required CI gate via `make security`; pre-merge `cargo-deny` rejection                                                                |
@@ -557,7 +555,7 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
 ## 13. Open Questions
 
 - [ ] **TODO-1**: Keychain / NCrypt / HSM-stored private keys for server-side TLS — owner TBD, target post-1.0 of
-  `cyberware-rustls-corecrypto-provider`. Today's PEM/DER load is acceptable for development and most production deployments
+  `cf-gears-rustls-corecrypto-provider`. Today's PEM/DER load is acceptable for development and most production deployments
   where filesystem permissions guard the key, but the strict-FIPS posture requires the key never to materialize outside
   the validated module.
 - [ ] **TODO-2**: Cross-implementation interop tests (our corecrypto provider ↔ `aws-lc-rs` ↔ `rustls-cng-crypto` over
@@ -589,9 +587,9 @@ TLS state machine. Only the crypto-primitive backend behind a `cfg` branch MUST 
     - [ADR 0004 — macOS server-side TLS via corecrypto](adrs/0004-macos-server-side-tls-via-corecrypto.md)
     - [ADR 0005 — Workspace-level FIPS dependency policy via cargo-deny](adrs/0005-fips-dependency-policy.md)
 - **Implementation pointers**:
-    - [`libs/modkit/src/bootstrap/crypto.rs`](../../../libs/modkit/src/bootstrap/crypto.rs) — provider dispatch +
+    - [`libs/toolkit/src/bootstrap/crypto.rs`](../../../libs/toolkit/src/bootstrap/crypto.rs) — provider dispatch +
       install.
-    - [`libs/modkit-http/src/tls.rs`](../../../libs/modkit-http/src/tls.rs) — TLS config wiring + EMS enforcement.
+    - [`libs/toolkit-http/src/tls.rs`](../../../libs/toolkit-http/src/tls.rs) — TLS config wiring + EMS enforcement.
     - [`libs/rustls-corecrypto-provider/`](../../../libs/rustls-corecrypto-provider/) — macOS provider crate.
     - [`libs/rustls-fips-shim/`](../../../libs/rustls-fips-shim/) — target-conditional shim.
     - [`deny-fips.toml`](../../../deny-fips.toml) — dep-graph deny list.

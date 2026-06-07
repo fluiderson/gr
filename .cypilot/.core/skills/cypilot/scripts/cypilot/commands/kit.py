@@ -1172,7 +1172,7 @@ def _resolve_install_source_github(
         return (Path("."), "", "", "", None, 1)
 
     conf_file = kit_source / _KIT_CONF_FILE
-    kit_slug = _read_kit_slug(kit_source) or repo.removeprefix("cyber-pilot-kit-")
+    kit_slug = _read_kit_slug(kit_source) or repo.removeprefix("studio-kit-")
     kit_version = (
         resolved_version or _read_kit_version(conf_file)
         if conf_file.is_file() else resolved_version
@@ -1201,7 +1201,7 @@ def cmd_kit_install(argv: List[str]) -> int:
     )
     p.add_argument(
         "source", nargs="?", default=None,
-        help="GitHub source: owner/repo[@version] (e.g. cyberfabric/cyber-pilot-kit-sdlc@v1.0.0)",
+        help="GitHub source: owner/repo[@version] (e.g. constructorfabric/studio-kit-sdlc@v1.0.0)",
     )
     p.add_argument(
         "--path", dest="local_path", default=None,

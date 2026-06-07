@@ -3,7 +3,7 @@
 [package]
 name = "de1303_no_primitive_type_alias"
 version = "0.1.0"
-authors = ["Cyber Fabric"]
+authors = ["Constructor Fabric"]
 description = "Disallow pub type X = primitive; use newtype for type safety (DE1303)"
 edition.workspace = true
 publish = false

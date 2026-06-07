@@ -3,7 +3,7 @@
 [package]
 name = "de0707_drop_zeroize"
 version = "0.1.0"
-authors = ["Cyber Fabric"]
+authors = ["Constructor Fabric"]
 description = "Manual byte-zeroing in Drop may be optimized away; use the zeroize crate instead (DE0707)"
 edition.workspace = true
 publish = false

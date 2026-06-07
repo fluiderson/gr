@@ -75,7 +75,7 @@ def _seed_root_tenants():
 
     Idempotent: uses INSERT OR IGNORE.
     """
-    home = os.path.expanduser(os.getenv("CYBERWARE_HOME", "~/.cyberware"))
+    home = os.path.expanduser(os.getenv("CF_GEARS_HOME", "~/.cf-gears"))
     db_path = pathlib.Path(home) / "resource-group" / "resource_group.db"
     if not db_path.exists():
         return  # server not started or different DB path
@@ -139,7 +139,7 @@ def unique_type_code(name: str) -> str:
     """Generate a unique RG type code to avoid collisions between test runs."""
     global _counter
     _counter += 1
-    return f"gts.cf.core.rg.type.v1~x.e2etest.{name}{_counter}.v1~"
+    return f"gts.cf.core.rg.type.v1~x.e2etest._.{name}{_counter}.v1~"
 
 
 @pytest.fixture

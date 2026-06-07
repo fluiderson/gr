@@ -1,6 +1,6 @@
 // simulated_dir=modules/simple-resource-registry/simple-resource-registry/src/api/rest
 
-use modkit::api::OperationBuilder;
+use toolkit::api::OperationBuilder;
 
 fn test_operations() {
     let router1: OperationBuilder<_, _, ()> =

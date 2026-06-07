@@ -1,5 +1,5 @@
 [package]
-name = "cyberware-system-sdk-directory"
+name = "cf-gears-system-sdk-directory"
 version = "0.1.35"
 edition.workspace = true
 license.workspace = true
@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Directory service SDK module"
 readme = "README.md"
 rust-version.workspace = true
-keywords = ["cyberfabric", "cyberware", "cyberware-system"]
+keywords = ["constructorfabric", "cf-gears", "cf-gears-system"]
 categories = ["web-programming"]
 build = "build.rs"
 include = ["proto/", "src/", "build.rs", "Cargo.toml"]
@@ -22,7 +22,7 @@ workspace = true
 
 [features]
 grpc = [
-    "dep:modkit-transport-grpc",
+    "dep:toolkit-transport-grpc",
     "dep:tonic",
     "dep:tonic-prost",
     "dep:prost",
@@ -35,7 +35,7 @@ anyhow = { workspace = true }
 async-trait = { workspace = true }
 
 
-modkit-transport-grpc = { workspace = true, optional = true }
+toolkit-transport-grpc = { workspace = true, optional = true }
 tonic = { workspace = true, features = ["transport"], optional = true }
 tonic-prost = { workspace = true, optional = true }
 prost = { workspace = true, optional = true }

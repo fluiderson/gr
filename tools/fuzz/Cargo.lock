@@ -85,7 +85,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyberware-modkit-errors"
+name = "cf-gears-toolkit-errors"
 version = "0.5.1"
 dependencies = [
  "http",
@@ -93,7 +93,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyberware-modkit-errors-macro"
+name = "cf-gears-toolkit-errors-macro"
 version = "0.5.1"
 dependencies = [
  "proc-macro2",
@@ -104,13 +104,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyberware-modkit-odata"
+name = "cf-gears-toolkit-odata"
 version = "0.5.1"
 dependencies = [
  "base64",
  "bigdecimal",
- "cyberware-modkit-errors",
- "cyberware-modkit-errors-macro",
+ "cf-gears-toolkit-errors",
+ "cf-gears-toolkit-errors-macro",
  "chrono",
  "hex",
  "http",
@@ -244,10 +244,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyberware-fuzz"
+name = "cf-gears-fuzz"
 version = "0.0.0"
 dependencies = [
- "cyberware-modkit-odata",
+ "cf-gears-toolkit-odata",
  "libfuzzer-sys",
 ]
 

@@ -4,7 +4,7 @@ Directory service SDK module.
 
 ## Overview
 
-The `cyberware-system-sdk-directory` crate provides the service discovery contract used by system modules:
+The `cf-gears-system-sdk-directory` crate provides the service discovery contract used by system modules:
 
 - `DirectoryClient` trait
 - Types for registering and resolving service instances

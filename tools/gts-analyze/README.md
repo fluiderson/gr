@@ -1,13 +1,13 @@
 # gts-analyze
 
-Analyze GTS (Global Type System) usage in a single Cyber Ware module. Reports types defined here, instances declared here, and every GTS identifier reference across `.rs` / `.md` / `.json` / `.toml` / `.yaml` files, broken down by location (`sdk` / `main` / `plugin` / `doc`).
+Analyze GTS (Global Type System) usage in a single Gear. Reports types defined here, instances declared here, and every GTS identifier reference across `.rs` / `.md` / `.json` / `.toml` / `.yaml` files, broken down by location (`sdk` / `main` / `plugin` / `doc`).
 
 ## Usage
 
 ```sh
-cargo run --release -p gts-analyze -- modules/system/resource-group
+cargo run --release -p gts-analyze -- gears/system/resource-group
 cargo run --release -p gts-analyze -- modules/mini-chat --skip-docs --verbose
-cargo run --release -p gts-analyze -- modules/system/account-management --format json --out report.json
+cargo run --release -p gts-analyze -- gears/system/account-management --format json --out report.json
 ```
 
 ### Flags

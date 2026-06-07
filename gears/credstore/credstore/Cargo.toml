@@ -1,0 +1,41 @@
+[package]
+name = "cf-gears-credstore"
+description = "credstore gateway module"
+version = "0.1.22"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "README.md"
+keywords = ["constructorfabric", "cf-gears", "cf-gears-system"]
+categories = ["security"]
+metadata.docs.rs.all-features = true
+
+[lib]
+name = "credstore"
+
+[lints]
+workspace = true
+
+[dependencies]
+credstore-sdk = { workspace = true }
+types-registry-sdk = { workspace = true }
+
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+inventory = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+utoipa = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+
+toolkit = { workspace = true }
+toolkit-security = { workspace = true }
+toolkit-macros = { workspace = true }
+
+[dev-dependencies]
+types-registry-sdk = { workspace = true, features = ["test-util"] }

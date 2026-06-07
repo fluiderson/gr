@@ -1,4 +1,4 @@
-// simulated_dir=/cyberfabric/modules/file_parser/build.rs
+// simulated_dir=/cf-gears/gears/file_parser/build.rs
 
 fn main() {
     println!("allowed in build.rs");

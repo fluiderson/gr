@@ -1,6 +1,6 @@
-# Cyber Ware Dylint Linters
+# Gears Dylint Linters
 
-Custom [dylint](https://github.com/trailofbits/dylint) linters enforcing Cyber Ware's architectural patterns, layer separation, and REST API conventions.
+Custom [dylint](https://github.com/trailofbits/dylint) linters enforcing Gears' architectural patterns, layer separation, and REST API conventions.
 
 ## Quick Start
 
@@ -287,8 +287,8 @@ Where each segment = vendor.org.package.type.version
 
 **Examples:**
 ```text
-gts.cf.modkit.plugins.plugin.v1~                             # Schema (type definition)
-gts.cf.modkit.plugins.plugin.v1~vendor.pkg.module.plugin.v1  # Instance (chained)
+gts.cf.toolkit.plugins.plugin.v1~                             # Schema (type definition)
+gts.cf.toolkit.plugins.plugin.v1~vendor.pkg.module.plugin.v1  # Instance (chained)
 gts.hx.core.errors.err.v1~hx.odata.errors.invalid.v1         # Error code
 ```
 

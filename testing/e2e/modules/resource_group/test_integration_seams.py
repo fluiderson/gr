@@ -8,7 +8,7 @@ Each test guards a specific integration seam -- a point where two independently
 correct components can break when connected. If the seam is already covered by
 a unit test (Feature 0006), there is no E2E test for it.
 
-See: modules/system/resource-group/docs/features/0007-e2e-testing.md
+See: gears/system/resource-group/docs/features/0007-e2e-testing.md
 """
 import os
 import uuid

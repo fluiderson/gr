@@ -82,7 +82,7 @@ A trait with `fn category(&self) -> Category` and `fn context(&self) -> ContextV
 
 ## More Information
 
-Library error blanket `From` impls shipped with `modkit-errors`:
+Library error blanket `From` impls shipped with `toolkit-errors`:
 
 | Library Type | Maps To | Rationale |
 |---|---|---|

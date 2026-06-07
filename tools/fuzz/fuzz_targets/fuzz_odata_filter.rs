@@ -1,7 +1,7 @@
 #![no_main]
 
 use libfuzzer_sys::fuzz_target;
-use modkit_odata::parse_filter_string;
+use toolkit_odata::parse_filter_string;
 
 fuzz_target!(|data: &[u8]| {
     // Limit input size to avoid OOM on pathological inputs

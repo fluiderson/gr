@@ -4,10 +4,10 @@
 # Based on quickstart.yaml but stripped to essentials.
 #
 # Usage:
-#   cargo run --bin cyberware-server --features mini-chat,static-authn,static-authz,single-tenant,static-credstore -- --config config/mini-chat.yaml run
+#   cargo run --bin cf-gears-server --features mini-chat,static-authn,static-authz,single-tenant,static-credstore -- --config config/mini-chat.yaml run
 
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 database:
   servers:
@@ -24,7 +24,7 @@ database:
 logging:
   default:
     console_level: info
-    file: "logs/cyberware.log"
+    file: "logs/cf-gears.log"
     file_level: info
   sqlx:
     console_level: debug
@@ -62,19 +62,19 @@ modules:
 
   grpc-hub:
     config:
-      listen_addr: "uds:///tmp/cyberware-grpc"
+      listen_addr: "uds:///tmp/cf-gears-grpc"
 
   authn-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   authz-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   static-authn-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       mode: accept_all
       s2s_credentials:
@@ -83,16 +83,16 @@ modules:
 
   static-authz-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
 
   tenant-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   single-tenant-tr-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   simple-user-settings:
     database:
@@ -115,14 +115,14 @@ modules:
     database:
       server: "sqlite_mini_chat"
       file: "resource_group.db"
-    config: {}      
+    config: {}
 
   mini-chat:
     database:
       server: "sqlite_mini_chat"
       file: "mini_chat.db"
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       orphan_watchdog:
         scan_interval_secs: 10
         timeout_secs: 90
@@ -196,13 +196,13 @@ modules:
 
   static-mini-chat-audit-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       enabled: true
 
   static-mini-chat-model-policy-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       model_catalog:
         # ── GPT-4.1 (Premium) ──

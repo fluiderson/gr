@@ -29,7 +29,7 @@ pub(crate) use rsa::RSA_SCHEMES;
 /// `fips()` consults the runtime witness in [`crate::oe::fips_witness_ok`]:
 /// `true` when the running macOS major is inside the active Apple
 /// corecrypto CMVP cert's Operational Environment (or when the
-/// `CYBERWARE_FIPS_OE_OVERRIDE` env-var is set for CI), `false`
+/// `CF_GEARS_FIPS_OE_OVERRIDE` env-var is set for CI), `false`
 /// otherwise. This propagates honestly to `ClientConfig::fips()` /
 /// `ServerConfig::fips()` rather than asserting a claim by intent —
 /// mirrors `rustls-cng-crypto`'s `fips::enabled()` pattern on Windows
@@ -62,7 +62,7 @@ fn any_supported_type(der: &PrivateKeyDer<'_>) -> Result<Arc<dyn SigningKey>, Er
         return Ok(Arc::new(key));
     }
     Err(Error::General(
-        "cyberware-rustls-corecrypto-provider: unsupported private-key type \
+        "cf-gears-rustls-corecrypto-provider: unsupported private-key type \
          (expected RSA or NIST P-256/P-384/P-521 in PKCS#1, PKCS#8 or SEC1 DER)"
             .to_owned(),
     ))

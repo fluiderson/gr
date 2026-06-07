@@ -1,9 +1,9 @@
-# Cyber Ware Example Server Configuration
+# CF/Gears Example Server Configuration
 #
 # Database Architecture Overview:
 # ===============================
 #
-# Cyber Ware Example Server uses a centralized DbManager that:
+# CF/Gears Example Server uses a centralized DbManager that:
 # 1. Loads global database server templates from `database.servers`
 # 2. For each module, merges server template with module-specific overrides
 # 3. Creates isolated database connections per module
@@ -18,7 +18,7 @@
 
 # Core server configuration (global section)
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 # Database configuration (DbManager architecture)
 #
@@ -64,7 +64,7 @@ logging:
   # global section
   default:
     console_level: info
-    file: "logs/cyberware.log"
+    file: "logs/cf-gears.log"
     file_level: info
     max_age_days: 28
     max_backups: 3
@@ -99,9 +99,9 @@ modules:
 
       # OpenAPI Documentation Configuration
       openapi:
-        title: "Cyber Ware Example Server API"
+        title: "CF/Gears Example Server API"
         version: "0.1.0"
-        description: "Cyber Ware Example Server API Documentation"
+        description: "CF/Gears Example Server API Documentation"
 
       # Authentication Configuration
       auth_disabled: true
@@ -125,7 +125,7 @@ modules:
         # args: ["--config", "config/oop-example.yaml"]
         # The local config file is used to:
         #   - Configure system modules for OoP process (e.g., grpc_hub.listen_addr)
-        #   - Override settings from master (MODKIT_MODULE_CONFIG)
+        #   - Override settings from master (TOOLKIT_MODULE_CONFIG)
         #   - Run in standalone mode (without master host)
         args: [ "--config", "./config/oop-example.yaml" ]
         working_directory: "."
@@ -141,7 +141,7 @@ modules:
       server: "sqlite_users"               # Inherits params and pool settings from sqlite_users
 
       # Module-specific database file (required for SQLite modules)
-      file: "users_info.db"                # Creates: ~/.cyberfabric/users_info/users_info.db
+      file: "users_info.db"                # Creates: ~/.cf-gears/users_info/users_info.db
 
       # Module can override server settings:
       # params:
@@ -168,10 +168,10 @@ modules:
 
   tenant-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
   static-tr-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 20
       # Tenant tree configuration (example: company with 2 divisions, each with departments)
       tenants:
@@ -228,11 +228,11 @@ modules:
 opentelemetry:
   # Shared resource identity (attached to all traces and metrics)
   resource:
-    service_name: "cyberware-api"
+    service_name: "cf-gears-api"
     attributes:
       service.version: "1.3.7"
       deployment.environment: "dev"
-      service.namespace: "cyberware"
+      service.namespace: "cf-gears"
 
   # Default exporter shared by tracing and metrics.
   # Per-signal `exporter` fields override this when present.
@@ -286,11 +286,11 @@ opentelemetry:
 #     main_postgres:
 #       host: "localhost"
 #       port: 5432
-#       user: "cyberware"
+#       user: "cf_gears"
 #       password: "${POSTGRES_PASSWORD}"  # From environment variable
 #       params:
 #         sslmode: "require"
-#         application_name: "cyberware"
+#         application_name: "cf_gears"
 #       pool:
 #         max_conns: 20
 #         acquire_timeout: "30s"

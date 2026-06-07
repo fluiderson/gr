@@ -1,14 +1,14 @@
 ---
 status: accepted
 date: 2026-01-29
-decision-makers: Vasily
+decision-makers: Constructor Fabric Steering Committee
 ---
 
 # Use Separate AuthN Resolver and AuthZ Resolver
 
 ## Context and Problem Statement
 
-Cyber Ware requires integration with vendor-specific identity and authorization infrastructure. This integration involves two distinct concerns:
+Gears require integration with vendor-specific identity and authorization infrastructure. This integration involves two distinct concerns:
 
 1. **Authentication (AuthN)** — Token validation (JWT signature verification, introspection), JWKS management, claim extraction, and SecurityContext production
 2. **Authorization (AuthZ)** — Policy Decision Point (PDP) functionality, policy evaluation, and constraint generation for Policy Enforcement Points (PEPs)
@@ -18,7 +18,7 @@ These are conceptually separate responsibilities governed by different standards
 - **AuthN** — OpenID Connect Core 1.0, RFC 7519 (JWT), RFC 7662 (Token Introspection)
 - **AuthZ** — OpenID AuthZEN Authorization API 1.0, NIST SP 800-162 (PDP/PEP model)
 
-**Key architectural question:** Should Cyber Ware use a single unified resolver module (Auth Resolver) that handles both AuthN and AuthZ, or should these be split into two independent modules with plugins (AuthN Resolver and AuthZ Resolver)?
+**Key architectural question:** Should Gears use a single unified resolver module (Auth Resolver) that handles both AuthN and AuthZ, or should these be split into two independent modules with plugins (AuthN Resolver and AuthZ Resolver)?
 
 This decision impacts deployment flexibility, vendor integration patterns, security boundaries, caching strategies, and component reusability.
 

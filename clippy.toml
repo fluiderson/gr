@@ -1,4 +1,4 @@
-# Clippy configuration for Cyber Ware
+# Clippy configuration for CF/Gears
 avoid-breaking-exported-api = false
 
 check-inconsistent-struct-field-initializers = true

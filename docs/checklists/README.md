@@ -136,7 +136,7 @@ These checklists are integrated with the Cypilot PR review workflow. When review
 - **PRD PRs**: Use `PRD.md` — covers requirements completeness, testability, traceability, and industry alignment
 - **Design PRs**: Use `DESIGN.md` — covers architecture, trade-offs, API contracts, security, and antipatterns
 - **ADR PRs**: Use `ADR.md` — covers decision significance, alternatives analysis, and overlap detection
-- **Code PRs**: Use `CODING.md` — covers Rust correctness, architecture (ModKit/SDK pattern), security (secure ORM), clippy/dylint compliance, testing, performance, etc.
+- **Code PRs**: Use `CODING.md` — covers Rust correctness, architecture (ToolKit/SDK pattern), security (secure ORM), clippy/dylint compliance, testing, performance, etc.
 
 The checklist is auto-selected by the `/cypilot-pr-review` workflow based on the PR content. Configuration is in `.cypilot/config/pr-review.toml` under the `[[prompts]]` entries.
 

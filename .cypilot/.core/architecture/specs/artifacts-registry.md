@@ -442,7 +442,7 @@ fail_on_unmatched_markdown = true
 
 [[systems.autodetect.children]]
 kit = "cypilot-sdlc"
-system_root = "{parent_root}/modules/{system}"
+system_root = "{parent_root}/gears/{system}"
 artifacts_root = "{system_root}/specs"
 
 [systems.autodetect.children.artifacts.PRD]
@@ -786,7 +786,7 @@ else:
 
 [[ignore]]
 reason = "Third-party module"
-patterns = ["modules/my_module/*"]
+patterns = ["gears/my_module/*"]
 
 # ── Root system ──────────────────────────────────────────────
 
@@ -844,7 +844,7 @@ fail_on_unmatched_markdown = true
 
 [[systems.autodetect.children]]
 kit = "cypilot-sdlc"
-system_root = "{parent_root}/modules/{system}"
+system_root = "{parent_root}/gears/{system}"
 artifacts_root = "{system_root}/specs"
 
 [systems.autodetect.children.artifacts.PRD]
@@ -907,21 +907,21 @@ end = "*/"
 name = "Auth"
 slug = "auth"
 kit = "cypilot-sdlc"
-artifacts_dir = "modules/auth/architecture"
+artifacts_dir = "gears/auth/architecture"
 
 [[systems.children.artifacts]]
-path = "modules/auth/architecture/PRD.md"
+path = "gears/auth/architecture/PRD.md"
 kind = "PRD"
 traceability = "DOCS-ONLY"
 
 [[systems.children.artifacts]]
-path = "modules/auth/architecture/features/sso.md"
+path = "gears/auth/architecture/features/sso.md"
 kind = "FEATURE"
 traceability = "FULL"
 
 [[systems.children.codebase]]
 name = "Auth Module"
-path = "src/modules/auth"
+path = "src/gears/auth"
 extensions = [".ts"]
 ```
 

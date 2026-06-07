@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use tonic::transport::Channel;
 
 use crate::api::{DirectoryClient, RegisterInstanceInfo, ServiceEndpoint, ServiceInstanceInfo};
-use modkit_transport_grpc::client::{GrpcClientConfig, connect_with_retry};
+use toolkit_transport_grpc::client::{GrpcClientConfig, connect_with_retry};
 
 use crate::{
     DeregisterInstanceRequest, DirectoryServiceClient, GrpcServiceEndpoint, HeartbeatRequest,

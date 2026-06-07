@@ -1,34 +1,34 @@
 ---
 status: accepted
 date: 2026-01-22
-decision-makers: Cyber Fabric Architects Committee
+decision-makers: Constructor Fabric steering committee
 ---
 
 # Adopt AuthZEN-based PDP/PEP Authorization Model
 
 ## Context and Problem Statement
 
-Cyber Ware is a modular platform for building multi-tenant vendor platforms. Each vendor has its own identity provider (IdP), authorization model, tenant service, and policy manager. Cyber Ware must integrate with these vendor-specific systems without assuming a particular policy model (RBAC/ABAC/ReBAC).
+Gears is a modular platform for building multi-tenant vendor platforms. Each vendor has its own identity provider (IdP), authorization model, tenant service, and policy manager. Gears must integrate with these vendor-specific systems without assuming a particular policy model (RBAC/ABAC/ReBAC).
 
 **Key requirements:**
 
-1. **Performance at scale** — Authorization must be efficient for all operations, including mass-management scenarios in multi-tenant environments (bulk updates, cross-tenant queries, hierarchical access). Access check complexity varies by vendor and should not bottleneck Cyber Ware.
+1. **Performance at scale** — Authorization must be efficient for all operations, including mass-management scenarios in multi-tenant environments (bulk updates, cross-tenant queries, hierarchical access). Access check complexity varies by vendor and should not bottleneck Gears.
 
-2. **Simplicity for module developers** — Authorization enforcement must be hard to get wrong. Authorization logic in modules should be minimal — ideally just "ask PDP, apply response". Complex policy evaluation belongs in vendor's PDP, not in Cyber Ware code (even shared libraries are costly to update across deployments).
+2. **Simplicity for module developers** — Authorization enforcement must be hard to get wrong. Authorization logic in modules should be minimal — ideally just "ask PDP, apply response". Complex policy evaluation belongs in vendor's PDP, not in Gears code (even shared libraries are costly to update across deployments).
 
-3. **Seamless vendor integration** — Cyber Ware must integrate into vendor's existing infrastructure without requiring significant changes on their side:
-   - **No resource sync** — Resources stay in Cyber Ware's DB; vendors don't need to replicate millions of resources or all their relationships to their authorization service
-   - **No policy format requirements** — Vendors keep their existing policy storage (RBAC tables, ReBAC tuples, custom DSL); Cyber Ware only defines the response contract
+3. **Seamless vendor integration** — Gears must integrate into vendor's existing infrastructure without requiring significant changes on their side:
+   - **No resource sync** — Resources stay in Gears' DB; vendors don't need to replicate millions of resources or all their relationships to their authorization service
+   - **No policy format requirements** — Vendors keep their existing policy storage (RBAC tables, ReBAC tuples, custom DSL); Gears only define the response contract
    - **Leverage existing infrastructure** — Works with vendor's IdP, tenant service, and policy manager as-is
 
 ### PDP/PEP Architecture Model
 
 Industry best practices (NIST SP 800-162, XACML, AuthZEN) recommend separating authorization into:
 
-- **PDP (Policy Decision Point)** — Evaluates policies and returns access decisions. In Cyber Ware, this is the vendor's authorization service accessed via AuthZ Resolver module.
-- **PEP (Policy Enforcement Point)** — Enforces PDP decisions at resource access points. In Cyber Ware, domain modules act as PEPs, with ModKit providing shared enforcement infrastructure.
-- **PAP (Policy Administration Point)** — Where policies are authored and managed. This is entirely vendor-controlled (their admin UI, policy DSL, etc.). Cyber Ware never sees or stores policies.
-- **PIP (Policy Information Point)** — Provides additional attributes for decision-making (user roles, tenant hierarchy, resource metadata). In Cyber Ware, Tenant Resolver and Resource Group Resolver serve as PIPs.
+- **PDP (Policy Decision Point)** — Evaluates policies and returns access decisions. In Gears, this is the vendor's authorization service accessed via AuthZ Resolver module.
+- **PEP (Policy Enforcement Point)** — Enforces PDP decisions at resource access points. In Gears, domain modules act as PEPs, with ToolKit providing shared enforcement infrastructure.
+- **PAP (Policy Administration Point)** — Where policies are authored and managed. This is entirely vendor-controlled (their admin UI, policy DSL, etc.). Gears never see or stores policies.
+- **PIP (Policy Information Point)** — Provides additional attributes for decision-making (user roles, tenant hierarchy, resource metadata). In Gears, Tenant Resolver and Resource Group Resolver serve as PIPs.
 
 Benefits of PDP/PEP separation:
 
@@ -37,12 +37,12 @@ Benefits of PDP/PEP separation:
 - Separation of concerns (business logic vs authorization logic)
 - Easier security audits and compliance
 
-Cyber Ware modules act as PEPs; AuthZ Resolver integrates with vendor's PDP; Tenant/RG Resolvers act as PIPs.
+CF/Gears act as PEPs; AuthZ Resolver integrates with vendor's PDP; Tenant/RG Resolvers act as PIPs.
 
 ## Decision Drivers
 
 - **Performance** — O(1) authorization overhead per query, not O(N) per resource
-- **Simplicity** — Module developers use shared ModKit library, not manual authorization code
+- **Simplicity** — Module developers use shared ToolKit library, not manual authorization code
 - **Vendor integration** — No resource sync, no policy format requirements, leverage existing infrastructure
 - **Vendor-neutral** — No assumption about policy model (RBAC/ABAC/ReBAC)
 - **Standards-based** — Build on industry standards where possible
@@ -100,7 +100,7 @@ Each module implements its own authorization logic: extracts permissions/roles f
 - Bad, because authorization logic scattered across modules — hard to audit, easy to make mistakes
 - Bad, because each module must understand and correctly implement policy evaluation
 - Bad, because inconsistent enforcement across modules, difficult compliance audits
-- Bad, because complex authorization logic lives in Cyber Ware (even if in shared library — bugs, versioning, update rollout across deployments)
+- Bad, because complex authorization logic lives in Gears (even if in shared library — bugs, versioning, update rollout across deployments)
 
 ### Option B: Google Zanzibar / ReBAC
 
@@ -143,7 +143,7 @@ Extend [AuthZEN 1.0](https://openid.net/specs/authorization-api-1_0.html) (appro
 
 - Good, because standards-based foundation (AuthZEN 1.0) with targeted extension
 - Good, because purpose-built for SQL compilation, simpler PEP implementation
-- Good, because **shared ModKit library handles enforcement** — module developers call one method, constraints automatically applied to queries
+- Good, because **shared ToolKit library handles enforcement** — module developers call one method, constraints automatically applied to queries
 - Good, because **vendor-neutral at policy storage level** — we define only the response format:
   - Vendors can use any internal policy format (RBAC tables, ReBAC tuples, ABAC rules, custom DSL)
   - PDP translates from vendor's native format to constraints JSON at runtime
@@ -192,7 +192,7 @@ Option E provides a cleaner contract between PDP and PEP with less implementatio
   - OPA Documentation: https://www.openpolicyagent.org/docs/latest/
 - **Option E** (AuthZEN + Constraints - CHOSEN):
   - OpenID AuthZEN 1.0 (base): https://openid.net/specs/authorization-api-1_0.html
-  - Cyber Ware constraint extension: [`DESIGN.md`](../DESIGN.md)
+  - Gears constraint extension: [`DESIGN.md`](../DESIGN.md)
 
 **Prior Art (Data Filtering / Query-time Authorization):**
 

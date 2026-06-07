@@ -1,13 +1,13 @@
 # Test configuration for static_tr_plugin integration testing
 #
 # This config uses auth_disabled mode with the hardcoded tenant ID from
-# modkit-security/constants.rs (DEFAULT_TENANT_ID).
+# toolkit-security/constants.rs (DEFAULT_TENANT_ID).
 #
 # Run with:
-#   cargo run --bin cyberware-server -- --config config/test-static-tr.yaml run
+#   cargo run --bin cf-gears-server -- --config config/test-static-tr.yaml run
 
 server:
-  home_dir: "~/.cyberware"
+  home_dir: "~/.cf-gears"
 
 database:
   servers:
@@ -23,18 +23,18 @@ modules:
     config:
       bind_addr: "127.0.0.1:8087"
       enable_docs: true
-      auth_disabled: true  # Uses DEFAULT_TENANT_ID from modkit-security
+      auth_disabled: true  # Uses DEFAULT_TENANT_ID from toolkit-security
 
   types-registry:
     config: {}
 
   static-tr-plugin:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
       priority: 100
       tenants:
         # Default tenant (used when auth_disabled)
-        # Matches DEFAULT_TENANT_ID from modkit-security/constants.rs
+        # Matches DEFAULT_TENANT_ID from toolkit-security/constants.rs
         - id: "00000000-df51-5b42-9538-d2b56b7ee953"
           name: "Dev Tenant"
           status: active
@@ -48,7 +48,7 @@ modules:
 
   tenant-resolver:
     config:
-      vendor: "cyberfabric"
+      vendor: "constructorfabric"
 
   users-info:
     database:

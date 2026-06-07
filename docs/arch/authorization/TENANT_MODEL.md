@@ -1,6 +1,6 @@
 # Tenant Model
 
-This document describes Cyber Ware's multi-tenancy model, tenant topology, and isolation mechanisms.
+This document describes Gears' multi-tenancy model, tenant topology, and isolation mechanisms.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ This document describes Cyber Ware's multi-tenancy model, tenant topology, and i
 
 ## Overview
 
-Cyber Ware uses a **hierarchical multi-tenancy** model where tenants form a single-root tree. Every tenant except the root has exactly one parent, and all tenants descend from a single shared root. Tenants can have child tenants, creating organizational structures like:
+Gears use a **hierarchical multi-tenancy** model where tenants form a single-root tree. Every tenant except the root has exactly one parent, and all tenants descend from a single shared root. Tenants can have child tenants, creating organizational structures like:
 
 ```
 Root
@@ -58,13 +58,13 @@ The tenant structure is a **single-root tree** — every tenant except the root 
 - Depth is not bounded by the tenant model itself; any limits on hierarchy depth come from the concrete Account/Tenant Management service implementation (operational policy, performance envelope, storage constraints).
 - The root is identified by convention (the single tenant with `parent_id = NULL`). There is no `is_system` field, and the root is not referred to as a "system tenant".
 
-**Relationship with the RG forest.** When tenants are materialized as groups in the Resource Group module, the single-root tree is embedded inside the broader **RG forest**: RG may hold several root groups (ownership-graph roots, auxiliary forests), each carrying its own `tenant_id`. At most one of those roots may be a tenant-type group — that root *is* the single tenant root described above. All other tenants live below it as sub-tenants. Non-tenant RG roots inherit the main tenant's `tenant_id` via seeding but are not tenants themselves. RG enforces this at create time (`TenantRootAlreadyExists` / 409 Conflict). See [RG DESIGN §Tenant Root Uniqueness](../../../modules/system/resource-group/docs/DESIGN.md#tenant-root-uniqueness).
+**Relationship with the RG forest.** When tenants are materialized as groups in the Resource Group module, the single-root tree is embedded inside the broader **RG forest**: RG may hold several root groups (ownership-graph roots, auxiliary forests), each carrying its own `tenant_id`. At most one of those roots may be a tenant-type group — that root *is* the single tenant root described above. All other tenants live below it as sub-tenants. Non-tenant RG roots inherit the main tenant's `tenant_id` via seeding but are not tenants themselves. RG enforces this at create time (`TenantRootAlreadyExists` / 409 Conflict). See [RG DESIGN §Tenant Root Uniqueness](../../../gears/system/resource-group/docs/DESIGN.md#tenant-root-uniqueness).
 
 **Why single-root tree?**
 - **One OAuth client is enough** for S2S tenant-scoped flows that need to act as the root — no per-root credential fan-out at the vendor IdP.
 - **Unambiguous "act as root" semantics** — platform-level tenant-scoped operations always address the same tenant.
 - **Organizational autonomy is preserved via sub-roots** — in multi-tenant deployments each independent organization is modelled as its own sub-root directly under the root; barriers continue to provide isolation between sub-trees.
-- **Works naturally for single-user / consumer deployments** of Cyber Ware -based products — the root *is* the tenant that owns all business objects, and no sub-roots are created.
+- **Works naturally for single-user / consumer deployments** of Gears -based products — the root *is* the tenant that owns all business objects, and no sub-roots are created.
 - **Avoids the accidental complexity of DAGs** — closure-table rows, barriers, and ancestry queries stay tree-shaped.
 
 **Deployment shapes:**
@@ -195,7 +195,7 @@ Many operations need to query "all resources in tenant T and its children". This
 | Explicit ID list from PDP | Simple SQL | Doesn't scale (thousands of IDs) |
 | Closure table | O(1) JOIN, scales well | Requires sync, storage overhead |
 
-Cyber Ware recommends **closure tables** for production deployments with hierarchical tenants.
+Gears recommend **closure tables** for production deployments with hierarchical tenants.
 
 **Tenant scope parameters (in `context.tenant_context`):**
 

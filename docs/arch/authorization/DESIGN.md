@@ -25,11 +25,11 @@
 
 ## Overview
 
-This document describes Cyber Ware's approach to authentication (AuthN) and authorization (AuthZ).
+This document describes Gears' approach to authentication (AuthN) and authorization (AuthZ).
 
-**Authentication** verifies the identity of the subject making a request. Cyber Ware uses the **AuthN Resolver** module to integrate with vendor's Identity Provider (IdP), validate access tokens, and extract subject identity into a `SecurityContext`.
+**Authentication** verifies the identity of the subject making a request. Gears use the **AuthN Resolver** module to integrate with vendor's Identity Provider (IdP), validate access tokens, and extract subject identity into a `SecurityContext`.
 
-**Authorization** determines what the authenticated subject can do. Cyber Ware uses the **AuthZ Resolver** module (acting as PDP) to obtain access decisions and query-level constraints. The core challenge: Cyber Ware modules need to enforce authorization at the **query level** (SQL WHERE clauses), not just perform point-in-time access checks.
+**Authorization** determines what the authenticated subject can do. Gears use the **AuthZ Resolver** module (acting as PDP) to obtain access decisions and query-level constraints. The core challenge: Gears need to enforce authorization at the **query level** (SQL WHERE clauses), not just perform point-in-time access checks.
 
 See [ADR 0001](./ADR/0001-pdp-pep-authorization-model.md) for the authorization model and [ADR 0002](./ADR/0002-split-authn-authz-resolvers.md) for the rationale behind separating AuthN and AuthZ.
 
@@ -40,7 +40,7 @@ This document uses the PDP/PEP authorization model (per NIST SP 800-162):
 - **PDP (Policy Decision Point)** — evaluates policies and returns access decisions with constraints
 - **PEP (Policy Enforcement Point)** — enforces PDP decisions at resource access points
 
-In Cyber Ware's architecture:
+In Gears' architecture:
 - **AuthN Resolver** validates tokens and produces SecurityContext (separate concern from PDP)
 - **AuthZ Resolver** (via vendor-specific plugin) serves as the **PDP**
 - **Domain modules** act as **PEPs**, applying constraints to database queries
@@ -56,7 +56,7 @@ In Cyber Ware's architecture:
 - **Resource Owner Subject** - Optional subject bound to a resource instance for per-subject scoping (e.g., "my tasks"). Relationship semantics are domain-specific (creator, assignee, etc.) and do not imply administrative control.
 - **Resource** - Object being accessed. Every resource belongs to a tenant and may optionally have a subject owner. Identified by type (GTS ID) and instance ID.
 - **Resource Group** - Optional container for resources, used for access control. See [RESOURCE_GROUP_MODEL.md](./RESOURCE_GROUP_MODEL.md).
-- **Permission** - `{ resource_type, action }` - allowed operation identifier. Canonical base GTS type: `gts.cf.modkit.authz.permission.v1~`. See [PERMISSION_GTS_TYPE.md](./PERMISSION_GTS_TYPE.md) for the full schema, instance naming convention, and scenario examples.
+- **Permission** - `{ resource_type, action }` - allowed operation identifier. Canonical base GTS type: `gts.cf.toolkit.authz.permission.v1~`. See [PERMISSION_GTS_TYPE.md](./PERMISSION_GTS_TYPE.md) for the full schema, instance naming convention, and scenario examples.
 - **Access Constraints** - Structured predicates returned by the PDP for query-time enforcement. NOT policies (stored vendor-side) or "grants" (OAuth flows, Zanzibar tuples), but compiled, time-bound enforcement artifacts computed at evaluation time.
 - **Security Context** - Result of successful authentication containing subject identity, tenant information, and optionally the original bearer token. Flows from authentication to authorization. Required fields: `subject_id`, `subject_tenant_id`, `token_scopes`. Optional fields: `subject_type`, `bearer_token`.
 - **Token Scopes** - Capability restrictions extracted from the access token. Act as a "ceiling" on what an application can do, regardless of user's actual permissions. See [Token Scopes](#token-scopes).
@@ -114,10 +114,10 @@ sequenceDiagram
 
 ### AuthN Resolver and AuthZ Resolver: Module + Plugin Architecture
 
-Since IdP and PDP are vendor-specific, Cyber Ware cannot implement authentication and authorization directly. Instead, we use the **module + plugin** pattern with two separate resolvers:
+Since IdP and PDP are vendor-specific, Gears cannot implement authentication and authorization directly. Instead, we use the **module + plugin** pattern with two separate resolvers:
 
-- **AuthN Resolver** — a Cyber Ware module with plugins that defines a unified interface for authentication operations (token validation, introspection, SecurityContext production)
-- **AuthZ Resolver** — a Cyber Ware module with plugins that defines a unified interface for authorization operations (PDP functionality, policy evaluation, constraint generation)
+- **AuthN Resolver** — a Gear with plugins that defines a unified interface for authentication operations (token validation, introspection, SecurityContext production)
+- **AuthZ Resolver** — a Gear with plugins that defines a unified interface for authorization operations (PDP functionality, policy evaluation, constraint generation)
 - **Vendor Plugins** — implement the AuthN and/or AuthZ interfaces, integrating with vendor's IdP and Authorization API
 
 This separation provides:
@@ -132,7 +132,7 @@ Each vendor develops their own AuthN and AuthZ plugins (or a unified plugin impl
 
 **AuthN Plugin:**
 
-The AuthN Resolver plugin bridges Cyber Ware to the vendor's IdP. The plugin is responsible for:
+The AuthN Resolver plugin bridges Gears to the vendor's IdP. The plugin is responsible for:
 - **IdP communication** — calling introspection endpoints, handling IdP-specific protocols
 - **Claim enrichment** — if the IdP doesn't include `subject_type` or `subject_tenant_id` in tokens, the plugin fetches this information from vendor services
 - **Response mapping** — converting IdP-specific responses to `SecurityContext`
@@ -140,7 +140,7 @@ The AuthN Resolver plugin bridges Cyber Ware to the vendor's IdP. The plugin is 
 
 **AuthZ Plugin:**
 
-The AuthZ Resolver plugin bridges Cyber Ware to the vendor's Authorization Service (PDP). The plugin is responsible for:
+The AuthZ Resolver plugin bridges Gears to the vendor's Authorization Service (PDP). The plugin is responsible for:
 - **Policy evaluation** — calling vendor's authorization API with subject, action, resource, context
 - **Constraint generation** — translating vendor's policy decisions into SQL-compilable constraints
 - **Hierarchy queries** — using Tenant Resolver and RG Resolver to query tenant and group hierarchies for constraint generation
@@ -148,7 +148,7 @@ The AuthZ Resolver plugin bridges Cyber Ware to the vendor's Authorization Servi
 
 **Policy Storage and Retrieval (Out of Scope):**
 
-How authorization rules are stored, represented, and retrieved within the PDP is entirely a vendor implementation detail. Cyber Ware defines only the PDP-PEP contract (request/response format via AuthZEN-extended API).
+How authorization rules are stored, represented, and retrieved within the PDP is entirely a vendor implementation detail. Gears define only the PDP-PEP contract (request/response format via AuthZEN-extended API).
 
 Vendors may use any policy model and storage mechanism:
 - **RBAC** — role-permission tables, role hierarchies
@@ -179,7 +179,7 @@ flowchart TB
         AuthzSvc["Authz Service"]
     end
 
-    subgraph Cyber Ware
+    subgraph Gears
         subgraph TenantResolver["Tenant Resolver"]
             TenantGW["Module"]
             TenantPlugin["Plugin"]
@@ -297,11 +297,11 @@ Token scopes provide capability narrowing for third-party applications. They act
 | First-party | UI, CLI | `["*"]` | No restrictions, full user permissions |
 | Third-party | Partner integrations | `["read:events"]` | Limited to granted scopes |
 
-**Detection:** AuthN Resolver plugin determines app type during introspection and sets `token_scopes` accordingly. Cyber Ware does not maintain a trusted client list.
+**Detection:** AuthN Resolver plugin determines app type during introspection and sets `token_scopes` accordingly. Gears do not maintain a trusted client list.
 
 ### Vendor Neutrality
 
-Cyber Ware accepts scopes as opaque strings (`Vec<String>`). Different vendors use
+Gears accept scopes as opaque strings (`Vec<String>`). Different vendors use
 different formats:
 - Google-style: `https://api.vendor.com/auth/tasks.read`
 - Simple strings: `read_all`, `admin`
@@ -496,7 +496,7 @@ SecurityContext {
 
 ### Plugin Responsibilities
 
-The AuthN Resolver plugin bridges Cyber Ware to the vendor's IdP. Plugin responsibilities:
+The AuthN Resolver plugin bridges Gears to the vendor's IdP. Plugin responsibilities:
 
 1. **Token Validation** — Implement vendor-specific validation logic (JWT signature verification, introspection, custom protocols)
 2. **Claim Extraction** — Extract subject identity from token claims or introspection response
@@ -511,7 +511,7 @@ For the rationale behind this single-method interface design, see [ADR 0003: Aut
 
 ### Implementation Reference
 
-For the current OIDC AuthN Resolver plugin design (JWT local validation, OpenID Connect Discovery, JWKS caching, service-to-service token exchange), see **[modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md)**.
+For the current OIDC AuthN Resolver plugin design (JWT local validation, OpenID Connect Discovery, JWKS caching, service-to-service token exchange), see **[gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md)**.
 
 This plugin design covers:
 - JWT token validation
@@ -534,7 +534,7 @@ We chose [OpenID AuthZEN Authorization API 1.0](https://openid.net/specs/authori
 - Clean subject/action/resource/context structure
 - Extensible via `context` field
 
-However, AuthZEN out of the box doesn't solve Cyber Fabric's core requirement: **query-level authorization**.
+However, AuthZEN out of the box doesn't solve Gears' core requirement: **query-level authorization**.
 
 #### Why Access Evaluation API Alone Isn't Enough
 
@@ -576,7 +576,7 @@ For **point operations**, Access Evaluation API could technically work, but requ
 
 AuthZEN's Resource Search API answers: "What resources can subject S perform action A on?" — returning a list of resource IDs.
 
-This **assumes the PDP has access to resource data**. In Cyber Ware's architecture, resources live in the PEP's database — the PDP cannot enumerate what it doesn't have.
+This **assumes the PDP has access to resource data**. In Gears' architecture, resources live in the PEP's database — the PDP cannot enumerate what it doesn't have.
 
 This creates an architectural mismatch:
 - **PDP** knows "who can access what" (authorization policies)
@@ -1054,7 +1054,7 @@ All predicates filter resources based on their properties. The `resource_propert
 
 The Rust SQL compilation library supports **extensible predicate types**:
 
-- **Standard predicates** — Cyber Ware's built-in modules use only the standard predicates listed below (`eq`, `in`, `in_tenant_subtree`, `in_group`, `in_group_subtree`)
+- **Standard predicates** — Gears' built-in modules use only the standard predicates listed below (`eq`, `in`, `in_tenant_subtree`, `in_group`, `in_group_subtree`)
 - **Custom predicates** — Vendors can extend the system by:
   1. Registering new predicate types with the SQL compilation library
   2. Providing SQL compilation handlers for these predicates
@@ -1272,7 +1272,7 @@ Capabilities declare what predicate types the PEP can enforce locally:
 **Progressive projection guidance:**
 - **Monolith** (single shared DB): no projections needed — PEP JOINs canonical tables directly.
 - **Microservices** (typical): project `resource_group` + `resource_group_closure` (small tables). Leave `resource_group_membership` to PDP capability degradation (→ `in` predicates with explicit IDs).
-- **Microservices** with membership filtering/pagination where the two-request pattern causes unacceptable N-request fan-out: project `resource_group_membership`. This table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables (see [RG DESIGN §Storage Estimates](../../../modules/system/resource-group/docs/DESIGN.md#storage-estimates)) — only project after profiling confirms the need.
+- **Microservices** with membership filtering/pagination where the two-request pattern causes unacceptable N-request fan-out: project `resource_group_membership`. This table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables (see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates)) — only project after profiling confirms the need.
 
 Do not add projections speculatively — each projection creates an additional database and synchronization load.
 
@@ -1297,7 +1297,7 @@ Do not add projections speculatively — each projection creates an additional d
 
 ### Table Schemas (Local Projections)
 
-These tables are maintained locally by Cyber Ware modules (Tenant Resolver, Resource Group module) and used by PEPs to execute constraint queries efficiently without calling back to the vendor platform.
+These tables are maintained locally by CF/Gears (Tenant Resolver, Resource Group module) and used by PEPs to execute constraint queries efficiently without calling back to the vendor platform.
 
 **Projectable to domain services:** `tenant_closure`, `resource_group`, `resource_group_closure`, `resource_group_membership` (progressively — see [Capabilities and Projection Tables](#capabilities-and-projection-tables) for guidance on when to project each table).
 
@@ -1314,7 +1314,7 @@ Denormalized closure table for tenant hierarchy. Enables efficient subtree queri
 
 **Notes:**
 - Status is denormalized into closure for query simplicity (avoids JOIN). When a tenant's status changes, all rows where it is `descendant_id` are updated.
-- **Provisioning exclusion:** `tenant_closure` never contains a row for a tenant in `provisioning` state. Closure rows are inserted on the `provisioning → active` transition (end of the tenant-create saga) and removed on hard-deletion; the `0=provisioning` code is therefore not a legal value for `tenant_closure.descendant_status` even though it is legal for `tenants.status`. The database-level enforcement point is `CHECK (descendant_status IN (1, 2, 3))` on the `tenant_closure` table — see [`modules/system/account-management/docs/migration.sql`](../../../modules/system/account-management/docs/migration.sql) for the constraint and column COMMENT, and [AM ADR-0007 — Exclude Provisioning Tenants from `tenant_closure`](../../../modules/system/account-management/docs/ADR/0007-cpt-cf-account-management-adr-provisioning-excluded-from-closure.md) for the decision rationale. Consumers of `tenant_closure` (Tenant Resolver Plugin today, business-module replicas later) therefore do **not** need a provisioning-specific filter — the invisibility is structural.
+- **Provisioning exclusion:** `tenant_closure` never contains a row for a tenant in `provisioning` state. Closure rows are inserted on the `provisioning → active` transition (end of the tenant-create saga) and removed on hard-deletion; the `0=provisioning` code is therefore not a legal value for `tenant_closure.descendant_status` even though it is legal for `tenants.status`. The database-level enforcement point is `CHECK (descendant_status IN (1, 2, 3))` on the `tenant_closure` table — see [`gears/system/account-management/docs/migration.sql`](../../../gears/system/account-management/docs/migration.sql) for the constraint and column COMMENT, and [AM ADR-0007 — Exclude Provisioning Tenants from `tenant_closure`](../../../gears/system/account-management/docs/ADR/0007-cpt-cf-account-management-adr-provisioning-excluded-from-closure.md) for the decision rationale. Consumers of `tenant_closure` (Tenant Resolver Plugin today, business-module replicas later) therefore do **not** need a provisioning-specific filter — the invisibility is structural.
 - **Barrier semantics:** The `barrier` column is defined over the interval **`(ancestor, descendant]`** — the ancestor endpoint is excluded, the descendant endpoint is included (canonical definition in [TENANT_MODEL.md §Closure Table](./TENANT_MODEL.md#closure-table)). This means when T2 is self_managed, rows with `ancestor_id = T2` have `barrier = 0`, while rows with T2 on the path from another ancestor have `barrier = 1`.
 - The `barrier` column enables simple filtering: `barrier_mode: "all"` adds `AND barrier = 0`, `barrier_mode: "none"` omits the clause.
 - Self-referential rows exist: each tenant has a row where `ancestor_id = descendant_id`.
@@ -1347,7 +1347,7 @@ Closure table for resource group hierarchy. Similar structure to tenant_closure 
 
 #### `resource_group_membership` (RG-owned — project only when needed)
 
-Association between resources and groups. A resource can belong to multiple groups. This table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than other projection tables — concrete estimates depend on vendor scale (see [RG DESIGN §Storage Estimates](../../../modules/system/resource-group/docs/DESIGN.md#storage-estimates)). Project only after profiling confirms the two-request pattern causes unacceptable latency — see [Capabilities -> Predicate Matrix](#capabilities---predicate-matrix) for the progressive projection strategy.
+Association between resources and groups. A resource can belong to multiple groups. This table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than other projection tables — concrete estimates depend on vendor scale (see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates)). Project only after profiling confirms the two-request pattern causes unacceptable latency — see [Capabilities -> Predicate Matrix](#capabilities---predicate-matrix) for the progressive projection strategy.
 
 | Column | Type | Nullable | Description |
 |--------|------|----------|-------------|
@@ -1436,7 +1436,7 @@ These questions require further design work.
 
 3. **Local projections sync** - How to keep projection tables (`tenant_closure`, `resource_group_closure`) in sync with vendor's source of truth? Possible approaches: event-based sync (requires event broker), CDC-based (Debezium-like), or periodic polling via Resolver APIs. Each has trade-offs in consistency, latency, and infrastructure complexity. Note: `resource_group_membership` projection is not recommended (see [Capabilities and Projection Tables](#capabilities-and-projection-tables)) but is not forbidden if the use case demands it.
 
-4. **Resource Group Service** - Should Cyber Ware have its own Resource Group Service, or is Resource Group Resolver (module bridging to vendor's service) sufficient? Having a Cyber Ware-native service has pros and cons. Needs design.
+4. **Resource Group Service** - Should Gears have its own Resource Group Service, or is Resource Group Resolver (module bridging to vendor's service) sufficient? Having a Gears-native service has pros and cons. Needs design.
 
 5. **Authorization decision caching** - See [Authorization Decision Caching](#authorization-decision-caching) section for detailed open questions: cache key structure, cache-control protocol, invalidation strategy, token expiration handling.
 
@@ -1451,10 +1451,10 @@ These questions require further design work.
 
 9. ~~**S2S token issuance**~~ — **Resolved.** See [S2S Authentication (Service-to-Service)](#s2s-authentication-service-to-service).
 
-10. **Multi-Factor Authentication (MFA) support** — How should Cyber Ware handle MFA across both AuthN and AuthZ layers? Industry standards and best practices to study:
+10. **Multi-Factor Authentication (MFA) support** — How should Gears handle MFA across both AuthN and AuthZ layers? Industry standards and best practices to study:
     - **AuthN side:**
       - **OIDC `acr` / `amr` claims** — [OpenID Connect Core §2 (acr, amr)](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) defines Authentication Context Class Reference (`acr`) and Authentication Methods References (`amr`) claims. Should AuthN Resolver extract and propagate these in `SecurityContext`?
-      - **NIST SP 800-63B** — Authenticator Assurance Levels (AAL1/AAL2/AAL3). Should Cyber Ware be aware of AAL and map `acr` values to AAL levels?
+      - **NIST SP 800-63B** — Authenticator Assurance Levels (AAL1/AAL2/AAL3). Should Gears be aware of AAL and map `acr` values to AAL levels?
       - **Step-up authentication** — [RFC 9470: OAuth 2.0 Step-Up Authentication Challenge Protocol](https://datatracker.ietf.org/doc/html/rfc9470) defines how a resource server can signal that a higher authentication level is required. Should AuthN Middleware or PEP be able to trigger step-up challenges (e.g., `WWW-Authenticate: Bearer ... acr_values="..."`)? How does this interact with the current single-method `authenticate()` interface?
       - **SecurityContext changes** — Should `SecurityContext` include `acr`, `amr`, or an abstracted `authentication_assurance_level` field?
     - **AuthZ side:**
@@ -1462,7 +1462,7 @@ These questions require further design work.
       - **Constraint-level MFA** — Can MFA requirements be expressed as constraints, or is this a pre-constraint check (deny before constraint evaluation)?
       - **Dynamic step-up** — If PDP determines MFA is needed but the current session lacks it, what should the PEP response be? HTTP 401 with step-up challenge vs 403?
     - **Open sub-questions:**
-      - Should MFA enforcement be purely IdP-side (transparent to Cyber Ware), or does Cyber Ware need explicit awareness?
+      - Should MFA enforcement be purely IdP-side (transparent to Gears), or do Gears need explicit awareness?
       - How do industry multi-tenant platforms (Azure AD Conditional Access, AWS IAM, Google Cloud IAP) handle MFA in the context of delegated authorization?
       - What is the interaction between MFA and token scopes? Should third-party apps be able to request MFA-elevated scopes?
 
@@ -1471,7 +1471,7 @@ These questions require further design work.
     - **Cache identity** — If credentials and scopes remain request-level inputs, any S2S cache key must include at least `client_id`, normalized scopes, and a non-reversible credential fingerprint. `client_id` alone is insufficient because it can reuse the wrong token across scope or credential changes.
     - **`AuthenticationResult.expires_at`** — Should `AuthenticationResult` include an `expires_at: Option<DateTime>` field so the plugin can communicate token lifetime to the caller? This enables smart caller-side caching without hardcoded TTLs.
     - **`S2sSecurityContextProvider`** — Should there be a standard cached wrapper in the SDK (`authn-resolver-sdk`) that modules use instead of calling `exchange_client_credentials()` directly? Design: ArcSwap-based cache with TTL from `expires_at`, automatic refresh on expiry.
-    - **Plugin-level caching** — Production plugins can reuse `modkit-auth::oauth2::Token` handles with auto-refresh internally. Should this be a requirement or recommendation for plugin implementors?
+    - **Plugin-level caching** — Production plugins can reuse `toolkit-auth::oauth2::Token` handles with auto-refresh internally. Should this be a requirement or recommendation for plugin implementors?
     - **Cache invalidation** — When credentials are rotated, how does the cached `SecurityContext` get invalidated? Is TTL-based expiry sufficient, or do we need explicit invalidation?
 
 ---
@@ -1479,7 +1479,7 @@ These questions require further design work.
 ## References
 
 ### Authentication
-- [modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../modules/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) — OIDC AuthN Resolver plugin design
+- [gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md](../../../gears/system/authn-resolver/plugins/oidc-authn-plugin/docs/DESIGN.md) — OIDC AuthN Resolver plugin design
 - [RFC 6749: OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749) (§4.4 Client Credentials Grant — S2S authentication)
 - [RFC 7519: JSON Web Token (JWT)](https://datatracker.ietf.org/doc/html/rfc7519)
 - [RFC 7662: OAuth 2.0 Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662)
@@ -1495,5 +1495,5 @@ These questions require further design work.
 - [TENANT_MODEL.md](./TENANT_MODEL.md) — Tenant topology, barriers, closure tables
 - [RESOURCE_GROUP_MODEL.md](./RESOURCE_GROUP_MODEL.md) — Resource group topology, membership, hierarchy
 - [AUTHZ_USAGE_SCENARIOS.md](./AUTHZ_USAGE_SCENARIOS.md) — Authorization usage scenarios
-- [PERMISSION_GTS_TYPE.md](./PERMISSION_GTS_TYPE.md) — Canonical permission GTS type (`gts.cf.modkit.authz.permission.v1~`), schema, instance naming, scenarios
-- [Cyber Ware GTS (Global Type System)](../../../modules/system/types-registry/)
+- [PERMISSION_GTS_TYPE.md](./PERMISSION_GTS_TYPE.md) — Canonical permission GTS type (`gts.cf.toolkit.authz.permission.v1~`), schema, instance naming, scenarios
+- [Gears GTS (Global Type System)](../../../gears/system/types-registry/)
