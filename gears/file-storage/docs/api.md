@@ -32,7 +32,7 @@ Encoding conventions:
 
 ```
 1.  POST   /files                              create   (multipart: metadata required + content required)
-2.  PATCH  /files/{id}                         update   (multipart: metadata optional + content optional)    — If-Match
+2.  PATCH  /files/{id}[?replace_content=true]  update   (multipart: metadata optional; content only with ?replace_content=true) — If-Match
 3.  GET    /files/{id}                         download content                                              — If-Match, If-None-Match, Range
 4.  HEAD   /files/{id}                         metadata headers                                              — If-Match, If-None-Match
 5.  DELETE /files/{id}                         delete                                                        — If-Match
@@ -66,12 +66,15 @@ Encoding conventions:
 |------------------------------|-------------------------------------|--------------------------------------------------------|
 | Body                         | `multipart/form-data`               | `multipart/form-data`                                  |
 | `metadata` part              | required (full metadata document)   | optional (JSON Merge Patch per RFC 7396)               |
-| `content` part               | required (binary)                   | optional (binary; replaces content when present)       |
+| `content` part               | required (binary)                   | optional — **accepted only with `?replace_content=true`** (then replaces content); a `content` part without the flag is `400` |
+| `?replace_content` query     | N/A                                 | `true` to opt into content replacement; default/absent = metadata-only. `true` with no `content` part is `400` |
 | `If-Match`                   | N/A                                 | required                                               |
 | Empty body / no parts        | `400`                               | `400`                                                  |
-| State on success             | `available`                         | `available` (with content) / unchanged (metadata only) |
+| State on success             | `available`                         | `available` (content replaced) / unchanged (metadata only) |
 
-`PATCH` with a `content` part replaces the file content; `content_revision` is bumped, `metadata_revision` is bumped, `hash_value` is recomputed, and `ETag` changes. When the backing storage declares `versioning_native = true`, each content replacement creates a new version retrievable by version id; otherwise the prior content is permanently overwritten.
+Content replacement is **full-file (`PUT`-style) semantics, not a partial patch**, and must be requested explicitly via the `?replace_content=true` query flag. With the flag set and a `content` part present, `PATCH` replaces the file content: `content_revision` is bumped, `metadata_revision` is bumped, `hash_value` is recomputed, and `ETag` changes. When the backing storage declares `versioning_native = true`, each content replacement creates a new version retrievable by version id; otherwise the prior content is permanently overwritten.
+
+The flag exists to prevent **silent content mutation**: a client (generic proxy, form library forwarding stale state) that accidentally includes a `content` part would otherwise overwrite the file's bytes unnoticed — and `If-Match` does **not** catch this, since the current content ETag still matches at request time. Therefore a `content` part **without** `?replace_content=true` is rejected with `400`, and `?replace_content=true` **without** a `content` part is likewise `400` (the flag asserts an intent the body does not carry).
 
 `PATCH` with a `metadata` part applies JSON Merge Patch semantics to `custom_metadata`: keys present in the patch overwrite their values, keys set to `null` delete the entry, keys absent from the patch are left untouched. Metadata-only updates bump `metadata_revision` and `Last-Modified` but do **not** change `ETag` or `hash_value` — both remain tied to the content.
 
@@ -80,7 +83,8 @@ Encoding conventions:
 - `If-Match`: required on every write (`PATCH`, `DELETE`) and on every multipart-control endpoint (`POST .../multipart/...`, `DELETE .../multipart/{upload_id}`). On read endpoints (`GET`, `HEAD`) it is optional; non-match returns `412 Precondition Failed`.
 - `If-None-Match`: optional on `GET`/`HEAD`; match returns `304 Not Modified` with no body.
 - ETag is opaque, deterministic per `(file_id, content_revision)`, and explicitly **not** equal to the content hash. The content hash is exposed as `X-FS-Hash-Algorithm` + `X-FS-Hash-Value` headers (P1: SHA-256 only, per ADR-0002).
-- **ETag is content-only.** Metadata-only `PATCH` (no `content` part) does **not** change ETag — only `metadata_revision` and `Last-Modified` are bumped. Consequently `If-Match` on metadata-only `PATCH` protects against concurrent **content** writes but does **not** detect concurrent metadata writes (S3-style limitation; metadata updates are last-write-wins).
+- **ETag is content-only.** Metadata-only `PATCH` (no `content` part) does **not** change ETag — only `metadata_revision` and `Last-Modified` are bumped. Consequently `If-Match` on metadata-only `PATCH` protects against concurrent **content** writes but does **not** detect concurrent metadata writes.
+- `If-Match-Metadata: <u64>`: **optional** on metadata-only `PATCH`; matched against the current `metadata_revision` (the value published on every response as `X-FS-Metadata-Revision`). Mismatch returns `412 Precondition Failed`. This gives lost-update protection for concurrent **metadata** writers, complementing content-only ETag. When the header is **absent**, metadata writes fall back to last-write-wins (back-compatible default); clients that keep meaningful state in custom metadata opt in. It is intentionally a separate header — not folded into ETag — so CDN caching of content is unaffected by metadata-only changes.
 
 ## Range support
 
@@ -116,14 +120,14 @@ X-FS-Meta-<key>: <value>                                # one header per custom 
 
 - `200 OK` — successful read or PATCH with state change.
 - `201 Created` — successful `POST /files`.
-- `204 No Content` — successful `DELETE`.
+- `204 No Content` — successful `DELETE`. The metadata row is removed before the best-effort backend object delete; re-`DELETE` of an already-deleted `file_id` returns `404` (idempotent).
 - `206 Partial Content` — successful range read.
 - `304 Not Modified` — `If-None-Match` matched current ETag.
-- `400 Bad Request` — malformed request (missing required form parts, invalid JSON, etc.).
+- `400 Bad Request` — malformed request (missing required form parts, invalid JSON, etc.), or a `PATCH` whose content-replace intent and body disagree: a `content` part without `?replace_content=true`, or `?replace_content=true` with no `content` part.
 - `403 Forbidden` — authorization denied.
 - `404 Not Found` — file does not exist or version does not exist.
 - `409 Conflict` — multipart state conflicts (e.g., complete on aborted upload).
-- `412 Precondition Failed` — `If-Match` mismatch.
+- `412 Precondition Failed` — `If-Match` (content ETag) mismatch, or `If-Match-Metadata` mismatch against the current `metadata_revision`.
 - `415 Unsupported Media Type` — declared mime does not match magic-bytes detection.
 - `416 Range Not Satisfiable` — a well-formed `Range` that cannot be satisfied against the file size (e.g. `start ≥ size`). A syntactically invalid / unparseable `Range` is **not** a `416`: it is ignored and the full body is served with `200`.
 - `422 Unprocessable Entity` — semantic validation failure (e.g., invalid GTS file type format).

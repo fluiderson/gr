@@ -153,6 +153,7 @@ roles) from the platform authentication middleware.
 - Audit trail for all write operations and optional read audit logging
 - Policies (file types, size limits, events) at tenant and user levels
 - Pluggable storage backend abstraction
+- Backend migration — relocating a file's content between backends without rotating its URL (P2; non-versioned files)
 - Multipart (chunked) upload for large files
 - Content-type validation against actual file content
 - File retention and lifecycle management
@@ -594,9 +595,12 @@ The system **MUST** automatically detect and reconcile orphan state between the 
 Even when content traffic transits FileStorage end-to-end, the metadata-DB write and the backend object write are not
 atomic with each other, and several edge cases produce orphans:
 
-- A `POST /files` create transaction committed the file row, but the backend write failed before the row could be
-  transitioned to `content_state = available`
-- A backend write succeeded, but the DB transaction that would have recorded the row failed (or was rolled back)
+- A backend write succeeded, but the DB transaction that would have recorded the row failed (or was rolled back) —
+  the primary P1 case, since single-shot upload uses the write-after model (commit only after a successful `put()`);
+  the in-process best-effort cleanup guard handles the common variants, leaving only hard-process-kill residue here
+- *(P2)* A `content_state = pending` row was committed (multipart pre-completion) but the content write never
+  completed, so the row was never transitioned to `available` (does not arise for P1 single-shot, which never commits
+  a row before the backend write)
 - *(P2)* A multipart upload session was initiated (`POST /files/multipart` per
   `cpt-cf-file-storage-fr-multipart-upload`), but neither `complete` nor `abort` was ever invoked, leaving a
   `pending` file row and uploaded parts hanging
@@ -660,6 +664,32 @@ major storage backends (S3, GCS, Azure Blob, MinIO, Ceph, Backblaze B2). Logical
 removal) enable restoration and follow the established pattern of S3 versioned deletes, GCS soft-delete, and Azure Blob
 soft-delete. Counting soft-deleted content against quota prevents quota bypass through repeated soft-delete cycles.
 **Actors**: `cpt-cf-file-storage-actor-platform-user`, `cpt-cf-file-storage-actor-cf-modules`
+
+#### Backend Migration
+
+- [ ] `p2` - **ID**: `cpt-cf-file-storage-fr-backend-migration`
+
+The system **MUST** be able to relocate a file's content from one storage backend to another **without changing the
+file's `/files/{id}` URL or its identity**. Migration **MUST**:
+
+- preserve the `file_id`, ownership, custom metadata, content hash, and externally observable behaviour of the file;
+- be authorized as an administrative/owner operation and emit audit records (`cpt-cf-file-storage-fr-audit-trail`) per
+  migrated file;
+- update the file's `backend_id`/`backend_path` only after the destination object is durably written and verified
+  (hash match), then remove the source object best-effort (a failed source cleanup degrades to an orphan handled by
+  `cpt-cf-file-storage-fr-orphan-reconciliation`).
+
+In P1 a file's backend is immutable; this requirement lifts that restriction for **non-versioned** files in P2.
+Migration of versioned files (which carry a backend-owned version chain) is constrained by the backend's versioning
+semantics and is out of scope until a dedicated design addresses version-chain relocation.
+
+**Rationale**: One of the two primary reasons to proxy content through FileStorage (ADR-0001) is the ability to move
+bytes between backends without rotating URLs. Real drivers include cost-tier optimization (move cold data to a cheaper
+tier), backend deprecation/decommissioning, tenant data residency (relocate a tenant's files to an in-region backend),
+capacity rebalancing across buckets, and disaster recovery from a degraded backend. Enforcing `backend_id`
+immutability at the service layer only (not as a DB constraint) keeps this a behavioural change in P2 with no schema
+migration.
+**Actors**: `cpt-cf-file-storage-actor-cf-modules`
 
 #### File Encryption
 
@@ -818,7 +848,10 @@ metadata requests, content-replacement and metadata-update operations, deletes).
 **ETag is content-only.** Metadata-only updates bump an internal `metadata_revision` and `last_modified_at` but
 **MUST NOT** change the ETag or content hash — both remain tied to the content. Consequently `If-Match` on a
 metadata-only update protects against concurrent **content** writes but does **not** detect concurrent metadata
-writes; metadata updates are last-write-wins (S3-style).
+writes. To give callers lost-update protection for metadata without coupling it to the content ETag, the system
+**MUST** support an optional metadata-revision precondition on metadata-only updates (matched against
+`metadata_revision`, returning `412` on mismatch); when the caller omits it, metadata updates remain last-write-wins
+(S3-style) for back-compatibility. See DESIGN `cpt-cf-file-storage-principle-content-only-etag`.
 
 **Rationale**: Conditional downloads eliminate redundant bandwidth for unchanged files and enable downstream caching by
 browsers and reverse proxies. Conditional updates prevent silent data loss when multiple clients modify file metadata
@@ -1244,7 +1277,9 @@ debits/credits per `cpt-cf-file-storage-fr-usage-reporting`)
 
 - [ ] File upload returns persistent URL and stores metadata (name, size, type, dates, owner)
 - [ ] File download returns content with correct metadata
-- [ ] File deletion of a non-versioned file permanently removes content
+- [ ] File deletion of a non-versioned file permanently removes content; the metadata row is removed before the
+  best-effort backend delete, so a deleted file never leaves a row pointing at missing content, and re-deleting an
+  already-deleted file is idempotent (`404`)
 - [ ] File deletion of a versioned file without version identifier places a soft-delete marker (no physical removal)
 - [ ] Authorization checked for every file operation via Authorization Service
 - [ ] Tenant boundary enforced — cross-tenant access rejected
@@ -1256,6 +1291,8 @@ debits/credits per `cpt-cf-file-storage-fr-usage-reporting`)
 - [ ] Metadata-only queries complete without transferring file content
 - [ ] Content is mutable through dedicated content-replacement operations; ETag (content-derived) changes on every
   content write; metadata-only updates do not change ETag or content hash
+- [ ] Content replacement requires explicit intent (`?replace_content=true`); a content payload sent without that
+  intent — or the intent sent without a content payload — is rejected (`400`) rather than silently mutating bytes
 - [ ] `custom_metadata` is updatable by any actor authorized for the **write** action on the file's GTS type;
   system-managed metadata is not user-updatable
 - [ ] Custom metadata update changes the file's last modified date
@@ -1288,6 +1325,10 @@ debits/credits per `cpt-cf-file-storage-fr-usage-reporting`)
   to the content hash
 - [ ] Conditional download with `If-None-Match` returns `304 Not Modified` when file is unchanged
 - [ ] `If-Match` is required on writes (`PATCH`/`DELETE`); missing or mismatching `If-Match` returns `412`
+- [ ] An optional metadata-revision precondition on metadata-only updates returns `412` on mismatch, giving
+  lost-update protection for concurrent metadata writers; when omitted, metadata updates remain last-write-wins
+- [ ] An upload that fails after the backend write but before the metadata row commits leaves no referenced row;
+  the orphaned backend object is cleaned up best-effort (residual orphans reconciled per orphan-reconciliation)
 - [ ] Retried upload with the same idempotency key returns the original result without creating a duplicate file
 - [ ] Retried upload with the same idempotency key by a different owner does not return or create the original owner's
   file

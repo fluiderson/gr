@@ -62,7 +62,8 @@ implemented. FileStorage P1/P2 stores no sharing-related state, exposes no anony
 paths, and has no endpoints tied to that future decision.
 
 P2 introduces multipart upload (with the tree-/streaming-hash work-out from ADR-0002), audit + events + quota + usage
-outbound flows, file versioning under content-replace, and the policy engine. P3 adds runtime BYOS backend
+outbound flows, file versioning under content-replace, backend migration (relocating bytes between backends without
+rotating URLs), and the policy engine. P3 adds runtime BYOS backend
 configuration, server-side encryption, read audit, and the sharing capability described above. These phases are
 declared in the component model below with forward references to future FEATURE artifacts; their detailed designs
 are deliberately out of scope for this document.
@@ -84,7 +85,7 @@ See [PRD.md](./PRD.md) §1 "Overview" and §1.3 "Goals":
 |--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `cpt-cf-file-storage-fr-upload-file`                   | `POST /files` multipart streamed through `content-pipeline` (hash + magic-bytes) to selected `backend-abstraction` driver                                                |
 | `cpt-cf-file-storage-fr-download-file`                 | `GET /files/{id}` streamed from `backend-abstraction` driver back through `stream-proxy`                                                                                 |
-| `cpt-cf-file-storage-fr-delete-file`                   | `DELETE /files/{id}` removes metadata row; `backend-abstraction.delete()` deletes the object                                                                             |
+| `cpt-cf-file-storage-fr-delete-file`                   | `DELETE /files/{id}` (requires `If-Match`): **metadata-row-first** — the `files` row is deleted in a committed transaction and `204` is returned, *then* `backend.delete(backend_path)` runs best-effort; a backend-delete failure leaves only an unreferenced object swept by the P2 `orphan-reconciler` (never a row pointing at missing bytes). Idempotent: deleting an already-deleted `file_id` returns `404`. Sequence in §3.6 |
 | `cpt-cf-file-storage-fr-get-metadata`                  | `GET /files/{id}` (content) and `HEAD /files/{id}` (headers only) read `files` + `files_custom_metadata` via `metadata-service`                                          |
 | `cpt-cf-file-storage-fr-list-files`                    | `GET /files` with mandatory `owner_kind` filter; tenant-scoped DB query through `metadata-service`                                                                       |
 | `cpt-cf-file-storage-fr-content-type-validation`       | First ~64 bytes of upload tapped by `content-pipeline` magic-bytes detector; mismatch aborts the stream with `415`                                                       |
@@ -110,7 +111,7 @@ See [PRD.md](./PRD.md) §1 "Overview" and §1.3 "Goals":
 | `cpt-cf-file-storage-nfr-metadata-latency`      | `<25 ms` p95 metadata queries                                        | `cpt-cf-file-storage-component-metadata-service`, `cpt-cf-file-storage-component-http-gateway`                                            | Single-row Postgres lookup on PK; covering index on `(tenant_id, owner_kind, owner_id, created_at)`. No backend round-trip on `HEAD`/`GET /files/{id}` metadata path                                                                                            | Load test driving `HEAD /files/{id}` at expected p95 traffic; p95 latency captured by OpenTelemetry histogram on `http-gateway`                       |
 | `cpt-cf-file-storage-nfr-transfer-latency`      | `<50 ms` fixed overhead p95 on content transfer                      | `cpt-cf-file-storage-component-stream-proxy`, `cpt-cf-file-storage-component-backend-abstraction`                                         | Streaming I/O end-to-end (axum `Body` ↔ `Stream<Bytes>` ↔ backend client); no full-file buffering. Range translated to backend-native range where supported                                                                                                    | Measure fixed delta between request arrival at FileStorage and first byte returned by backend; histogram per backend driver                           |
 | `cpt-cf-file-storage-nfr-url-availability`      | URLs available for retention duration matching platform SLA          | `cpt-cf-file-storage-component-metadata-service`, `cpt-cf-file-storage-component-backend-abstraction`                                     | URLs are derived from `file_id` and remain valid as long as the file row exists; deleted files return `404`; ETag changes do not invalidate URLs (only their cached representations)                                                                            | Long-running soak: re-fetch a set of `file_id`s over the SLA window; verify no transient `5xx`/`404` for live files                                  |
-| `cpt-cf-file-storage-nfr-durability`            | RPO=0 for committed writes; RTO ≤ 15 min                              | `cpt-cf-file-storage-component-metadata-service`, `cpt-cf-file-storage-component-backend-abstraction`                                     | DB row committed *after* backend `put()` returns success; backend durability is inherited from the chosen driver. RTO covered by Postgres HA + module restart procedures                                                                                       | Chaos test: kill module mid-upload — partial uploads MUST NOT leave a committed row pointing to missing content                                       |
+| `cpt-cf-file-storage-nfr-durability`            | RPO=0 for committed writes; RTO ≤ 15 min                              | `cpt-cf-file-storage-component-metadata-service`, `cpt-cf-file-storage-component-backend-abstraction`                                     | DB row committed *after* backend `put()` returns success; backend durability is inherited from the chosen driver. A request-scoped **best-effort cleanup guard** fires `backend.delete(backend_path)` on any error between a successful `put()` and the committed `INSERT` (DB blip, client drop, panic), so the only residual leak is a hard process kill in that window — bounded and swept by the P2 `orphan-reconciler`. RTO covered by Postgres HA + module restart procedures                                                                                       | Chaos test: kill module mid-upload — partial uploads MUST NOT leave a committed row pointing to missing content; inject a post-`put()` DB failure and assert the backend object is cleaned up (no orphan)                                       |
 | `cpt-cf-file-storage-nfr-scalability`           | ≥1000 concurrent operations/instance; linear horizontal scaling      | All P1 components — they are stateless except for the metadata DB                                                                         | No instance-local state in the request path; every instance can serve any file given the shared metadata DB and backend driver. Streaming I/O keeps **CPU and memory** bounded per request. The **bandwidth** dimension — the cost consciously accepted by ADR-0001 — is modeled separately in `cpt-cf-file-storage-nfr-bandwidth`                                                                  | Load test: scale N → 2N instances, verify near-2× throughput; per-instance concurrency target measured at saturation                                  |
 | `cpt-cf-file-storage-nfr-bandwidth`             | Per-instance ingress+egress budget; full traffic transits FileStorage | `cpt-cf-file-storage-component-stream-proxy`, `cpt-cf-file-storage-component-backend-abstraction`, deployment topology                    | ADR-0001 routes every uploaded and downloaded byte through FileStorage, so per-instance bandwidth — not CPU/memory — is the binding constraint. P1 deployment budget: **target ≥ 2.5 GiB/s combined ingress+egress per instance** (≈ 1.25 GiB/s each way on a 25 GbE NIC, sized so the ≥1000 concurrent-ops target is bandwidth- rather than CPU-bound at typical media object sizes). Capacity = `ceil(peak aggregate transfer rate / per-instance budget)` instances; transfer load scales horizontally with the stateless replicas. Download caching is offloaded to the API-Gateway / CDN layer using the content-only `ETag`, `Cache-Control`, and `Vary` response headers FileStorage already emits, so repeat-read egress need not re-transit FileStorage | Load test: saturate a single instance's NIC with concurrent downloads, confirm it sustains the per-instance budget before CPU saturates; verify CDN/proxy serves conditional re-reads from cache (no FileStorage egress on `304`/cache hit) |
 
@@ -186,9 +187,17 @@ update on each chunk; they never block the chunk from continuing downstream.
 - [ ] `p1` - **ID**: `cpt-cf-file-storage-principle-content-only-etag`
 
 ETag and hash are functions of the bytes only. Metadata updates change `metadata_revision` and `last_modified_at` but
-not ETag or hash. The S3-style consequence is that `If-Match` on metadata-only `PATCH` is last-write-wins between
-metadata writers — accepted because content-write conflicts (the high-stakes case) are still protected and
-metadata-write conflicts are rare and small.
+not ETag or hash — keeping ETag a pure content cache-validator (so CDNs do not invalidate cached bytes on a
+metadata-only change). Because ETag is deliberately content-only, `If-Match` on a metadata-only `PATCH` protects
+against concurrent **content** writes but cannot detect concurrent **metadata** writes.
+
+Rather than leave metadata writes silently last-write-wins, P1 exposes the metadata revision as its own conditional
+validator: the `metadata_revision` is already on the wire as `X-FS-Metadata-Revision: <u64>`, and a metadata-only
+`PATCH` MAY carry **`If-Match-Metadata: <u64>`**, matched against the current `metadata_revision` (mismatch → `412`).
+The header is optional: absent, the write falls back to last-write-wins for back-compatibility; clients that store
+real state in custom metadata (billing tags, classification, policy labels) opt in to lost-update protection. This
+keeps the wire contract locked in P1 without composing it into ETag (which would defeat CDN caching on metadata-only
+changes).
 
 **ADRs**: `cpt-cf-file-storage-adr-content-hash-selection`
 
@@ -255,8 +264,10 @@ their credentials requires a restart. Runtime/DB-driven configuration with admin
 
 - `File` → `OwnerPrincipal` (composition; immutable except via P2 ownership transfer)
 - `File` → `CustomMetadata` (1:N; cascade-deleted with the file)
-- `File` → `BackendConfig` (reference by `backend_id`; immutable per file — the backend that wrote the bytes also owns
-  the version chain when versioning is on)
+- `File` → `BackendConfig` (reference by `backend_id`; immutable per file **in P1**, relaxed by
+  `cpt-cf-file-storage-component-backend-migrator` in P2/P3 — until then the backend that wrote the bytes also owns the
+  version chain when versioning is on. Immutability is enforced at the service layer only, **not** as a DB constraint,
+  so a future migrator can relocate non-versioned files without a schema change)
 - `ETag` ← derived from `File.content_revision`
 - `BackendCapabilities` ← embedded in `BackendConfig`; surfaced read-only via `GET /storages`
 
@@ -310,8 +321,14 @@ error mapping to RFC 7807 Problem+JSON.
 
 - Register the auth-required router `/api/file-storage/v1/*` with the platform `security_context_layer`
 - Parse and validate HTTP-level inputs: `Content-Type` (must be `multipart/form-data` for create/update),
-  `Range` header (parse to `ByteRange`), conditional headers
-- Enforce conditional-request semantics (return `304`, `412` as defined in `cpt-cf-file-storage-fr-conditional-requests`)
+  `Range` header (parse to `ByteRange`), conditional headers, and the `?replace_content` flag on `PATCH` —
+  rejecting with `400` when a `content` part and the flag disagree (part without flag, or flag without part)
+- Enforce conditional-request semantics (return `304`, `412` as defined in `cpt-cf-file-storage-fr-conditional-requests`),
+  including the optional `If-Match-Metadata` precondition on metadata-only `PATCH` (matched against `metadata_revision`)
+- Own the **request-scoped best-effort cleanup guard**: on `POST /files`, fire `backend.delete(backend_path)` if any
+  error occurs after a successful `put()` but before the `files` `INSERT` commits (and on the `415` abort path); on
+  `DELETE /files/{id}`, issue `backend.delete(backend_path)` after the row is committed-deleted. Both are
+  fire-and-forget — a failed backend delete degrades to an orphan reconciled in P2, never a row pointing at missing bytes
 - Map domain errors to status codes + Problem+JSON bodies per `docs/modkit_unified_system/05_errors_rfc9457.md`
 - Populate response headers including `ETag`, `Accept-Ranges`, `Last-Modified`, all `X-FS-*` system metadata, and
   `X-FS-Meta-<key>` for custom metadata (with RFC 8187 encoding for non-ASCII values)
@@ -535,49 +552,33 @@ intended decomposition. Their detailed designs live in P2/P3 FEATURE artifacts (
 | `quota-adapter`                                       | P2    | Synchronous quota check before storage-consuming operations; usage reports asynchronously                                | PRD `cpt-cf-file-storage-fr-storage-quota`, `…fr-usage-reporting`                              |
 | `serverless-adapter`                                  | P2    | Subscribes to owner-deletion events; invokes the configured Serverless Runtime workflow per owner                        | PRD `cpt-cf-file-storage-fr-owner-deletion`                                                    |
 | `orphan-reconciler`                                   | P2    | Scheduled background task that reconciles `files` rows against backend object existence and aborts abandoned multipart sessions; emits audit per disposition | PRD `cpt-cf-file-storage-fr-orphan-reconciliation`                                             |
+| `backend-migrator`                                    | P2    | Relocates a file's bytes between backends (cost-tier moves, backend deprecation, residency, rebalancing, DR) without rotating the `/files/{id}` URL; flips the service-layer `backend_id`-immutability for non-versioned files | PRD `cpt-cf-file-storage-fr-backend-migration`                                                 |
 | `encryption-adapter`                                  | P3    | Manages server-side encryption parameters and key handles per backend                                                    | PRD `cpt-cf-file-storage-fr-file-encryption`                                                   |
 | `admin-config`                                        | P3    | DB-backed runtime backend management (CRUD on backend configs) with credential rotation                                  | PRD `cpt-cf-file-storage-fr-runtime-backends`                                                  |
 
-##### P2 preview — multipart upload initiation contract
+##### Multipart upload — deferred to P2 (no P1 wire commitment)
 
-The `multipart-coordinator` decomposition is deferred to its own P2 FEATURE artifact, but the shape of the
-initiation handshake is fixed enough now to record here so that P1 wire-level decisions (capability
-advertisement on `GET /storages`, hash-policy block, error model) leave room for it. This subsection is a
-**preview, not a binding specification** — the authoritative contract will live in the P2 FEATURE for
-`cpt-cf-file-storage-fr-multipart-upload`.
+The detailed multipart contract is **owned by the P2 FEATURE for `multipart-coordinator`**
+(`cpt-cf-file-storage-fr-multipart-upload`) and is **not designed here**. The P2 endpoint surface is only *sketched*
+in api.md (`POST /files/multipart` initiate → client uploads `.../parts/{n}` → `.../complete` / `.../abort`) — a
+**client-driven** part model consistent with `migration.sql`'s `multipart_uploads` / `multipart_upload_parts` tables.
+The detailed semantics (part-size rules, concurrency, resumability, idempotency, per-part hash carry-over for BLAKE3
+tree-mode, error codes) are deferred to that FEATURE. P1 leaves `capabilities.multipart_native` declared on
+`GET /storages` but inactive.
 
-**Initiation flow (illustrative):**
+To keep the P1 surface forward-compatible without binding the P2 shape, only these invariants are recorded:
 
-- **Client request** — the same file-metadata envelope as single-shot `POST /files` (see §3.3) plus a
-  **`desired_part_count`** hint expressing into how many parts the client would prefer to split the upload.
-  The client MAY also send a hash-algorithm preference per `cpt-cf-file-storage-adr-content-hash-selection`.
-- **Server response** — the parts plan is **server-authoritative**. The server inspects the resolved
-  `BackendConfig` (`cpt-cf-file-storage-component-backend-abstraction`), the resolved hash algorithm
-  (`cpt-cf-file-storage-adr-content-hash-selection`), and the declared `size` from the metadata envelope, and
-  returns:
-  - **`hash_algorithm`** — the algorithm the server actually selected for this upload. The client preference
-    is only a hint; the effective algorithm is bounded by the backend's `allowed_algorithms` and selection
-    rules.
-  - **`parts[]`** — an ordered list of `{ position, length }` byte ranges that the client MUST use verbatim
-    when transferring the parts. The server **MAY return a different number of parts than
-    `desired_part_count`** because:
-    - backend-native multipart enforces minimum/maximum part sizes (e.g. S3's ~5 MB floor, ~5 GB ceiling, and
-      a hard cap on total parts);
-    - certain hash algorithms constrain part boundaries to specific multiples (e.g. BLAKE3 tree-chunk
-      boundaries used by tree-mode finalization per ADR-0002).
-    The exact alignment rules per backend/algorithm pair are deferred to the P2 FEATURE.
-  - **`concurrency`** — directive telling the client how the parts plan may be transferred:
-    - whether parts MUST be uploaded **strictly sequentially** (required when the backend or the validation
-      pipeline needs in-order arrival — e.g. magic-bytes validation on the first part per
-      `cpt-cf-file-storage-fr-content-type-validation`), or MAY be uploaded **in parallel**;
-    - in the parallel case, the **maximum number of concurrent part transfers** the server will accept for
-      this upload session.
+- the initiation envelope reuses the single-shot `POST /files` file-metadata document (see §3.3) — no new
+  metadata schema;
+- the effective hash algorithm is bounded by the backend's `allowed_algorithms`
+  (`cpt-cf-file-storage-adr-content-hash-selection`) exactly as for single-shot upload;
+- capability discovery via `GET /storages` is sufficient for a client to learn whether a backend supports
+  native multipart — no separate negotiation endpoint is needed in P1.
 
-The wire format, idempotency semantics, per-part hash carry-over for tree-mode finalization
-(`cpt-cf-file-storage-adr-content-hash-selection`), resumability, retry semantics on individual parts, error
-codes, and the `complete` / `abort` flows are intentionally **not specified here**. They will be detailed in
-the P2 FEATURE for `multipart-coordinator` referenced from the table above and in a future revision of
-`api.md`.
+> An earlier draft specified a **server-authoritative** parts plan (server returns `parts[]` the client must use
+> verbatim, plus a `concurrency` directive). That is **not adopted**: it contradicts the client-driven `.../parts/{n}`
+> model in api.md and the dominant S3 idiom. Concrete request/response shapes are left to the P2 FEATURE so reviewers
+> approving this PR are not implicitly ratifying them.
 
 ### 3.3 API Contracts
 
@@ -593,8 +594,15 @@ schema, status codes — is documented in **[api.md](./api.md)**. The summary:
 - **Create / update body**: `multipart/form-data` with `metadata` (`application/json`, required on `POST`, optional
   on `PATCH`) and `content` (binary, required on `POST`, optional on `PATCH`). `metadata` MUST precede `content` to let
   the server route content through the right pipeline (declared mime informs the magic-bytes check)
+- **Explicit content-replace intent on `PATCH`**: content replacement is full-file (`PUT`-style) semantics, not a
+  partial patch, so a `PATCH` carrying a `content` part is accepted only with the `?replace_content=true` query flag.
+  A `content` part without the flag — and the flag without a `content` part — are both rejected with `400`. This
+  prevents silent content mutation when a client accidentally forwards a `content` part (which `If-Match` would not
+  catch, since the current content ETag still matches at request time). Metadata-only `PATCH` needs no flag
 - **Conditional headers**: `If-Match` required on `PATCH`/`DELETE`; `If-Match` and `If-None-Match` optional on
-  `GET`/`HEAD`. ETag is `(file_id, content_revision)`-derived and content-only
+  `GET`/`HEAD`. ETag is `(file_id, content_revision)`-derived and content-only. `If-Match-Metadata: <u64>` is an
+  optional metadata-concurrency validator on metadata-only `PATCH`, matched against `metadata_revision` (mismatch →
+  `412`); absent → last-write-wins (see `cpt-cf-file-storage-principle-content-only-etag`)
 - **Range**: full `bytes=` syntax supported; `Accept-Ranges: bytes` advertised on every download response; `HEAD`
   ignores `Range` and returns full-file headers. See §4.1 for backend translation rules
 - **Custom metadata in headers**: one `X-FS-Meta-<key>` per pair; non-ASCII values use RFC 8187
@@ -677,9 +685,15 @@ sequenceDiagram
         BA-->>SP: ObjectRef
         SP-->>HGW: (final hash, size, ObjectRef)
         HGW->>MS: persist(file, hash, size, backend_path)
-        MS->>DB: INSERT files (content_state='available', content_revision=1, hash_value, size, backend_*) — single commit
-        HGW-->>C: 201 + metadata JSON + headers
+        alt INSERT commits
+            MS->>DB: INSERT files (content_state='available', content_revision=1, hash_value, size, backend_*) — single commit
+            HGW-->>C: 201 + metadata JSON + headers
+        else INSERT fails (DB blip, client drop, panic)
+            HGW->>BA: delete(backend_path) — best-effort cleanup guard (fire-and-forget)
+            HGW-->>C: 5xx
+        end
     end
+    Note over HGW,BA: A request-scoped best-effort guard runs backend.delete(backend_path) on any error<br/>after a successful put() but before the committed INSERT (and on the 415 path). The only<br/>uncovered case is a hard process kill in that window → unreferenced object swept by the P2<br/>orphan-reconciler. A pending_uploads ledger was considered and deferred to P2.
     Note over MS,DB: Write-after model: the files row is committed only after a successful<br/>backend put(), so size/hash_value are always known at INSERT time and no<br/>'pending' row is ever created in P1 (see §4.4 durability). 'pending' is reserved<br/>for the P2 multipart flow, where content arrives across multiple requests.
 ```
 
@@ -764,10 +778,12 @@ sequenceDiagram
     participant MS as metadata-service
     participant DB as Postgres
 
-    C->>HGW: PATCH /files/{id} (multipart: metadata only, If-Match: "<etag>")
+    C->>HGW: PATCH /files/{id} (multipart: metadata only,<br/>If-Match: "<etag>", If-Match-Metadata: <rev> optional)
     HGW->>MS: read(file_id)
-    MS-->>HGW: current File row
-    alt ETag mismatch
+    MS-->>HGW: current File row (incl. metadata_revision)
+    alt If-Match (ETag) mismatch
+        HGW-->>C: 412 Precondition Failed
+    else If-Match-Metadata present and != current metadata_revision
         HGW-->>C: 412 Precondition Failed
     else
         HGW->>AZ: check(action=write, resource=gts~<type>~)
@@ -775,8 +791,46 @@ sequenceDiagram
         HGW->>MS: apply_merge_patch(file_id, json)
         MS->>DB: UPDATE files SET ...; UPSERT files_custom_metadata
         Note over MS,DB: bump metadata_revision, last_modified_at;<br/>do NOT bump content_revision or ETag
-        HGW-->>C: 200 + new metadata JSON + headers (ETag unchanged)
+        HGW-->>C: 200 + new metadata JSON + headers (ETag unchanged, X-FS-Metadata-Revision bumped)
     end
+    Note over C,HGW: If-Match-Metadata is optional; absent → last-write-wins (back-compat).<br/>Present → lost-update protection keyed on metadata_revision (already emitted as X-FS-Metadata-Revision).
+```
+
+#### Delete (P1)
+
+**ID**: `cpt-cf-file-storage-seq-delete`
+
+**Use cases**: `cpt-cf-file-storage-usecase-delete-file`
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant HGW as http-gateway
+    participant AZ as authz-adapter
+    participant MS as metadata-service
+    participant BA as backend driver
+    participant DB as Postgres
+
+    C->>HGW: DELETE /files/{id} (If-Match: "<etag>")
+    HGW->>MS: read(file_id)
+    alt file not found
+        MS-->>HGW: none
+        HGW-->>C: 404 Not Found
+    else found
+        MS-->>HGW: current File row (backend_id, backend_path, content_revision)
+        alt ETag mismatch
+            HGW-->>C: 412 Precondition Failed
+        else
+            HGW->>AZ: check(action=write, resource=gts~<type>~)
+            AZ-->>HGW: Allow
+            HGW->>MS: delete(file_id)
+            MS->>DB: DELETE files WHERE id=$1 (+ cascade custom_metadata) — single commit
+            HGW-->>C: 204 No Content
+            HGW->>BA: delete(backend_path) — best-effort, after the row is gone
+        end
+    end
+    Note over HGW,BA: Metadata-row-first: the row is removed and 204 returned before backend.delete().<br/>A backend-delete failure leaves an unreferenced object (swept by the P2 orphan-reconciler),<br/>never a row pointing at missing bytes. Re-DELETE of an already-deleted id → 404 (idempotent).
 ```
 
 #### List files (P1)
@@ -842,6 +896,8 @@ sequenceDiagram
 - `NOT NULL` on every column above
 - `tenant_id` immutable (enforced at the service layer; no DB trigger)
 - `(owner_kind, owner_id)` immutable except by `version-manager` (P2) and `serverless-adapter` (P2)
+- `backend_id` immutable per file in P1 (enforced at the service layer; no DB constraint), relaxed for non-versioned
+  files by `backend-migrator` (P2) — see `cpt-cf-file-storage-fr-backend-migration`
 
 **Indexes**:
 - `PRIMARY KEY (file_id)`
@@ -905,6 +961,19 @@ arrangements:
   variables / mounted secret files referenced from the TOML config
 - **Metadata DB**: shared Postgres cluster with the platform; `file_storage` schema; migrations applied at startup by
   one elected replica (`db-runner` handles election). Connection pooling per-replica via SeaORM defaults
+- **Bandwidth escape hatch for ADR-0001 (future).** The cost ADR-0001 accepts (`cpt-cf-file-storage-nfr-bandwidth`) is
+  absorbed by this same stateless-replica model — there is **no** plan to extract `stream-proxy` into a thin
+  byte-mover data-plane tier. If byte traffic must be moved closer to a heavy consumer or to the edge, the unit of
+  relocation is a **full FileStorage instance** (the entire stack — `http-gateway` → `metadata-service` →
+  `stream-proxy` → backend drivers), deployed as a co-located sidecar that connects to the **shared/remote metadata
+  Postgres** and, in the future, runs its own caching configuration. Such an instance serves `POST`/`GET /files/{id}`
+  end-to-end exactly as a central replica does (auth → resolve `backend_path` → stream ↔ backend → commit the row in
+  the shared DB). Because every replica is already stateless and any instance can serve any file, this needs **no
+  wire-contract change, no two-phase upload, and no trait extraction** — it is a deployment/configuration change, not
+  an architectural one. Download egress, the dominant cost, is additionally offloaded to the API-Gateway/CDN layer via
+  the content-only `ETag`/`Cache-Control`/`Vary` headers (`cpt-cf-file-storage-nfr-bandwidth`). Inter-module callers
+  reach such a standalone/co-located instance via the P3 out-of-process gRPC SDK variant noted in
+  `cpt-cf-file-storage-constraint-modkit-module` — the same escape hatch, viewed from the caller side
 
 ## 4. Additional Context
 
@@ -1052,7 +1121,7 @@ Concurrency caps:
 | `cpt-cf-file-storage-nfr-metadata-latency`      | Designed              | Single-row Postgres lookup; expected p95 well within budget under target load                                                                        |
 | `cpt-cf-file-storage-nfr-transfer-latency`      | Designed              | Streaming end-to-end; no full-file buffering; range translated to backend-native where supported                                                     |
 | `cpt-cf-file-storage-nfr-url-availability`      | Designed              | URLs derived from `file_id` and stable for the file's lifetime; deleted files return `404`                                                           |
-| `cpt-cf-file-storage-nfr-durability`            | Designed              | Write-after model: the `files` row is committed only after a successful backend `put()`, so `size`/`hash_value` are always known at INSERT. P1 never inserts a `content_state='pending'` row, so a crash mid-upload leaves **no dangling DB row** — at most an unreferenced backend object, which the P2 `orphan-reconciler` sweeps. The `415` magic-bytes abort path explicitly calls `backend.delete(backend_path)` on the partially written object (see §3.6 upload sequence), so a rejected upload leaves no backend orphan either |
+| `cpt-cf-file-storage-nfr-durability`            | Designed              | Write-after model: the `files` row is committed only after a successful backend `put()`, so `size`/`hash_value` are always known at INSERT. P1 never inserts a `content_state='pending'` row, so a crash mid-upload leaves **no dangling DB row**. The remaining failure window — `put()` succeeded but the `INSERT` did not commit — would leave an **unreferenced backend object**; P1 mitigates this with a request-scoped **best-effort cleanup guard** that fires `backend.delete(backend_path)` on any error in that window (DB blip, client drop, panic). The only case it cannot cover is a hard process kill between `put()` and commit; that residual orphan is swept by the P2 `orphan-reconciler`. The `415` magic-bytes abort path uses the same guard to delete the partially written object (see §3.6 upload sequence). A heavyweight `pending_uploads` ledger was considered and deferred to P2 — the in-process guard closes the common cases at far lower cost and keeps the `files` table free of transient rows |
 | `cpt-cf-file-storage-nfr-scalability`           | Designed              | Stateless request path; shared metadata DB; streaming I/O bounds per-request CPU and memory                                                          |
 | `cpt-cf-file-storage-nfr-bandwidth`             | Designed              | Per-instance ingress+egress budget (≥ 2.5 GiB/s combined on 25 GbE) sized so the concurrency target is bandwidth- not CPU-bound; capacity scales horizontally with stateless replicas; conditional re-reads offloaded to API-Gateway/CDN via `ETag`/`Cache-Control`/`Vary`. Models the cost accepted by ADR-0001 |
 | `cpt-cf-file-storage-nfr-audit-completeness`    | Deferred to P2        | P1 has no audit emission; the seam is reserved in `metadata-service` and `audit-publisher` is declared as P2                                         |
