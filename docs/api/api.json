@@ -950,6 +950,43 @@
         ],
         "type": "object"
       },
+      "GearInstanceDto": {
+        "description": "Response DTO for a running gear instance",
+        "properties": {
+          "grpc_services": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "gRPC services provided by this instance (service name -> endpoint URI)",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "instance_id": {
+            "description": "Unique instance ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "state": {
+            "description": "Current instance state (e.g., \"registered\", \"healthy\", \"quarantined\")",
+            "type": "string"
+          },
+          "version": {
+            "description": "Gear version (if reported during registration)",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "instance_id",
+          "state",
+          "grpc_services"
+        ],
+        "type": "object"
+      },
       "GpuInfoDto": {
         "properties": {
           "cores": {
@@ -1622,43 +1659,6 @@
         },
         "required": [
           "items"
-        ],
-        "type": "object"
-      },
-      "GearInstanceDto": {
-        "description": "Response DTO for a running gear instance",
-        "properties": {
-          "grpc_services": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "gRPC services provided by this instance (service name -> endpoint URI)",
-            "propertyNames": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "instance_id": {
-            "description": "Unique instance ID",
-            "format": "uuid",
-            "type": "string"
-          },
-          "state": {
-            "description": "Current instance state (e.g., \"registered\", \"healthy\", \"quarantined\")",
-            "type": "string"
-          },
-          "version": {
-            "description": "Gear version (if reported during registration)",
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        },
-        "required": [
-          "instance_id",
-          "state",
-          "grpc_services"
         ],
         "type": "object"
       },
@@ -8421,6 +8421,103 @@
         ]
       }
     },
+    "/gear-orchestrator/v1/gears": {
+      "get": {
+        "description": "Returns a list of all compiled-in and out-of-process gears with their capabilities, dependencies, running instances, and deployment mode.",
+        "operationId": "gear_orchestrator.list_gears",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vec"
+                }
+              }
+            },
+            "description": "List of registered gears"
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "429": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List all registered gears",
+        "tags": [
+          "Gear Orchestrator"
+        ]
+      }
+    },
     "/mini-chat/v1/chats": {
       "get": {
         "operationId": "mini_chat.list_chats",
@@ -10472,103 +10569,6 @@
         "summary": "Get quota status for the authenticated user",
         "tags": [
           "Mini Chat Quotas"
-        ]
-      }
-    },
-    "/gear-orchestrator/v1/gears": {
-      "get": {
-        "description": "Returns a list of all compiled-in and out-of-process gears with their capabilities, dependencies, running instances, and deployment mode.",
-        "operationId": "gear_orchestrator.list_gears",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Vec"
-                }
-              }
-            },
-            "description": "List of registered gears"
-          },
-          "400": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Bad Request"
-          },
-          "401": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Unauthorized"
-          },
-          "403": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Forbidden"
-          },
-          "404": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "409": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Conflict"
-          },
-          "429": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Too Many Requests"
-          },
-          "500": {
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Problem"
-                }
-              }
-            },
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List all registered gears",
-        "tags": [
-          "Gear Orchestrator"
         ]
       }
     },
