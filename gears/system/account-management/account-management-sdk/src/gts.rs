@@ -619,7 +619,7 @@ mod sync_tests {
     //! `docs/schemas/<name>.v1.schema.json`. The macro additionally emits
     //! a data-type top-level shape (`id`/`properties`/`required`/
     //! `additionalProperties`) that the docs omit by design and that is
-    //! inert at runtime (see module docs), so only the trait subtrees are
+    //! inert at runtime (see gear docs), so only the trait subtrees are
     //! compared.
 
     use std::fs;
