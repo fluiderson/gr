@@ -314,6 +314,7 @@ fail_on_unmatched_markdown = true
 
 [[systems.autodetect]]
 kit = "gears"
+slug = "cf-bss"
 system_root = "{project_root}/gears/bss/$system"
 artifacts_root = "{system_root}/docs"
 
