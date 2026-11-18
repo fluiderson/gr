@@ -50,6 +50,7 @@ use crate::domain::metadata::registry::MetadataSchemaRegistry;
 use crate::domain::metadata::repo::MetadataRepo;
 use crate::domain::metadata::service::MetadataService;
 use crate::domain::metrics::install_facade_bridge;
+use crate::domain::principal_lifecycle::PrincipalLifecycleNotifier;
 use crate::domain::root_type::validate_root_binding;
 use crate::domain::service_account::service::ServiceAccountService;
 use crate::domain::tenant::TenantRepo;
@@ -640,8 +641,9 @@ impl Gear for AccountManagementGear {
         // clients otherwise (`gts_publication(...)` and `#[toolkit::consumes]` wire both
         // with the infrastructure). Request reads use `request_registry` with
         // each caller's context (types-registry SPEC §8.4). Bootstrap, retention and the reaper use
-        // `platform_registry`. Process-wide IdP selection and TR hierarchy reads
-        // are named platform exceptions; see `tr_plugin::plugin_impl`.
+        // `platform_registry`. Process-wide IdP selection, principal-lifecycle
+        // hook discovery and TR hierarchy reads are named platform exceptions;
+        // see `tr_plugin::plugin_impl` and `infra::principal_lifecycle`.
         let request_registry = ctx
             .client_hub()
             .get::<dyn types_registry_sdk::TypesRegistryApi>()
@@ -863,6 +865,24 @@ impl Gear for AccountManagementGear {
         ));
         // @cpt-end:cpt-cf-account-management-flow-user-groups-cascade-cleanup-trigger:p1:inst-flow-cascade-entry
 
+        // Principal-lifecycle hooks: other gears register a hook to hear
+        // about user and tenant deletions. One dispatcher serves both the `delete_user` path
+        // (wired into `UserService` below) and the tenant hard-delete
+        // pipeline (this hook, registered after the user-groups cascade so
+        // AM's own cleanup runs first). The dispatcher resolves hooks on
+        // every delivery, so it is safe to build before the registry has
+        // committed the hooks' instances.
+        let principal_lifecycle: Arc<dyn PrincipalLifecycleNotifier> =
+            Arc::new(crate::infra::principal_lifecycle::HookDispatcher::new(
+                ctx.client_hub(),
+                Arc::clone(&platform_registry),
+            ));
+        self.register_hard_delete_hook(
+            crate::domain::principal_lifecycle::build_tenant_hard_delete_hook(Arc::clone(
+                &principal_lifecycle,
+            )),
+        );
+
         // Validate bootstrap config (fast, fail-fast) and store
         // params for `serve`. The saga itself runs there, under the
         // lifecycle's cancellation, so IdP-wait sleeps are interruptible
@@ -1027,6 +1047,9 @@ impl Gear for AccountManagementGear {
             // rows that surface in group-member listings until the
             // RG-side cleanup pipeline catches up.
             .with_rg_membership_cleanup(Arc::clone(&rg_client))
+            // Tell other gears' principal-lifecycle hooks the user is
+            // gone, so their state keyed by the user goes with it.
+            .with_principal_lifecycle(Arc::clone(&principal_lifecycle))
             // Plumb the per-deployment `listing.max_top` so the user
             // listing surface honors the operator knob uniformly with
             // tenant / conversion / metadata listings.

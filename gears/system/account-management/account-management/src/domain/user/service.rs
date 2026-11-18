@@ -46,7 +46,7 @@ use account_management_sdk::gts::{USER_GROUP_RG_TYPE_CODE, USER_RG_TYPE_CODE};
 use account_management_sdk::{
     IdpDeprovisionUserRequest, IdpListUsersRequest, IdpNewUser, IdpPluginClient,
     IdpProvisionUserRequest, IdpTenantContext, IdpUpdateUserRequest, IdpUser, IdpUserFilterField,
-    IdpUserOperationFailure, IdpUserPatch, ListUsersQuery,
+    IdpUserOperationFailure, IdpUserPatch, ListUsersQuery, PrincipalLifecycleEvent,
 };
 use authz_resolver_sdk::PolicyEnforcer;
 use authz_resolver_sdk::pep::ResourceType;
@@ -65,6 +65,7 @@ use uuid::Uuid;
 use crate::domain::error::DomainError;
 use crate::domain::idp::UserOperationFailureExt;
 use crate::domain::metrics::{AM_DEPENDENCY_HEALTH, MetricKind, emit_metric};
+use crate::domain::principal_lifecycle::{self, PrincipalLifecycleNotifier};
 use crate::domain::tenant::TenantContext;
 use crate::domain::tenant::repo::TenantRepo;
 
@@ -165,6 +166,11 @@ pub struct UserService {
     /// tests that don't exercise the cleanup path; production wiring
     /// always sets it.
     rg_client: Option<Arc<dyn ResourceGroupClient + Send + Sync>>,
+    /// Delivers [`PrincipalLifecycleEvent::UserDeprovisioned`] to the
+    /// hooks other gears register, so their state keyed by the deleted
+    /// user goes with it. `None` in tests that don't exercise delivery;
+    /// production wiring always sets it.
+    lifecycle: Option<Arc<dyn PrincipalLifecycleNotifier>>,
     /// Per-deployment listing cap. Defaults to
     /// [`account_management_sdk::IdpUserPagination::MAX_TOP`];
     /// production wiring overrides via [`Self::with_listing_max_top`]
@@ -231,6 +237,7 @@ impl UserService {
             types_registry,
             enforcer,
             rg_client: None,
+            lifecycle: None,
             max_listing_top: account_management_sdk::IdpUserPagination::MAX_TOP,
         }
     }
@@ -311,6 +318,22 @@ impl UserService {
         rg_client: Arc<dyn ResourceGroupClient + Send + Sync>,
     ) -> Self {
         self.rg_client = Some(rg_client);
+        self
+    }
+
+    /// Wire the [`PrincipalLifecycleNotifier`] [`Self::delete_user`] uses to
+    /// tell other gears a user is gone. Without it, state other gears keep
+    /// for the user — access grants naming them, for instance — outlives
+    /// the user as orphans.
+    ///
+    /// Production wiring in `gear.rs` always invokes this builder; tests
+    /// that don't exercise delivery skip it.
+    #[must_use]
+    pub fn with_principal_lifecycle(
+        mut self,
+        notifier: Arc<dyn PrincipalLifecycleNotifier>,
+    ) -> Self {
+        self.lifecycle = Some(notifier);
         self
     }
 
@@ -556,6 +579,12 @@ impl UserService {
             // cleanup retries.
             Ok(()) => {
                 self.cleanup_user_group_memberships(ctx, tenant_id, user_id)
+                    .await?;
+                // Other gears' cleanup, after AM's own: the user is gone
+                // from the IdP, so no hook ever strips a live user. A
+                // failure returns Err like the RG cleanup does, and the
+                // retried delete delivers the event to every hook again.
+                self.notify_user_deprovisioned(ctx, tenant_id, user_id)
                     .await?;
                 tracing::info!(
                     target: "am.events",
@@ -979,6 +1008,28 @@ impl UserService {
             tenant_id,
         )
         .await
+    }
+
+    // ----------------------------------------------------------------
+    // Principal-lifecycle delivery post user-deprovision
+    // ----------------------------------------------------------------
+
+    /// Deliver [`PrincipalLifecycleEvent::UserDeprovisioned`] to the
+    /// registered hooks. A no-op when no notifier is wired.
+    async fn notify_user_deprovisioned(
+        &self,
+        ctx: &SecurityContext,
+        tenant_id: Uuid,
+        user_id: Uuid,
+    ) -> Result<(), DomainError> {
+        let Some(lifecycle) = self.lifecycle.as_ref() else {
+            return Ok(());
+        };
+        let event = PrincipalLifecycleEvent::UserDeprovisioned { tenant_id, user_id };
+        lifecycle
+            .notify(ctx, &event)
+            .await
+            .map_err(|err| principal_lifecycle::into_domain_error(&event, err))
     }
 
     // ----------------------------------------------------------------

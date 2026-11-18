@@ -1880,3 +1880,114 @@ async fn every_registry_read_names_the_requests_caller() {
     }
     assert_eq!(spy.platform_reads(), 0);
 }
+
+// ---------------------------------------------------------------------
+// Principal-lifecycle delivery on delete
+// ---------------------------------------------------------------------
+
+/// Notifier double: records each delivered event and answers with a fixed
+/// result.
+struct RecordingLifecycle {
+    result: Result<(), account_management_sdk::PrincipalLifecycleHookError>,
+    seen: std::sync::Mutex<Vec<account_management_sdk::PrincipalLifecycleEvent>>,
+}
+
+impl RecordingLifecycle {
+    fn answering(
+        result: Result<(), account_management_sdk::PrincipalLifecycleHookError>,
+    ) -> Arc<Self> {
+        Arc::new(Self {
+            result,
+            seen: std::sync::Mutex::new(Vec::new()),
+        })
+    }
+
+    fn seen(&self) -> Vec<account_management_sdk::PrincipalLifecycleEvent> {
+        self.seen.lock().expect("lock").clone()
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::domain::principal_lifecycle::PrincipalLifecycleNotifier for RecordingLifecycle {
+    async fn notify(
+        &self,
+        _ctx: &SecurityContext,
+        event: &account_management_sdk::PrincipalLifecycleEvent,
+    ) -> Result<(), account_management_sdk::PrincipalLifecycleHookError> {
+        self.seen.lock().expect("lock").push(event.clone());
+        self.result.clone()
+    }
+}
+
+#[tokio::test]
+async fn delete_user_delivers_user_deprovisioned_after_the_idp_removed_the_user() {
+    let tenants = Arc::new(FakeTenantRepo::new());
+    let tenant_id = Uuid::from_u128(0x40);
+    seed_tenant(&tenants, tenant_id, None, TenantStatus::Active, "acme");
+    let idp = Arc::new(FakeIdpUserProvisioner::new());
+    let lifecycle = RecordingLifecycle::answering(Ok(()));
+    let svc = make_service(tenants, idp.clone()).with_principal_lifecycle(lifecycle.clone());
+    let user_id = Uuid::from_u128(0x4040);
+
+    svc.delete_user(&ctx(), tenant_id, user_id)
+        .await
+        .expect("delete succeeds");
+
+    assert_eq!(idp.delete_call_count(), 1);
+    assert_eq!(
+        lifecycle.seen(),
+        vec![
+            account_management_sdk::PrincipalLifecycleEvent::UserDeprovisioned {
+                tenant_id,
+                user_id
+            }
+        ]
+    );
+}
+
+#[tokio::test]
+async fn delete_user_hook_failure_is_retryable_and_the_retry_redelivers() {
+    let tenants = Arc::new(FakeTenantRepo::new());
+    let tenant_id = Uuid::from_u128(0x41);
+    seed_tenant(&tenants, tenant_id, None, TenantStatus::Active, "acme");
+    let idp = Arc::new(FakeIdpUserProvisioner::new());
+    let lifecycle = RecordingLifecycle::answering(Err(
+        account_management_sdk::PrincipalLifecycleHookError::Retryable {
+            detail: "hook store down".to_owned(),
+        },
+    ));
+    let svc = make_service(tenants, idp).with_principal_lifecycle(lifecycle.clone());
+    let user_id = Uuid::from_u128(0x4141);
+
+    for _ in 0..2 {
+        let err = svc
+            .delete_user(&ctx(), tenant_id, user_id)
+            .await
+            .expect_err("a failing hook fails the delete");
+        assert!(
+            matches!(err, DomainError::ServiceUnavailable { .. }),
+            "{err:?}"
+        );
+    }
+    // The IdP delete is idempotent, so each retry reaches the hooks again.
+    assert_eq!(lifecycle.seen().len(), 2);
+}
+
+#[tokio::test]
+async fn delete_user_idp_failure_delivers_nothing() {
+    // A user the IdP could not remove still exists: no hook may hear that
+    // it is gone.
+    let tenants = Arc::new(FakeTenantRepo::new());
+    let tenant_id = Uuid::from_u128(0x42);
+    seed_tenant(&tenants, tenant_id, None, TenantStatus::Active, "acme");
+    let idp = Arc::new(FakeIdpUserProvisioner::new());
+    idp.set_delete_outcome(FakeUserOutcome::Unavailable);
+    let lifecycle = RecordingLifecycle::answering(Ok(()));
+    let svc = make_service(tenants, idp).with_principal_lifecycle(lifecycle.clone());
+
+    svc.delete_user(&ctx(), tenant_id, Uuid::from_u128(0x4242))
+        .await
+        .expect_err("IdP failure surfaces");
+
+    assert_eq!(lifecycle.seen(), Vec::new());
+}
