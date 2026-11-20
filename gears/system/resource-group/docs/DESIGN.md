@@ -1510,7 +1510,7 @@ API tests verify HTTP-level behavior: request/response shapes, status codes, ODa
 
 | Dependency | Mock | Why |
 |---|---|---|
-| `PolicyEnforcer` / `AuthZResolverApi` | `MockAuthZResolverClient` (always Allow) or `DenyingAuthZResolverClient` | Isolate from AuthZ; test RG's own auth mode logic |
+| `PolicyEnforcer` / `AuthZResolverApi` | `AllowAllAuthZ` (always Allow) or `DenyAllAuthZ` (`tests/common/mod.rs`) | Isolate from AuthZ; test RG's own auth mode logic |
 | Database | SQLite in-memory | REST tests need real query execution for OData/pagination; PostgreSQL-dialect behavior covered by E2E |
 | Domain services | Real (not mocked) | REST layer delegates to real services |
 
@@ -1536,7 +1536,7 @@ API tests verify HTTP-level behavior: request/response shapes, status codes, ODa
 | Cursor pagination — all list endpoints | `GET /types?limit=2`, follow `next_cursor` | All items eventually returned |
 | Invalid OData filter | `GET /groups?$filter=invalid` | 400 Bad Request |
 | JWT auth — standard request | Request with bearer token | `PolicyEnforcer` called, response scoped by tenant |
-| JWT auth — AuthZ denies | Request + `DenyingAuthZResolverClient` | 403 Forbidden |
+| JWT auth — AuthZ denies | Request + `DenyAllAuthZ` | 403 Forbidden |
 | MTLS auth — hierarchy endpoint allowed | Simulated MTLS context, `GET /groups/{id}/hierarchy` | 200 OK, no PolicyEnforcer call |
 | MTLS auth — non-hierarchy endpoint rejected | Simulated MTLS context, `POST /groups` | 403 Forbidden |
 | All error categories — RFC 9457 format | Trigger each error category | Response has `type`, `title`, `status`, `detail` fields |

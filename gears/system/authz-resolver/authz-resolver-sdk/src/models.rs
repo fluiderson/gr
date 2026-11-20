@@ -178,8 +178,8 @@ pub struct EvaluationRequestContext {
     #[serde(default)]
     pub token_scopes: Vec<String>,
     /// Whether the PDP should return row-level constraints.
-    /// - `true` for LIST/GET/UPDATE/DELETE (need scope filtering)
-    /// - `false` for CREATE (just need decision)
+    /// The `PolicyEnforcer` sends `true` for every action, CREATE included,
+    /// unless the caller opts out with `AccessRequest::require_constraints(false)`.
     #[serde(default)]
     pub require_constraints: bool,
     /// PEP capabilities (tells PDP what the PEP can handle).
@@ -189,8 +189,8 @@ pub struct EvaluationRequestContext {
     #[serde(default)]
     pub supported_properties: Vec<String>,
     /// Original bearer token for PDP forwarding. Wrapped in `SecretString` to prevent
-    /// accidental logging. Skipped during serialization - the PDP receives the token
-    /// through a separate channel if needed.
+    /// accidental logging. Skipped during serialization, so it never crosses REST:
+    /// the `PolicyEnforcer` fills it, and only an in-process PDP or plugin sees it.
     #[serde(skip)]
     pub bearer_token: Option<SecretString>,
 }
@@ -202,7 +202,9 @@ pub struct EvaluationRequestContext {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, schemars::JsonSchema, utoipa::ToSchema)]
 pub struct EvaluationResponseContext {
     /// Row-level constraints to apply when `decision` is `true`.
-    /// Empty when `require_constraints` was `false` or when access is unrestricted.
+    /// May be empty only when `require_constraints` was `false` (the PEP then
+    /// applies no row-level filtering); with `require_constraints=true` an
+    /// empty list fails closed with `ConstraintsRequiredButAbsent`.
     /// Multiple constraints are `ORed` (any one matching is sufficient).
     #[serde(default)]
     pub constraints: Vec<Constraint>,

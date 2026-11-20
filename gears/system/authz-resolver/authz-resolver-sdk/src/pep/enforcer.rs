@@ -117,9 +117,9 @@ impl EnforcerError {
     ///
     /// True only for [`EnforcerError::EvaluationFailed`] carrying
     /// [`CanonicalError::ServiceUnavailable`] or
-    /// [`CanonicalError::DeadlineExceeded`], including the enforcer's own
-    /// evaluation deadline. Any other evaluation failure (`Internal` among
-    /// them), a refusal and a compile failure are false.
+    /// [`CanonicalError::DeadlineExceeded`]. The enforcer's own evaluation
+    /// deadline surfaces as `ServiceUnavailable`. Any other evaluation failure
+    /// (`Internal` among them), a refusal and a compile failure are false.
     ///
     /// It describes the cause, not whether a retry is safe: that depends on
     /// the operation and its idempotency. Recommended mapping for new or
@@ -183,6 +183,8 @@ pub enum AccessDenial {
 ///
 /// ```ignore
 /// use authz_resolver_sdk::pep::{AccessRequest, PolicyEnforcer, ResourceType};
+/// use authz_resolver_sdk::{BarrierMode, TenantMode};
+/// use toolkit_security::pep_properties;
 ///
 /// // CREATE with target tenant + resource properties (constrained scope)
 /// let scope = enforcer.access_scope_with(
@@ -396,6 +398,16 @@ impl ResourceType {
     }
 }
 
+/// Default PEP-side deadline for a single PDP `evaluate` call.
+///
+/// `evaluate` sits on the request-gating hot path and, out-of-process, is a
+/// network round-trip. This bounds it independently of the generic REST client
+/// default so a hung/unresponsive `authz-resolver` cannot stall consumers
+/// indefinitely. The default is intentionally generous — it is a hang guard,
+/// not a latency SLO; set a tighter value on latency-sensitive gating paths
+/// with [`PolicyEnforcer::with_deadline`].
+pub const DEFAULT_EVAL_DEADLINE: Duration = Duration::from_secs(30);
+
 /// Policy Enforcement Point.
 ///
 /// Holds the `AuthZ` client and optional PEP capabilities.
@@ -407,6 +419,7 @@ impl ResourceType {
 ///
 /// ```ignore
 /// use authz_resolver_sdk::pep::{PolicyEnforcer, ResourceType};
+/// use toolkit_gts::gts_id;
 /// use toolkit_security::pep_properties;
 ///
 /// const USER: ResourceType = ResourceType::from_static(
@@ -416,20 +429,11 @@ impl ResourceType {
 ///
 /// let enforcer = PolicyEnforcer::new(authz.clone());
 ///
-/// // All CRUD operations return AccessScope (PDP always returns constraints)
+/// // All CRUD operations, CREATE included, request constraints by default
+/// // (`require_constraints=true`) and return an AccessScope
 /// let scope = enforcer.access_scope(&ctx, &USER, "get", Some(id)).await?;
 /// let scope = enforcer.access_scope(&ctx, &USER, "create", None).await?;
 /// ```
-/// Default PEP-side deadline for a single PDP `evaluate` call.
-///
-/// `evaluate` sits on the request-gating hot path and, out-of-process, is a
-/// network round-trip. This bounds it independently of the generic REST client
-/// default so a hung/unresponsive `authz-resolver` cannot stall consumers
-/// indefinitely. The default is intentionally generous — it is a hang guard,
-/// not a latency SLO; set a tighter value on latency-sensitive gating paths
-/// with [`PolicyEnforcer::with_deadline`].
-pub const DEFAULT_EVAL_DEADLINE: Duration = Duration::from_secs(30);
-
 #[derive(Clone)]
 pub struct PolicyEnforcer {
     authz: AuthzSource,
@@ -649,8 +653,10 @@ impl PolicyEnforcer {
     /// Execute the full PEP flow with constraints: build request → evaluate
     /// → compile constraints to `AccessScope`.
     ///
-    /// Always sets `require_constraints=true`. PDP returns constraints for
-    /// all CRUD operations (GET, LIST, UPDATE, DELETE, CREATE).
+    /// Always sets `require_constraints=true`, for every action (GET, LIST,
+    /// UPDATE, DELETE, CREATE): if the PDP returns no constraints, the call
+    /// fails closed with [`EnforcerError::CompileFailed`]
+    /// ([`ConstraintCompileError::ConstraintsRequiredButAbsent`]).
     ///
     /// Refuses empty scopes. Use [`Self::access_scope_with`] and
     /// [`AccessRequest::allow_empty_scope`] for queries that preserve them.
@@ -732,8 +738,10 @@ impl PolicyEnforcer {
         // credential-free plane marker; the caller identity (`ctx`) is conveyed
         // to the PDP as `req.subject`, built above (`cpt-cf-adr-two-plane-auth`).
         // Bound the PDP call: `evaluate` gates every request and is a network
-        // round-trip out-of-process, so a slow/unresponsive PDP must fail fast
-        // (retryable) rather than cascade into blocked consumers.
+        // round-trip out-of-process, so a hung PDP must not block consumers
+        // indefinitely. `self.deadline` is a hang guard (see
+        // `DEFAULT_EVAL_DEADLINE`); on expiry the call fails with
+        // `ServiceUnavailable`.
         let response = match tokio::time::timeout(
             self.deadline,
             authz.evaluate(PlatformSecurityContext::outbound_marker(), eval_request),

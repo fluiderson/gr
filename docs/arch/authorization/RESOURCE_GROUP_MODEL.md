@@ -36,11 +36,11 @@ For topology details (forest invariants, type system, query profiles), see [RG D
 
 ## How AuthZ Uses Resource Groups
 
-AuthZ consumes RG data as a **PIP (Policy Information Point)** source. RG is policy-agnostic — it stores hierarchy and membership data without evaluating access decisions. AuthZ plugin reads this data to resolve group-based predicates.
+AuthZ consumes RG data as a **PIP (Policy Information Point)** source. RG is policy-agnostic — it stores hierarchy and membership data without evaluating access decisions. A PDP may read this data to resolve group-based predicates; the shipped `tr-authz-plugin` does not read RG directly (see [Integration Path](#integration-path)).
 
 ### Projection Tables
 
-RG tables are the canonical source of truth, owned by the RG gear. External consumers (AuthZ resolver, domain services) may maintain **projection copies** in their databases — synchronized from RG via read contracts (`ResourceGroupReadHierarchy`).
+RG tables are the canonical source of truth, owned by the RG gear. Projection copies in external consumers' databases (AuthZ resolver, domain services), synchronized from RG via read contracts (`ResourceGroupReadHierarchy`), are **planned, not implemented**: no projection mechanism exists. SecureORM queries `resource_group_membership`, `resource_group_closure` and `gts_type` by fixed name in whatever database the PEP's connection points at, so native group predicates compile only where those tables are present — the RG gear's own database or a shared-database deployment — and no gear opts in to native group predicates.
 
 **Projectable tables:**
 
@@ -50,17 +50,17 @@ RG tables are the canonical source of truth, owned by the RG gear. External cons
 
 #### Progressive projection strategy
 
-Whether and which tables to project depends on the deployment topology and access patterns. **Do not add projections speculatively** — each projection creates an additional database, synchronization load, and operational complexity.
+The guidance below is for the planned projection; none of these projections exist. Whether and which tables to project depends on the deployment topology and access patterns. **Do not add projections speculatively** — each projection creates an additional database, synchronization load, and operational complexity.
 
 | Deployment | Recommended projections | Rationale |
 |------------|------------------------|-----------|
 | **Monolith** (single shared DB) | **None** — all tables are already co-located | PEP JOINs against canonical tables directly; no extra databases or sync needed |
 | **Microservices** (separate DBs, typical case) | **`resource_group` + `resource_group_closure`** | Supports local hierarchy operations. Authorization must use explicit `in` predicates expanded by a capable PDP because the membership table is absent. Hierarchy tables are small (~100 K rows). |
-| **Microservices** with membership filtering/pagination | **`resource_group` + `resource_group_closure` + `resource_group_membership` + `gts_type`** | Only when profiling confirms the two-request pattern (RG API → domain service) is unacceptable for latency budget. `gts_type` is required to resolve external member-handle types to RG-local membership discriminators. The membership table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables — see [RG DESIGN §Storage Estimates](../../../gears/system/resource-group/docs/DESIGN.md#storage-estimates) for concrete numbers |
+| **Microservices** with membership filtering/pagination | **`resource_group` + `resource_group_closure` + `resource_group_membership` + `gts_type`** (planned, not implemented) | Only when profiling confirms the two-request pattern (RG API → domain service) is unacceptable for latency budget. `gts_type` is required to resolve external member-handle types to RG-local membership discriminators. The membership table grows as `M_resources × N_groups_per_resource` and is expected to be **10× or more larger** than hierarchy tables — see [RG DESIGN §4.1 Database Size Analysis & Production Projections](../../../gears/system/resource-group/docs/DESIGN.md#41-database-size-analysis--production-projections) for concrete numbers |
 
-> **Important:** When a domain service query includes filters by resource group attributes (e.g., `GET /tasks?status=pending&project={projectX}&after=…&limit=50`), the two-request pattern means N additional round-trips to the RG Membership API (one per filter page or group), not just +1. If this N-request fan-out violates the latency budget, that is the signal to project the membership table locally.
+> **Important:** When a domain service query includes filters by resource group attributes (e.g., `GET /tasks?status=pending&project={projectX}&after=…&limit=50`), the two-request pattern means N additional round-trips to the RG Membership API (one per filter page or group), not just +1. If this N-request fan-out violates the latency budget, that is the signal for the planned (not yet implemented) local membership projection; until it exists, the options are the two-request pattern or PDP degradation.
 >
-> **Architecture guidance:** default to consuming explicit `in` predicates expanded by the PDP. Advertise a native group capability only when every table required to execute its SQL is co-located or projected into the querying service's database.
+> **Architecture guidance:** default to consuming explicit `in` predicates expanded by the PDP. Advertise a native group capability only when every table required to execute its SQL is present in the querying service's database — only the RG gear's own database or a shared-database deployment, since no projection mechanism exists.
 
 | Native predicate | Capabilities advertised together | Required local tables |
 |------------------|----------------------------------|-----------------------|
@@ -84,7 +84,7 @@ membership subquery. This is required because
 `resource_group_membership` is shared by all member types and external resource
 IDs are only unique within a type.
 
-The type MUST already resolve in the local or projected `gts_type` table. RG's
+The type MUST already resolve in the `gts_type` table in the PEP's database (RG's own table, or a projected copy once projection exists). RG's
 current public registration path accepts external membership types during
 validation but cannot materialize a non-RG-prefixed type row; that independent
 registry inconsistency is tracked by
@@ -144,7 +144,7 @@ generic toolkit cannot create this index on behalf of arbitrary entities.
 
 ### Integration Path
 
-AuthZ plugin reads RG hierarchy via `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract). In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer` (the plugin cannot evaluate itself). In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../gears/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
+RG exposes the `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract) for an in-process AuthZ PDP that needs to read RG hierarchy. The shipped AuthZ plugins do not depend on RG: `tr-authz-plugin` uses only `TenantResolverClient` and takes group IDs from the request's resource properties. The in-process consumer is the Tenant Resolver's `rg-tr-plugin`, which backs tenant hierarchy with RG. It is reached indirectly when `tr-authz-plugin` calls `TenantResolverClient` only if `rg-tr-plugin` is the selected Tenant Resolver plugin; the other plugins (`static-tr-plugin`, `single-tenant-tr-plugin`, Account Management's `tr_plugin`) do not read RG. In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer`, because its callers run on the PDP's evaluation path and re-entering the enforcer would be circular. In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../gears/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
 
 ---
 

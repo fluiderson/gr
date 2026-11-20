@@ -117,7 +117,7 @@ Gears implement a **PDP/PEP authorization model** per NIST SP 800-162, extended 
 
 ```
 Client → AuthN Middleware → AuthN Resolver (token validation)
-       → Gear Handler (PEP) → AuthZ Resolver (PDP, policy evaluation)
+       → Gear Domain Service (PEP) → AuthZ Resolver (PDP, policy evaluation)
        → Constraints compiled to AccessScope
        → Database (query with WHERE clauses from constraints)
 ```
@@ -163,9 +163,9 @@ Plain AuthZEN point-in-time `true/false` decisions are insufficient for LIST que
 |---|---|
 | `eq(property, value)` | Exact match (e.g., `owner_id`) |
 | `in(property, values)` | Set membership |
-| `in_tenant_subtree(root_id, barrier_mode, status)` | Hierarchical tenant scoping via `tenant_closure` |
-| `in_group(group_ids)` | Resource group membership |
-| `in_group_subtree(group_ids)` | Hierarchical group membership |
+| `in_tenant_subtree(property, root_tenant_id, barrier_mode, descendant_status)` | Hierarchical tenant scoping via `tenant_closure` |
+| `in_group(property, group_ids)` | Resource group membership |
+| `in_group_subtree(property, ancestor_ids)` | Hierarchical group membership |
 
 Constraints **OR** across alternatives, **AND** predicates within each constraint. PEP compiles constraints into `AccessScope` → SecureORM translates to SQL `WHERE` clauses.
 
@@ -186,7 +186,7 @@ Empty value lists inside `in`, `in_group`, and `in_group_subtree` are valid pred
 
 **404 vs 403 for point reads** — Constrained queries returning 0 rows yield 404, preventing existence leakage.
 
-**TOCTOU mitigation** — For UPDATE/DELETE, PEP prefetches the target attribute and uses `eq` predicates in the WHERE clause so the mutation is atomic with the authorization check.
+**TOCTOU mitigation** — For UPDATE/DELETE, the gear's domain service prefetches the target attribute (`PolicyEnforcer` does not), passes it to the PDP, and uses the resulting `eq` predicates in the WHERE clause so the mutation is atomic with the authorization check.
 
 ### Multi-Tenancy — Tenant Resolver
 
@@ -378,7 +378,7 @@ Project-specific Dylint rules are orchestrated by [`cargo-gears`](https://github
 `DE0902` forbids `schema_for` on GTS-typed structs |
 | DE1301 | `no_print_macros` | Forbids print/debug macros in production code, reducing uncontrolled disclosure |
 
-These lints materially strengthen the secure development path, especially layer isolation, direct-SQL prevention, plugin contracts, and GTS correctness. They complement rather than replace framework type-state and runtime controls: the current published rule catalog does **not** itself prove that every protected handler invokes `PolicyEnforcer`, that every entity derives `Scopable`, or that every outbound connection uses OAGW. Those properties come from `OperationBuilder`, Secure ORM APIs/macros, code review and tests, and deployment policy; additional Dylint rules can make more of them build-breaking over time.
+These lints materially strengthen the secure development path, especially layer isolation, direct-SQL prevention, plugin contracts, and GTS correctness. They complement rather than replace framework type-state and runtime controls: the current published rule catalog does **not** itself prove that every protected operation invokes `PolicyEnforcer`, that every entity derives `Scopable`, or that every outbound connection uses OAGW. Those properties come from `OperationBuilder`, Secure ORM APIs/macros, code review and tests, and deployment policy; additional Dylint rules can make more of them build-breaking over time.
 
 ## 8. Dependency Security — cargo-deny
 

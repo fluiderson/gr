@@ -86,7 +86,7 @@ See [ADR 0004](./ADR/0004-single-root-tenant-model-topology.md) for the rational
 |----------|------|-------------|
 | `id` | UUID | Unique tenant identifier |
 | `parent_id` | UUID? | Parent tenant. `NULL` for exactly one tenant: the root. |
-| `status` | enum | `active`, `suspended`, `deleted` |
+| `status` | SMALLINT | 0 = provisioning (internal, pre-activation), 1 = active, 2 = suspended, 3 = deleted |
 | `self_managed` | bool | If true, creates a barrier — parent cannot access this subtree |
 
 **Status semantics:**
@@ -203,8 +203,8 @@ Gears recommend **closure tables** for production deployments with hierarchical 
 |-----------|---------|-------------|
 | `mode` | `"subtree"` | `"root_only"` (single tenant) or `"subtree"` (tenant + descendants) |
 | `root_id` | — | Root tenant. Optional — PDP can determine from `token_scopes` or `subject.properties.tenant_id` |
-| `barrier_mode` | `"all"` | `"all"` (respect barriers) or `"none"` (ignore). See [DESIGN.md](./DESIGN.md#3-tenant-subtree-predicate-type-in_tenant_subtree). |
-| `tenant_status` | all | Filter by tenant status (`active`, `suspended`) |
+| `barrier_mode` | `"respect"` | `"respect"` (respect barriers) or `"ignore"` (ignore). See [DESIGN.md](./DESIGN.md#3-tenant-subtree-predicate-op-in_tenant_subtree). |
+| `tenant_status` | all | Filter by tenant status (`active`, `suspended`, `deleted`) |
 
 ---
 
@@ -219,7 +219,7 @@ The `tenant_closure` table is a denormalized representation of the tenant hierar
 | `ancestor_id` | UUID | Ancestor tenant |
 | `descendant_id` | UUID | Descendant tenant |
 | `barrier` | SMALLINT NOT NULL DEFAULT 0 | 0 = no respected barrier on path `(ancestor, descendant]`, 1 = at least one `self_managed` tenant exists on that path |
-| `descendant_status` | enum | Status of descendant tenant (denormalized for query efficiency) |
+| `descendant_status` | SMALLINT | Status of descendant tenant: 1 = active, 2 = suspended, 3 = deleted (denormalized for query efficiency) |
 
 **Barrier semantics:** The `barrier` column is defined over the path `(ancestor, descendant]`: the ancestor endpoint is excluded, the descendant endpoint is included. Formally, `barrier = 1` iff any tenant on that path has `self_managed = true`. Self-rows `(id, id)` are a special case and always carry `barrier = 0`.
 
@@ -239,14 +239,14 @@ T1
 
 | ancestor_id | descendant_id | barrier | descendant_status |
 |-------------|---------------|---------|-------------------|
-| T1 | T1 | 0 | active |
-| T1 | T2 | 1 | active |
-| T1 | T3 | 1 | active |
-| T1 | T4 | 0 | active |
-| T2 | T2 | 0 | active |
-| T2 | T3 | 0 | active |
-| T3 | T3 | 0 | active |
-| T4 | T4 | 0 | active |
+| T1 | T1 | 0 | 1 (active) |
+| T1 | T2 | 1 | 1 (active) |
+| T1 | T3 | 1 | 1 (active) |
+| T1 | T4 | 0 | 1 (active) |
+| T2 | T2 | 0 | 1 (active) |
+| T2 | T3 | 0 | 1 (active) |
+| T3 | T3 | 0 | 1 (active) |
+| T4 | T4 | 0 | 1 (active) |
 
 **Key observations:**
 - `T1 → T2`: barrier = 1 because the descendant endpoint `T2` is self-managed and the descendant endpoint is included in `(ancestor, descendant]`
@@ -255,14 +255,14 @@ T1
 - `T2 → T3`: barrier = 0 because ancestor `T2` is excluded from `(T2, T3]`
 - Because the hierarchy has a single root, that root appears as `ancestor_id` of every tenant in the table (subject to the barrier rules above).
 
-**Query: "All tenants in T1's subtree, with `barrier_mode: "all"`"**
+**Query: "All tenants in T1's subtree, with `barrier_mode: "respect"`"**
 
 ```sql
--- barrier_mode: "all" (default) adds the barrier clause
+-- barrier_mode: "respect" (default) adds the barrier clause
 SELECT descendant_id FROM tenant_closure
 WHERE ancestor_id = 'T1'
   AND barrier = 0
--- barrier_mode: "none" omits the barrier clause
+-- barrier_mode: "ignore" omits the barrier clause
 ```
 
 Result: T1, T4 (T2 and T3 excluded due to barrier = 1)

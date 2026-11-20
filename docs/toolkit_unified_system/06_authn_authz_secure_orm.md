@@ -21,7 +21,7 @@ For the full architectural design (AuthZEN model, predicate types, caching, depl
 ```text
 Request → API Gateway (AuthN middleware) → SecurityContext
               ↓
-         Gear Handler (PEP)
+         Gear Domain Service (PEP)
               ↓
          PolicyEnforcer → AuthZ Resolver (PDP) → decision + constraints
               ↓
@@ -99,7 +99,7 @@ pub async fn list_users(
 | `subject_tenant_id` | Yes | Tenant the subject belongs to |
 | `subject_type` | No | GTS type identifier (e.g., `gts.cf.core.security.subject_user.v1~`) |
 | `token_scopes` | Yes | Capability restrictions (`["*"]` for first-party apps) |
-| `bearer_token` | No | Original token (wrapped in `Secret<String>`, forwarded to PDP) |
+| `bearer_token` | No | Original token (a `SecretString`; never serialized, so only an in-process PDP/plugin sees it) |
 
 ## AuthZ: PolicyEnforcer (PEP)
 
@@ -110,7 +110,7 @@ pub async fn list_users(
 ```rust
 #[toolkit::gear(
     name = "my_gear",
-    deps = ["authz-resolver"],
+    deps = [authz_resolver],
     capabilities = [db, rest],
 )]
 pub struct MyGear { /* ... */ }
@@ -407,15 +407,15 @@ This adds `("city_id", Column::CityId)` to the generated `custom` list, so `reso
 To use the custom property, include it in both `ResourceType.supported_properties` and the PDP policy:
 
 ```rust
-pub const ADDRESS: ResourceType = ResourceType {
-    name: "my_gear.address",
-    supported_properties: &[
+pub const ADDRESS: ResourceType = ResourceType::from_static(
+    "my_gear.address",
+    &[
         pep_properties::OWNER_TENANT_ID,
         pep_properties::RESOURCE_ID,
         pep_properties::OWNER_ID,
         "city_id",  // matches the pep_prop key
     ],
-};
+);
 ```
 
 When the PDP returns constraints referencing `"city_id"`, the PEP compiler includes them in the `AccessScope`, and `SecureConn` resolves them to `Column::CityId` for the SQL `WHERE` clause.
@@ -554,6 +554,7 @@ pub async fn create_user(
         )
         .await?;
 
+    // `user` is the domain `User` built from `new_user` (generated id, timestamps).
     // SecureConn INSERT validates tenant_id is within the scope
     let created = self.repo.create(&conn, &scope, user).await?;
     Ok(created)
@@ -608,26 +609,27 @@ pub async fn update_user(
 
 ### Preferred: SecureConn for scoped access
 
-```rust
-use toolkit_db::secure::AccessScope;
+The domain service (the PEP) holds the `PolicyEnforcer` and a `DBProvider`; handlers only pass
+the `SecurityContext` and business parameters to it.
 
-pub async fn list_users(
-    Extension(ctx): Extension<SecurityContext>,
-    Extension(db): Extension<Arc<DbHandle>>,
-) -> ApiResult<JsonPage<UserDto>> {
-    let secure_conn = db.sea_secure();
-    // In production, scope comes from PolicyEnforcer (see CRUD patterns above)
-    let scope = enforcer
+```rust
+use toolkit_db::secure::SecureEntityExt;
+
+pub async fn list_users(&self, ctx: &SecurityContext) -> Result<Vec<User>, DomainError> {
+    let conn = self.db.conn()?;
+    // Scope comes from PolicyEnforcer (see CRUD patterns above)
+    let scope = self.policy_enforcer
         .access_scope_with(
-            &ctx, &resources::USER, actions::LIST, None,
+            ctx, &resources::USER, actions::LIST, None,
             &AccessRequest::new().allow_empty_scope(true),
         )
         .await?;
-    let users = secure_conn
-        .find::<user::Entity>(&scope)
-        .all(&secure_conn)
+    let users = user::Entity::find()
+        .secure()
+        .scope_with(&scope)
+        .all(&conn)
         .await?;
-    Ok(Json(users.into_iter().map(UserDto::from).collect()))
+    Ok(users.into_iter().map(User::from).collect())
 }
 ```
 
@@ -771,7 +773,7 @@ For development and testing, Gears provide static AuthN and AuthZ plugins:
   - `accept_all`: any non-empty token maps to a default identity
   - `static_tokens`: specific tokens map to specific identities (subject_id, tenant_id, scopes)
 
-- **Static AuthZ plugin** — returns `decision: true` with an `In` predicate on `owner_tenant_id` scoped to the subject's tenant from the request context. Denies if no tenant is resolvable.
+- **Static AuthZ plugin** — scopes to the context tenant (`tenant_context.root_id`, falling back to the subject's `tenant_id`) and returns `decision: true` with an `In` predicate on `owner_tenant_id` when the PEP declares that property (plus `InTenantSubtree` when `tenant_hierarchy` is advertised). Denies if no tenant is resolvable or the resource carries `group_ids` / `ancestor_group_ids`. See the [plugin README](../../gears/system/authz-resolver/plugins/static-authz-plugin/README.md).
 
 ### Feature flags
 
@@ -779,7 +781,7 @@ The server binary uses feature flags to include static plugins:
 
 ```bash
 # Run with static AuthN + AuthZ plugins (development mode)
-cargo run --bin cf-gears-server --features static-authn,static-authz -- --config config.yaml run
+cargo run --bin cf-gears-example-server --features static-authn,static-authz -- --config config/quickstart.yaml run
 
 # Makefile target includes these features
 make example
@@ -792,7 +794,8 @@ For the simplest local development (no auth at all), configure the API Gateway:
 ```yaml
 gears:
   api-gateway:
-    auth_disabled: true
+    config:
+      auth_disabled: true
 ```
 
 This injects a default `SecurityContext` for all requests without calling any AuthN resolver.
@@ -804,15 +807,14 @@ This injects a default `SecurityContext` for all requests without calling any Au
 ### Test setup
 
 ```rust
-use toolkit_db::DbHandle;
 use toolkit_security::AccessScope;
 
 #[tokio::test]
 async fn test_user_repository() {
-    let db = setup_test_db().await;
+    let db = setup_test_db().await; // a `toolkit_db::Db`
     let scope = AccessScope::for_tenant(Uuid::new_v4());
     let repo = UserRepository;
-    let conn = db.sea_secure();
+    let conn = db.conn().unwrap();
 
     // Test operations
     let user = repo.create(&conn, &scope, new_user).await.unwrap();
@@ -826,7 +828,7 @@ In tests, build scopes explicitly (`AccessScope::for_tenant(...)`, `AccessScope:
 ## Quick checklist
 
 ### AuthZ wiring
-- [ ] Add `deps = ["authz-resolver"]` to your gear declaration.
+- [ ] Add `deps = [authz_resolver]` to your gear declaration.
 - [ ] Resolve `AuthZResolverApi` from `ClientHub` in `init()`.
 - [ ] Create `PolicyEnforcer::new(authz)` once, clone into sub-services.
 - [ ] Define `ResourceType` constants with `supported_properties` for each resource.
@@ -842,7 +844,7 @@ In tests, build scopes explicitly (`AccessScope::for_tenant(...)`, `AccessScope:
 - [ ] Derive `Scopable` on SeaORM entities with `tenant_col` (required).
 - [ ] Declare all four dimensions or use `unrestricted`.
 - [ ] Add `pep_prop(name = "column")` for custom domain properties.
-- [ ] Use `db.sea_secure()` for all DB access in handlers/services.
+- [ ] Acquire connections in domain services with `self.db.conn()?` (`DBProvider`); handlers get no DB objects.
 - [ ] Pass the `AccessScope` from `PolicyEnforcer` to `SecureConn` methods.
 - [ ] Use `secure_conn.find::<Entity>(&scope).all(&secure_conn)` for auto-scoped queries.
 - [ ] Use `secure_conn.update_with_ctx::<Entity>(&scope, id, am)` for single-record updates.

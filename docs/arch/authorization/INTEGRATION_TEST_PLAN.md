@@ -15,13 +15,13 @@ For background on how AuthZ uses RG data, see [RESOURCE_GROUP_MODEL.md](./RESOUR
 |-----------|--------|-------|
 | RG Gear | **Done** | `ResourceGroupClient` + `ResourceGroupReadHierarchy` traits, `get_group_descendants` / `get_group_ancestors` endpoints |
 | AuthZ Resolver | Existing | Plugin discovery, `PolicyEnforcer`, `AccessScope` → SecureORM already exist in the platform |
-| Static AuthZ Plugin | Existing | Returns `In(owner_tenant_id, [tid])` — tenant predicates only |
+| Static AuthZ Plugin | Existing | Returns `In(owner_tenant_id, [tid])`, plus `InTenantSubtree` when `tenant_hierarchy` is advertised — tenant predicates only. Group predicates come from `tr-authz-plugin` |
 | **PolicyEnforcer in RG handlers** | **Done** | `GroupService` calls `enforcer.access_scope()` for all operations |
 | **AccessScope → SecureORM in RG repo** | **Done** | `GroupRepository.list_groups`, `find_by_id`, `get_descendants`, `get_ancestors` accept `&AccessScope` |
-| **Rust integration tests** | **Done** | 324 unit tests + 8 tr-authz-plugin tests |
-| **E2E HTTP tests** | **Partial** | 214 e2e tests (static-authz); authz e2e blocked on tenant provisioning |
-| **Tenant provisioning** | **Planned** | Tenant groups are identified by GTS type prefix (`TENANT_RG_TYPE_PATH`): `tenant_id = group.id` for tenant groups. Required for authz e2e |
-| Group predicates (`in_group`, `in_group_subtree`) | Planned | Requires RG-aware PDP behavior |
+| **Rust integration tests** | **Done** | RG crate tests (incl. `authz_integration_test.rs`, `tenant_scoping_test.rs`, `tenant_filtering_db_test.rs`) + 35 tr-authz-plugin tests |
+| **E2E HTTP tests** | **Partial** | 13 RG e2e tests in `test_integration_seams.py` (static-authz). The `tr-authz` e2e profile is TEMPORARILY reduced to a feature set without `resource-group` / `tr-authz` / `tenant-resolver-rg` (startup-ordering crash, [#4568](https://github.com/constructorfabric/gears-rust/issues/4568)), so the AuthZ → TR → RG chain is not exercised end-to-end |
+| **Tenant provisioning** | **Done** | Tenant groups are identified by GTS type prefix (`TENANT_RG_TYPE_PATH`): `tenant_id = group.id` for tenant groups, otherwise inherited from the caller / parent (`GroupService` create path) |
+| Group predicates (`in_group`, `in_group_subtree`) | **Done** | PEP compiler + SecureORM compile them; `tr-authz-plugin` emits them from `group_ids` / `ancestor_group_ids` resource properties |
 
 ---
 
@@ -30,12 +30,13 @@ For background on how AuthZ uses RG data, see [RESOURCE_GROUP_MODEL.md](./RESOUR
 ```
 testing/e2e/suites/resource_group/         ← E2E tests (pytest, HTTP against running server)
   conftest.py                              ← Fixtures: base_url, auth headers, type/group factories
-  test_authz_tenant_scoping.py             ← Phase 1: CRUD + tenant isolation + hierarchy + membership
+  test_integration_seams.py                ← HTTP integration seams, incl. tenant filter + cross-tenant isolation
 
 gears/system/resource-group/
   resource-group/tests/                    ← Rust integration tests (in-process, no HTTP)
     authz_integration_test.rs              ← PolicyEnforcer + mock AuthZ: 9 tests
     tenant_scoping_test.rs                 ← AccessScope scoping: 10 tests
+    tenant_filtering_db_test.rs            ← full chain with real SQLite DB: 8 tests (6 tenant + 2 group-based)
 ```
 
 Follows existing project conventions: `testing/e2e/suites/{gear}/` for HTTP-level tests (see `oagw/`, `mini_chat/`, `types_registry/`), `gears/.../tests/` for Rust in-process tests.
@@ -89,7 +90,7 @@ cargo run --bin cf-gears-server \
 
 ```bash
 # Rust integration tests (no server/DB required)
-cargo test -p cf-gears-resource-group --test authz_integration_test --test tenant_scoping_test
+cargo test -p cf-gears-resource-group --test authz_integration_test --test tenant_scoping_test --test tenant_filtering_db_test
 
 # E2E tests (requires running server + PostgreSQL)
 E2E_BASE_URL=http://localhost:8087 pytest testing/e2e/suites/resource_group/ -v
@@ -97,7 +98,7 @@ E2E_BASE_URL=http://localhost:8087 pytest testing/e2e/suites/resource_group/ -v
 
 ---
 
-## Phase 1: Tenant Scoping via PolicyEnforcer _(Planned)_
+## Phase 1: Tenant Scoping via PolicyEnforcer _(Implemented)_
 
 **Goal**: Verify that RG endpoints apply `AccessScope` from AuthZ pipeline, filtering results by `tenant_id` from `SecurityContext`.
 
@@ -124,7 +125,7 @@ Request → API Gateway (AuthN) → SecurityContext{tenant=T1}
   → Response: groups from T1 only
 ```
 
-### Planned Rust integration tests (24 tests)
+### Rust integration tests (25 tests)
 
 **`authz_integration_test.rs`** (9 tests — mock AuthZ, no DB):
 - `enforcer_tenant_scoping_produces_correct_access_scope` — mock PDP → correct scope
@@ -140,29 +141,24 @@ Request → API Gateway (AuthN) → SecurityContext{tenant=T1}
 **`tenant_scoping_test.rs`** (10 tests — AccessScope shape, no DB):
 - AccessScope construction, isolation, `tenant_only()`, `deny_all()`, `for_resource()`
 
-**`tenant_filtering_db_test.rs`** (5 tests — **full chain with real SQLite DB**):
+**`tenant_filtering_db_test.rs`** (6 tests — **full chain with real SQLite DB**):
 - `tenant_isolation_list_groups` — two tenants create groups, each sees only own via `WHERE tenant_id IN (...)`
 - `tenant_isolation_get_group_cross_tenant_invisible` — cross-tenant `get_group` → not found
 - `tenant_isolation_hierarchy_scoped` — hierarchy filtered by tenant scope
 - `tenant_isolation_update_cross_tenant_blocked` — cross-tenant `update_group` → blocked
+- `tenant_isolation_update_cross_tenant_is_not_an_existence_oracle` — cross-tenant update answers the same as a missing group
 - `tenant_isolation_delete_cross_tenant_blocked` — cross-tenant `delete_group` → blocked; own-tenant delete succeeds
 
-### Planned E2E HTTP tests (9 tests)
+### E2E HTTP tests (13 tests)
 
-**`test_authz_tenant_scoping.py`**:
-- `test_create_and_get_type` — type CRUD
-- `test_create_and_get_group` — group with tenant_id from SecurityContext
-- `test_list_groups_returns_created_groups` — list returns own groups
-- `test_group_has_tenant_id_from_security_context` — consistent tenant_id across groups
-- `test_child_group_inherits_parent_tenant` — parent-child tenant enforcement
-- `test_group_hierarchy_returns_parent_and_children` — hierarchy traversal
-- `test_delete_group` — delete + 404 verification
-- `test_membership_add_and_list` — membership CRUD
-- `test_tenant_isolation_same_token_sees_own_groups` — same-tenant visibility
+**`test_integration_seams.py`** (the only RG e2e test file; tenant scoping is covered by the seams below):
+- `test_authz_tenant_filter_applied` — SecurityContext produces the correct tenant filter
+- `test_cross_tenant_invisible` — tenant boundary enforced
+- `test_route_smoke_all_endpoints`, `test_dto_roundtrip_group_json_shape`, `test_hierarchy_closure`, `test_move_closure_rebuild`, `test_force_delete_cascade`, `test_error_response_rfc9457`, `test_pagination_cursor_roundtrip`, `test_membership_filter_wiring`, `test_hierarchy_depth_filter_wiring`, `test_barrier_metadata_in_descendants`, `test_membership_quoted_uuid_and_gts_filter_sql` — other RG HTTP seams
 
 ---
 
-## Phase 2: Group-Based Predicates _(Planned)_
+## Phase 2: Group-Based Predicates _(Implemented)_
 
 **Goal**: `InGroup` / `InGroupSubtree` predicates compile to SQL subqueries against `resource_group_membership` and `resource_group_closure` tables.
 
@@ -170,40 +166,44 @@ Request → API Gateway (AuthN) → SecurityContext{tenant=T1}
 
 1. **Predicate types** (`authz-resolver-sdk/src/constraints.rs`): add `InGroupPredicate` (group_ids) and `InGroupSubtreePredicate` (ancestor_ids) to `Predicate` enum with serde support (`"op":"in_group"`, `"op":"in_group_subtree"`)
 
-2. **ScopeFilter variants** (`toolkit-security/src/access_scope.rs`): `InGroupScopeFilter`, `InGroupSubtreeScopeFilter` carry property + group/ancestor UUIDs. Well-known table constants in `rg_tables` gear (`MEMBERSHIP_TABLE`, `CLOSURE_TABLE`, column names)
+2. **ScopeFilter variants** (`toolkit-security/src/access_scope.rs`): `InGroupScopeFilter`, `InGroupSubtreeScopeFilter` carry property + group/ancestor UUIDs. Well-known table constants in the `rg_tables` module (`toolkit-db/src/secure/schema.rs`: `MEMBERSHIP_TABLE`, `CLOSURE_TABLE`, `GTS_TYPE_TABLE`, column names)
 
-3. **PEP compiler** (`authz-resolver-sdk/src/pep/compiler.rs`): compiles `InGroup`/`InGroupSubtree` predicates into corresponding `ScopeFilter` variants via `json_to_scope_value`
+3. **PEP compiler** (`authz-resolver-sdk/src/pep/compiler.rs`): compiles `InGroup`/`InGroupSubtree` predicates into type-qualified `ScopeFilter` variants via `json_values_to_uuid_scope_values` + `ScopeFilter::in_group_typed` / `in_group_subtree_typed` (the member type is the resource type's canonical GTS name)
 
 4. **SecureORM** (`toolkit-db/src/secure/cond.rs`): `build_constraint_condition` generates subquery SQL:
-   - `InGroup` → `col IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (...))`
-   - `InGroupSubtree` → `col IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (SELECT descendant_id FROM resource_group_closure WHERE ancestor_id IN (...)))`
+   - `InGroup` → `CAST(col AS text) IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (...) AND gts_type_id IN (SELECT id FROM gts_type WHERE schema_id = <member type>))`
+   - `InGroupSubtree` → `CAST(col AS text) IN (SELECT resource_id FROM resource_group_membership WHERE group_id IN (SELECT descendant_id FROM resource_group_closure WHERE ancestor_id IN (...)) AND gts_type_id IN (SELECT id FROM gts_type WHERE schema_id = <member type>))`
 
 ### SQL generated (S14 scenario)
 
 ```sql
 WHERE owner_tenant_id IN ('T1')
-  AND id IN (
+  AND CAST(id AS text) IN (
     SELECT resource_id FROM resource_group_membership
     WHERE group_id IN ('ProjectA-uuid')
+      AND gts_type_id IN (
+        SELECT id FROM gts_type
+        WHERE schema_id = 'gts.cf.core.tasks.task.v1~'
+      )
   )
 ```
 
 ### Tests
 
-**`constraints.rs`** (3 planned unit tests): serialization roundtrip for InGroup, InGroupSubtree, mixed constraint
+**`constraints_tests.rs`** (unit tests): serialization roundtrip for InGroup, InGroupSubtree, mixed constraint
 
-**`compiler.rs`** (6 unit tests): InGroup → InGroup filter, InGroupSubtree → InGroupSubtree filter, tenant + InGroup combined, empty In values fail-closed, empty InGroup group_ids fail-closed, empty InGroupSubtree ancestor_ids fail-closed
+**`compiler_tests.rs`** (unit tests): InGroup → InGroup filter, InGroupSubtree → InGroupSubtree filter, tenant + InGroup combined. Empty `In` / `InGroup` / `InGroupSubtree` sets are valid selections that match nothing; only an all-empty scope becomes `ScopeMatchesNothing` (unless `allow_empty_scope` is set)
 
-**`cond.rs`** (3 planned unit tests): InGroup subquery condition, InGroupSubtree nested subquery, tenant + InGroup AND condition
+**`cond.rs`** (unit tests): InGroup subquery condition, InGroupSubtree nested subquery, tenant + InGroup AND condition
 
-**`tenant_filtering_db_test.rs`** (2 planned DB tests):
+**`tenant_filtering_db_test.rs`** (2 DB tests):
 - `group_based_in_group_predicate_against_groups_fails_closed` — mock AuthZ with InGroup + tenant against `RG_GROUP_RESOURCE` → typed unadvertised-capability compile error (the enforcer has table-level group capability, but the group resource does not opt in to membership predicates, so the capability is suppressed and an unsolicited native predicate is rejected fail-closed)
 - `group_based_membership_data_correctly_stored` — full S14 data: ProjectA/B, task memberships, verify isolation
 
 ### What remains for production use
 
-- **RG-aware AuthZ plugin**: static-authz-plugin currently only returns tenant predicates. A real plugin needs to resolve user→group access from an external policy source and emit `InGroup`/`InGroupSubtree` predicates
-- **Domain entity integration**: consuming gears may project `resource_group` + `resource_group_closure` for hierarchy queries. `resource_group_membership` projection should only be added when profiling confirms the two-request pattern (RG Membership API → domain service) causes unacceptable latency — this table is 10×+ larger than other projections. In a monolith with a shared DB, no projections are needed at all. By default, domain services rely on PDP capability degradation: PDP resolves group memberships and returns explicit resource IDs via `in` predicates
+- **RG-aware AuthZ plugin**: static-authz-plugin returns only tenant predicates (`In`, `InTenantSubtree`); tr-authz-plugin emits `InGroup`/`InGroupSubtree` only from caller-supplied `group_ids` / `ancestor_group_ids`. A real plugin needs to resolve user→group access from an external policy source and emit `InGroup`/`InGroupSubtree` predicates
+- **Domain entity integration**: no projection mechanism exists; native group predicates compile only where the RG tables are present in the PEP's database (the RG gear's own database, or a shared-database deployment), and no gear opts in to them. A planned (not implemented) projection would let consuming gears project `resource_group` + `resource_group_closure` for hierarchy queries; `resource_group_membership` (with `gts_type`) projection should only be added when profiling confirms the two-request pattern (RG Membership API → domain service) causes unacceptable latency — this table is 10×+ larger than other projections. In a monolith with a shared DB, no projections are needed at all. By default, domain services rely on PDP capability degradation: PDP resolves group memberships and returns explicit resource IDs via `in` predicates
 
 ---
 
@@ -305,12 +305,16 @@ curl -H "Authorization: Bearer test" \
 
 ## E2E Test Hierarchy Fixture (AuthZ plugins)
 
-E2E tests using AuthZ plugins (profile `tr-authz` in `testing/e2e/suites/resource_group/e2e.yaml`, applied over `config/e2e-local.yaml`) require a pre-seeded tenant hierarchy. A session-scoped pytest fixture creates the hierarchy via REST API before any tests run, then all tests reuse it.
+E2E tests using AuthZ plugins (profile `tr-authz` in `testing/e2e/suites/resource_group/e2e.yaml`, applied over `config/e2e-local.yaml`) require a pre-seeded tenant hierarchy. `conftest.py` provides only the session-scoped, autouse `_seed_root_tenants` fixture (direct SQLite insert of one tenant type and two root tenant groups, `TENANT_A_ID` / `TENANT_B_ID`); each test builds its own groups through the `create_type` / `create_group` factories.
+
+> **Profile status:** the `tr-authz` profile is TEMPORARY-reduced to a feature set that excludes `resource-group`, `tr-authz` and `tenant-resolver-rg` (startup-ordering crash, [#4568](https://github.com/constructorfabric/gears-rust/issues/4568)), so the AuthZ → TR → RG chain is not exercised until it is restored.
 
 **Available AuthZ plugins:**
-- `tr-authz-plugin` (priority 50) — resolves tenants via `TenantResolverClient` (recommended, no direct RG dependency)
+- `tr-authz-plugin` (priority 90 in the `tr-authz` profile; `rg-tr-plugin` priority 10) — resolves tenants via `TenantResolverClient` (recommended, no direct RG dependency)
 
 ### Fixture: `tenant_hierarchy`
+
+> **Not implemented.** No `tenant_hierarchy` fixture exists in `testing/e2e/suites/resource_group/conftest.py`; the hierarchy and setup steps below are the planned design.
 
 ```
 T1 (root tenant, tenant type, can_be_root=true, token-a subject_tenant_id)
@@ -336,19 +340,19 @@ Tenant-type recognition is code-prefix-driven: any GTS type whose path starts wi
 8. **Seed T2 root tenant** directly in the same DB backend (SQLite in CI/e2e; PostgreSQL in production deployments). `id` = token-b `subject_tenant_id`.
 
 **Prerequisites**:
-- Tenant provisioning feature (tenant-type prefix): sub-tenant groups set `tenant_id = group.id` when their type code starts with `TENANT_RG_TYPE_PATH`
-- Root tenants seeded in DB before server start or via conftest SQLite fixture
+- Tenant provisioning (tenant-type prefix, implemented): sub-tenant groups set `tenant_id = group.id` when their type code starts with `TENANT_RG_TYPE_PATH`
+- Root tenants seeded in DB via the `_seed_root_tenants` conftest fixture (direct SQLite)
 
 ### Test coverage using fixture
 
-| Test | Fixture data used | Verifies |
-|------|-------------------|----------|
-| Barrier metadata in descendants | T1, T_barrier, T_behind | RG returns barrier data without filtering |
-| AuthZ tenant filter | T1, Dept1 | AuthZ plugin resolves hierarchy, scopes correctly |
-| Cross-tenant invisible | T1, T2 | T2 cannot see T1 data via AuthZ plugin |
-| Barrier exclusion from scope | T1, T_barrier, T_behind | AuthZ plugin excludes barrier subtree from AccessScope |
-| Sub-tenant provisioning | T_normal | Verify `tenant_id == group.id` for sub-tenants |
-| Normal group inherits tenant | Dept1 | Verify `tenant_id == parent.tenant_id` |
+| Test | Fixture data used | Verifies | Status |
+|------|-------------------|----------|--------|
+| Barrier metadata in descendants | T1, T_barrier, T_behind | RG returns barrier data without filtering | Implemented as `test_barrier_metadata_in_descendants` (builds its own groups) |
+| AuthZ tenant filter | T1, Dept1 | AuthZ plugin resolves hierarchy, scopes correctly | Implemented as `test_authz_tenant_filter_applied` (own type/group, token A) |
+| Cross-tenant invisible | T1, T2 | T2 cannot see T1 data via AuthZ plugin | Implemented as `test_cross_tenant_invisible` (own type/group, tokens A/B) |
+| Barrier exclusion from scope | T1, T_barrier, T_behind | AuthZ plugin excludes barrier subtree from AccessScope | Not implemented |
+| Sub-tenant provisioning | T_normal | Verify `tenant_id == group.id` for sub-tenants | Not implemented |
+| Normal group inherits tenant | Dept1 | Verify `tenant_id == parent.tenant_id` | Not implemented |
 
 ### Running
 
@@ -369,8 +373,8 @@ python3 tools/scripts/run_e2e.py --suite resource-group --profile tr-authz
 
 | Phase | Scope | Effort | Priority | Status |
 |-------|-------|--------|----------|--------|
-| Phase 1 | Tenant scoping via PolicyEnforcer | 2–3 hours | `p1` | **Planned** |
-| Phase 2 | Group predicates (in_group/in_group_subtree) | 1–2 days | `p1` | **Planned** |
+| Phase 1 | Tenant scoping via PolicyEnforcer | 2–3 hours | `p1` | **Done** |
+| Phase 2 | Group predicates (in_group/in_group_subtree) | 1–2 days | `p1` | **Done** |
 | Phase 3 | MTLS verification | 2–3 hours | `p2` | **Deferred — not implemented yet** |
 
 ---
