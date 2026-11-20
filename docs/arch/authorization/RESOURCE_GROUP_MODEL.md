@@ -144,7 +144,7 @@ generic toolkit cannot create this index on behalf of arbitrary entities.
 
 ### Integration Path
 
-AuthZ plugin reads RG hierarchy via `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract). In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer` (the plugin cannot evaluate itself). In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../gears/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
+AuthZ plugin reads RG hierarchy via `ResourceGroupReadHierarchy` trait (narrow, hierarchy-only read contract). In monolith deployments (current `p1` reality), it's a direct in-process call via `ClientHub` and the trait surface itself bypasses `PolicyEnforcer` (the plugin cannot evaluate itself). Account-management's tenant soft-delete ownership probe uses the same unscoped `list_groups`, so its answer does not depend on the deleting caller's visibility. In a future microservice deployment (`p2`, deferred / not implemented yet), the same trait will be backed by an MTLS-authenticated request to the RG service. See [RG DESIGN §RG Authentication Modes: JWT vs MTLS](../../../gears/system/resource-group/docs/DESIGN.md#rg-authentication-modes-jwt-vs-mtls).
 
 ---
 

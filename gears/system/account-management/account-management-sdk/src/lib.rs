@@ -50,6 +50,7 @@ pub mod precondition;
 pub mod quota;
 pub mod reason;
 pub mod tenant;
+pub mod tenant_ownership;
 mod tenant_validation;
 pub use tenant_validation::{TenantInputValidationError, validate_tenant_name};
 #[cfg(test)]
@@ -64,7 +65,8 @@ pub use client::AccountManagementClient;
 pub use error::AccountManagementError;
 pub use gts::{
     CONVERSION_REQUEST_RESOURCE_TYPE, IdpPluginSpecV1, SERVICE_ACCOUNT_RESOURCE_TYPE,
-    TENANT_METADATA_RESOURCE_TYPE, TENANT_RESOURCE_TYPE, USER_RESOURCE_TYPE,
+    TENANT_METADATA_RESOURCE_TYPE, TENANT_RESOURCE_TYPE, TenantOwnershipPluginSpecV1,
+    USER_RESOURCE_TYPE,
 };
 pub use idp::{
     IdpDeprovisionFailure, IdpDeprovisionTenantRequest, IdpPluginClient, IdpProvisionFailure,
@@ -88,3 +90,4 @@ pub use tenant::{
     CreateTenantRequest, Tenant, TenantAncestor, TenantId, TenantInfoFilterField, TenantInfoQuery,
     TenantNode, TenantStatus, UpdateTenantRequest,
 };
+pub use tenant_ownership::{TenantOwnershipFailure, TenantOwnershipPluginClient};

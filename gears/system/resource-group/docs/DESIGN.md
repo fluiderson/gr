@@ -64,7 +64,7 @@ RG is intentionally policy-agnostic:
 
 The architecture consists of:
 
-- **RG Resolver SDK** — read and write trait contracts (`ResourceGroupClient`, `ResourceGroupReadHierarchy`, `ResourceGroupTypeBootstrap` — the last one un-gated, for in-process type registration at gear init, see the AuthZ matrix below)
+- **RG Resolver SDK** — read and write trait contracts (`ResourceGroupClient`, `ResourceGroupReadHierarchy`, `ResourceGroupTypeBootstrap` — un-gated, for in-process type registration at gear init, see the AuthZ matrix below — and `ResourceGroupTenantCleanup` — un-gated, for in-process removal of a hard-deleted tenant's groups)
 - **RG Gear (Gateway)** — routes requests to built-in or vendor-specific provider
 - **RG Plugin** — full service with database, REST API, seeding, and domain logic
 
@@ -518,7 +518,7 @@ Type list `$filter` fields: `code` (eq, ne, in).
 
 **Integration read API** (stable):
 
-`ResourceGroupReadHierarchy` is a narrow read-only contract for in-process plugin consumers — the AuthZ resolver plugin, the tenant-resolver RG plugin, and an in-process AuthZ PDP. It carries hierarchy walks (`get_group_descendants` / `get_group_ancestors`), flat OData-filtered group listing (`list_groups`), single-group existence lookup (`get_group`), and membership listing (`list_memberships`). All other consumers use `ResourceGroupClient`, which includes the same reads plus full CRUD.
+`ResourceGroupReadHierarchy` is a narrow read-only contract for in-process consumers that need group data regardless of a caller's tenant scope — the AuthZ resolver plugin, the tenant-resolver RG plugin, an in-process AuthZ PDP, and account-management's tenant soft-delete ownership probe. It carries hierarchy walks (`get_group_descendants` / `get_group_ancestors`), flat OData-filtered group listing (`list_groups`), single-group existence lookup (`get_group`), and membership listing (`list_memberships`). All other consumers use `ResourceGroupClient`, which includes the same reads plus full CRUD.
 
 These reads are resolved **unscoped** — they bypass `PolicyEnforcer`. A consumer that *is* the PDP cannot route reads back through the PEP without re-entering and recursing into itself, so implementations resolve them with no tenant `AccessScope`; the caller supplies any subject/tenant `OData` filter and owns tenant scoping.
 
@@ -539,7 +539,8 @@ Integration read trait hierarchy (defined in `resource-group-sdk/src/api.rs`):
 
 | Trait | Extends | Methods | Used by |
 | ----- | ------- | ------- | ------- |
-| `ResourceGroupReadHierarchy` | — | `get_group_descendants`, `get_group_ancestors`, `list_groups`, `get_group`, `list_memberships` (all unscoped / PEP-bypassing) | AuthZ resolver plugin, tenant-resolver RG plugin, in-process AuthZ PDP |
+| `ResourceGroupReadHierarchy` | — | `get_group_descendants`, `get_group_ancestors`, `list_groups`, `get_group`, `list_memberships` (all unscoped / PEP-bypassing) | AuthZ resolver plugin, tenant-resolver RG plugin, in-process AuthZ PDP, account-management tenant soft-delete ownership probe |
+| `ResourceGroupTenantCleanup` | — | `delete_tenant_groups(ctx, tenant_id, type_code)` (unscoped / PEP-bypassing write; force-cascades each root of the tenant's groups of that type) | Tenant hard-delete cleanup paths (a tenant that is already soft-deleted cannot be admitted by a PEP-gated actor) |
 | `ResourceGroupClient` | — | full CRUD (types, groups, memberships, hierarchy) | General consumers |
 
 > The previously planned two-tier split — a separate `ResourceGroupReadPluginClient` extending `ResourceGroupReadHierarchy` with `list_memberships` — was collapsed. `list_memberships` and `get_group` now live directly on `ResourceGroupReadHierarchy`, and the vendor-specific plugin gateway resolves `dyn ResourceGroupReadHierarchy`. A vendor backend replaces the registered `ResourceGroupReadHierarchy` implementation at gear init rather than implementing a distinct plugin trait.

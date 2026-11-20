@@ -11,6 +11,7 @@ pub mod read_service;
 pub mod repo;
 pub mod rg_service;
 pub mod seeding;
+pub mod tenant_cleanup_service;
 pub mod type_bootstrap_service;
 pub mod type_service;
 pub mod validation;

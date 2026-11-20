@@ -7,7 +7,8 @@ SDK crate for the Resource Group gear, providing public API contracts for hierar
 This crate defines the transport-agnostic interface for the Resource Group gear:
 
 - **`ResourceGroupClient`** — Async trait for full type/group/membership lifecycle
-- **`ResourceGroupReadHierarchy`** — Narrow read-only trait for in-process plugin consumers (e.g. AuthZ resolver, tenant-resolver RG plugin) that need ancestor/descendant walks plus flat OData listing
+- **`ResourceGroupReadHierarchy`** — Narrow read-only trait for in-process consumers (e.g. AuthZ resolver, tenant-resolver RG plugin, account-management's tenant-delete ownership probe) that need ancestor/descendant walks plus flat OData listing, unscoped by the caller's tenant
+- **`ResourceGroupTenantCleanup`** — Un-gated, in-process trait for tenant-lifecycle cleanup: removes a hard-deleted tenant's groups of one type (never exposed via REST)
 - Models: `ResourceGroupType`, `ResourceGroup`, `ResourceGroupMembership`, `ResourceGroupWithDepth`, `GroupHierarchy`, etc.
 - **`ResourceGroupError`** — Error type for all operations
 - OData filter field definitions (behind the `odata` feature)

@@ -33,7 +33,10 @@ pub mod reason;
 pub mod odata;
 
 // Re-export main types at crate root for convenience
-pub use api::{ResourceGroupClient, ResourceGroupReadHierarchy, ResourceGroupTypeBootstrap};
+pub use api::{
+    ResourceGroupClient, ResourceGroupReadHierarchy, ResourceGroupTenantCleanup,
+    ResourceGroupTypeBootstrap,
+};
 pub use error::ResourceGroupError;
 pub use gts::{
     GROUP_MEMBERSHIP_RESOURCE_TYPE, GROUP_RESOURCE_TYPE, TENANT_RG_TYPE_PATH, TYPE_RESOURCE_TYPE,

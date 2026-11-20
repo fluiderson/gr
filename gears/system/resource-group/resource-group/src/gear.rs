@@ -6,7 +6,8 @@ use std::sync::{Arc, OnceLock};
 use async_trait::async_trait;
 use authz_resolver_sdk::PolicyEnforcer;
 use resource_group_sdk::{
-    ResourceGroupClient, ResourceGroupReadHierarchy, ResourceGroupTypeBootstrap,
+    ResourceGroupClient, ResourceGroupReadHierarchy, ResourceGroupTenantCleanup,
+    ResourceGroupTypeBootstrap,
 };
 use sea_orm_migration::MigrationTrait;
 use toolkit::api::OpenApiRegistry;
@@ -21,6 +22,7 @@ use crate::domain::group_service::{GroupService, QueryProfile, TenantTypes};
 use crate::domain::membership_service::MembershipService;
 use crate::domain::read_service::RgReadService;
 use crate::domain::rg_service::RgService;
+use crate::domain::tenant_cleanup_service::RgTenantCleanupService;
 use crate::domain::type_bootstrap_service::RgTypeBootstrapService;
 use crate::domain::type_service::TypeService;
 use crate::infra::storage::group_repo::GroupRepository;
@@ -171,6 +173,14 @@ impl Gear for ResourceGroup {
         ctx.client_hub()
             .register::<dyn ResourceGroupClient>(rg_client);
 
+        // Un-gated, in-process tenant-lifecycle cleanup (hard-delete of a
+        // soft-deleted tenant) -- see `ResourceGroupTenantCleanup`'s doc
+        // comment for why it cannot go through the PEP. Never exposed via REST.
+        let cleanup_client: Arc<dyn ResourceGroupTenantCleanup> =
+            Arc::new(RgTenantCleanupService::new(group_svc.clone()));
+        ctx.client_hub()
+            .register::<dyn ResourceGroupTenantCleanup>(cleanup_client);
+
         let read_client: Arc<dyn ResourceGroupReadHierarchy> =
             Arc::new(RgReadService::new(group_svc, membership_service));
         ctx.client_hub()
@@ -193,7 +203,7 @@ impl Gear for ResourceGroup {
             .register::<dyn ResourceGroupTypeBootstrap>(type_bootstrap_client);
 
         info!(
-            "Resource Group gear initialized (ClientHub: ResourceGroupClient + ResourceGroupReadHierarchy + ResourceGroupTypeBootstrap)"
+            "Resource Group gear initialized (ClientHub: ResourceGroupClient + ResourceGroupReadHierarchy + ResourceGroupTenantCleanup + ResourceGroupTypeBootstrap)"
         );
         Ok(())
     }
