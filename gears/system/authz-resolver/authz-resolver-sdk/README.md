@@ -13,6 +13,8 @@ This crate defines the transport-agnostic interface for the AuthZ Resolver gear:
 - **Constraint types** — `Constraint`, `Predicate`, `EqPredicate`, `InPredicate`, `InGroupPredicate`, `InGroupSubtreePredicate`, `InTenantSubtreePredicate`
 - **PEP compiler** — `compile_to_access_scope()` converts PDP constraints to SecureORM `AccessScope`
 
+Batch evaluation is designed but not implemented; see [Batch evaluation](#batch-evaluation).
+
 ## Usage
 
 ### Consumer Test Fixtures
@@ -146,6 +148,152 @@ let scope = compile_to_access_scope_with_options(
     CompileOptions::new().allow_empty_scope(true),
 )
 .map_err(EnforcerError::from)?;
+```
+
+## Batch evaluation
+
+> **Designed, not implemented** ([#5522](https://github.com/constructorfabric/gears-rust/issues/5522)). The contract is specified in [Batch Evaluation](../../../../docs/arch/authorization/DESIGN.md#batch-evaluation-access-evaluations-api).
+
+- `AuthZResolverApi::evaluate_batch` sends many evaluations in one call (`POST /authz-resolver/v1/evaluations` over REST). Convert its response with `EvaluationBatchResponse::into_results`.
+- `PolicyEnforcer::access_scopes` / `access_scopes_with` are the batch counterparts of `access_scope_with` for one `SecurityContext`.
+- `AuthZResolverPluginClient::evaluate_batch` has a default implementation that evaluates items one by one with bounded concurrency.
+- **Item limit:** a batch may hold at most **100** items by default (the resolver's `batch.max_items`, see [AuthZ Resolver README — Limits](../README.md#limits)). Larger batches fail as a whole with `400` InvalidArgument; split them before calling.
+
+### Planned API
+
+Request types: each absent key of an item is taken from the request's top-level default.
+
+```rust
+pub struct EvaluationBatchRequest {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject: Option<Subject>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<Action>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resource: Option<Resource>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<EvaluationRequestContext>,
+    pub evaluations: Vec<EvaluationBatchItem>,
+    /// Omitted from the wire when it equals the default (`execute_all`).
+    #[serde(default, skip_serializing_if = "EvaluationBatchOptions::is_default")]
+    pub options: EvaluationBatchOptions,
+}
+
+/// One evaluation; each absent key is taken from the request's default.
+pub struct EvaluationBatchItem {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject: Option<Subject>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<Action>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub resource: Option<Resource>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<EvaluationRequestContext>,
+}
+
+pub struct EvaluationBatchOptions {
+    #[serde(default)]
+    pub evaluations_semantic: EvaluationsSemantic,
+}
+
+#[non_exhaustive]
+#[serde(rename_all = "snake_case")]
+pub enum EvaluationsSemantic {
+    #[default]
+    ExecuteAll,
+    DenyOnFirstDeny,
+    PermitOnFirstPermit,
+}
+
+impl EvaluationBatchRequest {
+    /// Applies the default values and checks the request. Returns one complete
+    /// `EvaluationRequest` per item, in order.
+    pub fn resolve(self, max_items: Option<usize>)
+        -> Result<(Vec<EvaluationRequest>, EvaluationsSemantic), CanonicalError>;
+}
+```
+
+Response types and the fail-closed conversion every consumer uses:
+
+```rust
+pub struct EvaluationBatchResponse {
+    pub evaluations: Vec<EvaluationBatchResult>,
+}
+
+pub struct EvaluationBatchResult {
+    pub decision: bool,
+    #[serde(default)]
+    pub context: EvaluationBatchResultContext,
+}
+
+pub struct EvaluationBatchResultContext {
+    #[serde(default)]
+    pub constraints: Vec<Constraint>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deny_reason: Option<DenyReason>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<EvaluationItemError>,
+}
+
+pub struct EvaluationItemError {
+    pub status: u16,     // 503 or 500
+    pub message: String, // generic text, no diagnostics
+}
+
+impl EvaluationBatchResponse {
+    /// Fail-closed conversion used by every SDK consumer of batch results.
+    /// Returns `expected` entries; `None` marks an item the semantic did not evaluate.
+    pub fn into_results(self, expected: usize, semantic: EvaluationsSemantic)
+        -> Result<Vec<Option<Result<EvaluationResponse, CanonicalError>>>, CanonicalError>;
+}
+```
+
+PEP helper:
+
+```rust
+pub struct AccessCheck<'a> {
+    pub resource: &'a ResourceType,
+    pub action: &'a str,
+    pub resource_id: Option<Uuid>,
+    pub request: AccessRequest,
+}
+
+impl PolicyEnforcer {
+    /// `execute_all`: one result per check.
+    pub async fn access_scopes(
+        &self,
+        ctx: &SecurityContext,
+        checks: &[AccessCheck<'_>],
+    ) -> Result<Vec<Result<AccessScope, EnforcerError>>, EnforcerError>;
+
+    /// Any semantic: one entry per check, `None` for checks the PDP did not evaluate.
+    pub async fn access_scopes_with(
+        &self,
+        ctx: &SecurityContext,
+        checks: &[AccessCheck<'_>],
+        semantic: EvaluationsSemantic,
+    ) -> Result<Vec<Option<Result<AccessScope, EnforcerError>>>, EnforcerError>;
+}
+```
+
+Plugin trait (the default `evaluate_batch` runs `evaluate` per item with bounded, order-preserving concurrency and stops as the semantic requires):
+
+```rust
+#[async_trait]
+pub trait AuthZResolverPluginClient: Send + Sync {
+    async fn evaluate(&self, request: EvaluationRequest)
+        -> Result<EvaluationResponse, AuthZResolverError>;
+
+    /// Results for the evaluated prefix of `requests`, in request order (all of
+    /// them for `ExecuteAll`). The default runs `evaluate` per item with at most
+    /// `max_concurrency` items in flight and stops as the semantic requires.
+    async fn evaluate_batch(
+        &self,
+        requests: Vec<EvaluationRequest>,
+        semantic: EvaluationsSemantic,
+        max_concurrency: NonZeroUsize,
+    ) -> Result<Vec<Result<EvaluationResponse, AuthZResolverError>>, AuthZResolverError>;
+}
 ```
 
 ## Models

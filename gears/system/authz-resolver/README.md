@@ -19,6 +19,8 @@ The gear registers [`AuthZResolverApi`](authz-resolver-sdk/src/api.rs) in Client
 
 - `evaluate(ctx, request)` — Evaluate an authorization request and return a decision with constraints. `ctx` is a `PlatformSecurityContext` plane marker that carries no identity and is ignored by the resolver; the PDP trusts the subject in `request.subject`
 
+Batch evaluation (`evaluate_batch`, `POST /authz-resolver/v1/evaluations`) is designed but not implemented; see [Batch evaluation](#batch-evaluation) below for the resolver's limits and [Batch Evaluation](../../../docs/arch/authorization/DESIGN.md#batch-evaluation-access-evaluations-api) for the contract ([#5522](https://github.com/constructorfabric/gears-rust/issues/5522)).
+
 ### Evaluation Model (AuthZEN-based)
 
 **Request:**
@@ -155,6 +157,48 @@ gears:
       vendor: "constructorfabric"
       priority: 100
 ```
+
+## Batch evaluation
+
+> **Designed, not implemented** ([#5522](https://github.com/constructorfabric/gears-rust/issues/5522)). The contract, default values, evaluation semantics and error outcomes are specified in [Batch Evaluation](../../../docs/arch/authorization/DESIGN.md#batch-evaluation-access-evaluations-api); this section covers how the resolver bounds and executes a batch.
+
+### Limits
+
+The gear configuration gains a `batch` section:
+
+```yaml
+gears:
+  authz-resolver:
+    config:
+      vendor: "constructorfabric"
+      batch:
+        max_items: 100          # 1..=1000
+        max_body_bytes: 1048576 # request body limit of the batch route
+        max_concurrency: 8      # items in flight per batch (fallback execution), 1..=64
+        max_in_flight: 64       # items in flight across all batches in the process
+        deadline: "20s"         # whole-batch deadline, measured from request arrival
+```
+
+| Limit | Default | When exceeded | Rationale |
+|---|---|---|---|
+| `max_items` | 100 | `400` InvalidArgument naming the limit | The REST batch guideline's default; covers a page of rows with several actions each. Counted before default values are applied. |
+| `max_body_bytes` | 1 MiB | `413` | The REST batch guideline's default batch payload. Item `properties` maps are unbounded, so the item count alone does not bound the bytes deserialized. |
+| `max_concurrency` | 8 | Items wait | Bounds load that one batch puts on the plugin and its dependencies (for example Tenant Resolver); matches the PDP fan-out bound used by usage-collector. |
+| `max_in_flight` | 64 | Items wait | Process-wide semaphore shared by all batches, so concurrent batches cannot multiply plugin load without limit. Waiting for a permit counts against the deadline. |
+| `deadline` | 20s | `503` ServiceUnavailable | Covers plugin discovery, permit waits and plugin execution. |
+
+- Keep `deadline` below the api-gateway's `request_timeout` (30s default) and the PEP's evaluation deadline (`PolicyEnforcer::with_deadline`, 30s default), so the resolver answers with a canonical `503` before an outer timeout fires. The resolver cannot read the gateway configuration.
+- `#[toolkit::rest_contract]` routes use the gateway-wide body limit (16 MiB default) and the plain `axum::Json` extractor. Enforcing `max_body_bytes` requires a per-route body limit in `OperationBuilder` and the REST contract macro, which the implementation adds.
+
+### Execution
+
+1. Start the deadline.
+2. Resolve and validate the request (`EvaluationBatchRequest::resolve`, including `max_items`); return an empty response for an empty batch.
+3. Resolve the plugin once, exactly as for single evaluation.
+4. Call `plugin.evaluate_batch(items, semantic, max_concurrency)`; each item evaluation holds a `max_in_flight` permit.
+5. Check the shape of the plugin's results against the semantic; convert per-item plugin errors to item `error` results with `decision: false` and no constraints.
+
+All work runs inside the request future: no tasks are spawned. When the caller disconnects, the deadline expires or a short-circuit semantic stops, outstanding item evaluations are dropped.
 
 ## Usage
 
